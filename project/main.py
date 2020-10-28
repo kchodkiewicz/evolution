@@ -2,7 +2,6 @@ from Population import Population
 
 if __name__ == '__main__':
     population = Population(10, 10)
-    population.create_phenotypes()
 
     population.cross(population.phenotypes[1], population.phenotypes[2])
     x = 1

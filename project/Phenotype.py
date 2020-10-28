@@ -3,13 +3,11 @@ import random
 
 class Phenotype:
 
-    committee = 0
-    genes = [False for x in range(100)]
-    fitness = 0.0
-    isBest = False
-    isClassificationFinished = False
-
     def __init__(self, committee):
+        self.genes = [False for x in range(100)]
+        self.fitness = 0.0
+        self.isBest = False
+        self.isClassificationFinished = False
         self.committee = committee
         self.create_random_genes()
 

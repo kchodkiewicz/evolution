@@ -4,17 +4,13 @@ from Phenotype import Phenotype
 
 
 class Population:
-    size = 0
-    classifierCommittee = 0
-    mutation_ratio = 3
-    phenotypes = []
-    bestInGen = None
 
     def __init__(self, size, committee):
+        self.mutation_ratio = 3
+        self.phenotypes = [Phenotype(self.classifierCommittee) for i in range(self.size)]
+        self.bestInGen = None
         self.size = size
         self.classifierCommittee = committee
-        for _ in range(self.size):
-            self.phenotypes.append(Phenotype(self.classifierCommittee))
 
     def classification_did_finish(self):
         flag = True
