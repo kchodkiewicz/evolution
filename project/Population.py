@@ -5,12 +5,12 @@ from Phenotype import Phenotype
 
 class Population:
 
-    def __init__(self, size, committee):
-        self.mutation_ratio = 3
-        self.phenotypes = [Phenotype(self.classifierCommittee) for i in range(self.size)]
-        self.bestInGen = None
+    def __init__(self, size, committee, gen_length):
         self.size = size
         self.classifierCommittee = committee
+        self.mutation_ratio = 3
+        self.phenotypes = [Phenotype(self.classifierCommittee, gen_length) for i in range(self.size)]
+        self.bestInGen = None
 
     def classification_did_finish(self):
         flag = True
