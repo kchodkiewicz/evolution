@@ -17,7 +17,7 @@ class Population:
     def classification_did_finish(self):
         flag = True
         for i in self.phenotypes:
-            if not i.isClassificationFinished:
+            if not i.is_classification_finished:
                 flag = False
         return flag
 
@@ -43,8 +43,8 @@ class Population:
             child_second[index] = True
         for index in duplicates:
             child_second[index] = True
-        child1st = Phenotype(parent_first.committee, parent_first.genLength)
-        child2nd = Phenotype(parent_second.committee, parent_second.genLength)
+        child1st = Phenotype(parent_first.committee, parent_first.gen_length)
+        child2nd = Phenotype(parent_second.committee, parent_second.gen_length)
         child1st.genes = child_first
         child2nd.genes = child_second
         return child1st, child2nd
