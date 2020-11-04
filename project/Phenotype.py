@@ -4,6 +4,7 @@ import random
 class Phenotype:
 
     def __init__(self, committee, gen_length):
+        # phenotype attributes
         self.__committee = committee
         self.__genLength = gen_length
         self.__fitness = 0.0
@@ -11,6 +12,8 @@ class Phenotype:
         self.__isBest = False
         self.__isClassificationFinished = False
         self.__genes = [False for x in range(self.gen_length)]
+        # classifier attributes
+
         self.create_random_genes()
 
     @property
@@ -76,6 +79,7 @@ class Phenotype:
         for gen in self.genes:
             if gen:
                 # choose classifiers from list and execute
+
                 pass
         self.calc_fitness()
         self.__isClassificationFinished = True
