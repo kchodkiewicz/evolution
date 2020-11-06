@@ -3,6 +3,7 @@ from Population import Population
 if __name__ == '__main__':
     population = Population(10, 2, 10)
 
+    population.test()
     print("PreCross")
     print(population.phenotypes[1].genes)
     print(population.phenotypes[2].genes)

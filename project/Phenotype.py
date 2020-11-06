@@ -1,5 +1,7 @@
 import json
 import random
+import sys
+
 from models import DecisionForest
 
 
@@ -15,7 +17,9 @@ class Phenotype:
         self.__isClassificationFinished = False
         self.__genes = [False for x in range(self.gen_length)]
         # classifier attributes
-        self.__classifiers = json.load()
+        self.__classifiers = {}
+        with open("models/_models_list.json") as f:
+            self.__classifiers = json.load(f)
         self.create_random_genes()
 
     @property
@@ -76,18 +80,32 @@ class Phenotype:
     def calc_fitness(self):
         pass
 
+    # choose classifiers from list and execute
+    # then calculate fitness of all
     def run(self):
         self.__isClassificationFinished = False
         for i, gen in enumerate(self.genes):
             if gen:
-                # choose classifiers from list and execute
-                # getattr() <- useful shit check it out for launching objects from json file
+                # make more versatile
                 if i < 10:
                     s = "0" + str(i)
                 else:
                     s = str(i)
                 digit1st = s[0]
                 digit2nd = s[1]
-                a = DecisionForest.DecisionForest()
+                # END
+                classifier = self.__classifiers[digit1st]["version"][digit2nd]
+                method = getattr(getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"]),
+                                 classifier, lambda: "Invalid classifier")
+                method()
         self.calc_fitness()
         self.__isClassificationFinished = True
+
+    # Just for testing
+    def test(self):
+        digit1st = "0"
+        digit2nd = "0"
+        classifier = self.__classifiers[digit1st]["version"][digit2nd]
+        method = getattr(getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"]),
+                         classifier, lambda: "Invalid classifier")
+        method()

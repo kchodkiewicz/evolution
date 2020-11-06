@@ -1,8 +1,3 @@
-class DecisionForest:
-    id = 1
-
-    def __init__(self):
-        pass
-
-    def move(self):
-        pass
+def func():
+    print("Hello there ")
+    x = 1

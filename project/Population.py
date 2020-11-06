@@ -126,3 +126,6 @@ class Population:
     def run(self):
         for phenotype in self.phenotypes:
             phenotype.run()
+
+    def test(self):
+        self.phenotypes[0].calc_fitness()
