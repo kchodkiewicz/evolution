@@ -30,7 +30,7 @@ class Population:
         child_second = [False for _ in range(len(parent_first.genes))]
         true_genes = []
         duplicates = []
-        for i in range(0, len(parent_first.genes)):
+        for i in range(len(parent_first.genes)):
             if parent_first.genes[i] or parent_second.genes[i]:
                 true_genes.append(i)
             if parent_first.genes[i] and parent_second.genes[i]:
@@ -58,7 +58,7 @@ class Population:
     def mutate(self, phenotype):
         positive_values = []
         negative_values = []
-        for i in range(0, len(phenotype.genes) - 1):
+        for i in range(len(phenotype.genes)):
             if phenotype.genes[i]:
                 positive_values.append(i)
             else:

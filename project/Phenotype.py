@@ -1,4 +1,6 @@
+import json
 import random
+from models import DecisionForest
 
 
 class Phenotype:
@@ -13,7 +15,7 @@ class Phenotype:
         self.__isClassificationFinished = False
         self.__genes = [False for x in range(self.gen_length)]
         # classifier attributes
-
+        self.__classifiers = json.load()
         self.create_random_genes()
 
     @property
@@ -76,10 +78,16 @@ class Phenotype:
 
     def run(self):
         self.__isClassificationFinished = False
-        for gen in self.genes:
+        for i, gen in enumerate(self.genes):
             if gen:
                 # choose classifiers from list and execute
-
-                pass
+                # getattr() <- useful shit check it out for launching objects from json file
+                if i < 10:
+                    s = "0" + str(i)
+                else:
+                    s = str(i)
+                digit1st = s[0]
+                digit2nd = s[1]
+                a = DecisionForest.DecisionForest()
         self.calc_fitness()
         self.__isClassificationFinished = True
