@@ -18,6 +18,10 @@ class Phenotype:
         self.__genes = [False for x in range(self.gen_length)]
         # classifier attributes
         self.__classifiers = {}
+        self.__scores = []
+        self.__times = []
+        self.__predictions = []
+        # prep phase
         with open("models/_models_list.json") as f:
             self.__classifiers = json.load(f)
         self.create_random_genes()
@@ -86,7 +90,7 @@ class Phenotype:
         self.__isClassificationFinished = False
         for i, gen in enumerate(self.genes):
             if gen:
-                # make more versatile
+                # TODO make more versatile
                 if i < 10:
                     s = "0" + str(i)
                 else:
@@ -95,9 +99,12 @@ class Phenotype:
                 digit2nd = s[1]
                 # END
                 classifier = self.__classifiers[digit1st]["version"][digit2nd]
-                method = getattr(getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"]),
-                                 classifier, lambda: "Invalid classifier")
-                method()
+                filename = getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"])
+                method = getattr(filename, classifier, lambda: "Invalid classifier")
+                score, time, result = method()
+                self.__scores.append(score)
+                self.__times.append(time)
+                self.__predictions.append(result)
         self.calc_fitness()
         self.__isClassificationFinished = True
 

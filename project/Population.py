@@ -15,11 +15,12 @@ class Population:
         self.bestInGen = None
 
     def classification_did_finish(self):
-        flag = True
         for i in self.phenotypes:
             if not i.is_classification_finished:
-                flag = False
-        return flag
+                break
+        else:
+            return True
+        return False
 
     # Create list of indexes of true values in both parents
     # choose genes for child1 and remove them from true_genes
@@ -83,11 +84,19 @@ class Population:
                 best = phenotype
         return best
 
+    # Pick random phenotype from a weighted list of phenotypes
+    # Get random number between 0 and 1
+    # Check if phenotype's normalized fitness is greater than random number
+    # If it is then return this phenotype
+    # If not then try for another phenotype (keep the same random number)
     def find_parent(self):
+        sorted_phenotypes = sorted(self.phenotypes,
+                                   key=lambda phenotype: phenotype.normalizedFitness, reverse=True)
+        # self.phenotypes.sort(key=lambda phenotype: phenotype.normalizedFitness, reverse=True)
         index = 0
         rand = random.uniform(0, 1)
         while rand > 0:
-            rand = rand - self.phenotypes[index].normalizedFitness
+            rand = rand - sorted_phenotypes[index].normalizedFitness
             index += 1
 
         return self.phenotypes[index - 1]
@@ -123,9 +132,22 @@ class Population:
 
         new_generation[0] = champ
 
+    # Check whether all phenotypes are getting similar fitness
+    # i.e. max fitness is close to avg fitness
+    # If so then increase mutation ratio to eliminate similarity
+    def validate(self):
+        sum_fitness = 0
+        for phenotype in self.phenotypes:
+            sum_fitness += phenotype.fitness
+        avg_fitness = sum_fitness / len(self.phenotypes)
+        if (self.bestInGen.fitness * 0.9) < avg_fitness:
+            self.mutation_ratio = 7
+        else:
+            self.mutation_ratio = 3
+
     def run(self):
         for phenotype in self.phenotypes:
             phenotype.run()
 
     def test(self):
-        self.phenotypes[0].calc_fitness()
+        self.phenotypes[0].test()

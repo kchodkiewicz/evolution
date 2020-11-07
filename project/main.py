@@ -1,7 +1,7 @@
 from Population import Population
 
 if __name__ == '__main__':
-    population = Population(10, 2, 10)
+    population = Population(size=10, committee=2, gen_length=10)
 
     population.test()
     print("PreCross")
@@ -11,10 +11,10 @@ if __name__ == '__main__':
     print("PostCross")
     print(ch1.genes)
     print(ch2.genes)
-    #if population.classification_did_finish():
-        # natural selection
-       # pass
-    #else:
-        # run classifiers
-        #pass
+
+    if population.classification_did_finish():
+        population.select()
+        population.validate()
+    else:
+        population.run()
 
