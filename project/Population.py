@@ -3,7 +3,7 @@ import random
 from Phenotype import Phenotype
 
 
-class Population:
+class Population(object):
 
     def __init__(self, size, committee, gen_length):
         self.size = size
@@ -147,6 +147,7 @@ class Population:
 
     def run(self):
         for phenotype in self.phenotypes:
+            print("---------------------")
             phenotype.run()
 
     def test(self):

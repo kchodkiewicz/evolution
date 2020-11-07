@@ -2,10 +2,12 @@ import json
 import random
 import sys
 
-from models import DecisionForest
+from models import DecisionForest, DecisionTree, AdaBoost, KNearestNeighbors,\
+    LinearDiscriminantAnalysis, NaiveBayes, PassiveAggressive,\
+    Ridge, StochasticGradient, SupportVectorMachine
 
 
-class Phenotype:
+class Phenotype(object):
 
     def __init__(self, committee, gen_length):
         # phenotype attributes
@@ -81,6 +83,9 @@ class Phenotype:
     def classification_did_finish(self):
         return self.__isClassificationFinished
 
+    # Take results, vote for answer and calc score, then penalize time
+    # OR
+    # Sum all scores and penalize time
     def calc_fitness(self):
         pass
 
@@ -90,7 +95,7 @@ class Phenotype:
         self.__isClassificationFinished = False
         for i, gen in enumerate(self.genes):
             if gen:
-                # TODO make more versatile
+                # TODO make more robust (now works only between 0 - 99)
                 if i < 10:
                     s = "0" + str(i)
                 else:
@@ -98,9 +103,13 @@ class Phenotype:
                 digit1st = s[0]
                 digit2nd = s[1]
                 # END
+                # Get filename, classname and method name from json file and execute
+                # Fuck I think it works 🤪
                 classifier = self.__classifiers[digit1st]["version"][digit2nd]
                 filename = getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"])
-                method = getattr(filename, classifier, lambda: "Invalid classifier")
+                classname = getattr(filename, self.__classifiers[digit1st]["name"])
+                class_object = classname()
+                method = getattr(class_object, classifier, lambda: "Invalid classifier")
                 score, time, result = method()
                 self.__scores.append(score)
                 self.__times.append(time)
@@ -115,4 +124,4 @@ class Phenotype:
         classifier = self.__classifiers[digit1st]["version"][digit2nd]
         method = getattr(getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"]),
                          classifier, lambda: "Invalid classifier")
-        method()
+        a, b, c = method()

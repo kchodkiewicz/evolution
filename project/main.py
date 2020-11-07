@@ -1,9 +1,9 @@
 from Population import Population
 
 if __name__ == '__main__':
-    population = Population(size=10, committee=2, gen_length=10)
+    population = Population(size=10, committee=10, gen_length=100)
 
-    population.test()
+    # population.test()
     print("PreCross")
     print(population.phenotypes[1].genes)
     print(population.phenotypes[2].genes)
