@@ -1,7 +1,6 @@
-import csv
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, accuracy_score, consensus_score, auc, roc_curve
+from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
 
 
 # Handler for file opening, cleaning data, splitting dataset etc.
@@ -14,7 +13,7 @@ class Model(object):
     METRICS_METHOD = "accuracy_score"
 
     def __init__(self, dataset_path, col, metrics):
-        self.dataset = pd.read_csv(dataset_path)
+        self.dataset = pd.read_csv(dataset_path)  # maybe move to main - dunno if creating classifier class will invoke this init
         self.METRICS_METHOD = metrics
         # TODO clean dataset
 
@@ -31,3 +30,11 @@ class Model(object):
         else:
             score = f1_score(self.y_test, predictions)
         return score
+
+    # Not sure if good solution - some classifiers may need separate methods
+    def runClassifier(self, model):
+        model.fit(self.X_train, self.y_train)
+        predictions = model.predict(self.X_test)
+        score = self.calcScore(predictions)
+
+        return score, predictions

@@ -1,10 +1,10 @@
-# returns f1 score / accuracy and time
+import time
 from models.Model import Model
 
 
 class DecisionForest(Model):
 
-    def func(self):
+    def default_decision_forest(self):
         print("DecisionForest")
-        x = self.dataset
-        return 1, 2, [1, 2, 3]
+
+        return 1, 2 ,3, 4

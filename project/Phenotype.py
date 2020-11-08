@@ -23,6 +23,7 @@ class Phenotype(object):
         self.__scores = []
         self.__times = []
         self.__predictions = []
+        self.__trainedModels = []
         # prep phase
         with open("models/_models_list.json") as f:
             self.__classifiers = json.load(f)
@@ -110,10 +111,11 @@ class Phenotype(object):
                 classname = getattr(filename, self.__classifiers[digit1st]["name"])
                 class_object = classname()
                 method = getattr(class_object, classifier, lambda: "Invalid classifier")
-                score, time, result = method()
+                score, time, predictions, model_dump = method()
                 self.__scores.append(score)
                 self.__times.append(time)
-                self.__predictions.append(result)
+                self.__predictions.append(predictions)
+                self.__trainedModels.append(model_dump)
         self.calc_fitness()
         self.__isClassificationFinished = True
 

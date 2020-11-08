@@ -1,22 +1,19 @@
 import time
 from models.Model import Model
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.externals import joblib
 
 
-# returns f1 score / accuracy and time
 class DecisionTree(Model):
 
-    def func(self):
+    def default_decision_tree(self):
         print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier()
-        model.fit(self.X_train, self.y_train)
-        predictions = model.predict(self.X_test)
-
-        score = self.calcScore(predictions)
+        score, predictions = self.runClassifier(model)
+        model_dump = f'{time.process_time()}-default-decision-tree.joblib'
+        # joblib.dump(model, model_dump)  # something is no yes
 
         elapsed_time = time.process_time() - start_time
-        # TODO save results in db or some shit
-
-        return score, elapsed_time, [1, 2, 3]
+        return score, elapsed_time, predictions, model_dump
