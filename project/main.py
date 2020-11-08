@@ -1,6 +1,10 @@
 from Population import Population
+from models import Model
 
 if __name__ == '__main__':
+
+    dataset = "dataset.csv"
+    model = Model.Model(dataset)
     population = Population(size=10, committee=10, gen_length=100)
 
     # population.test()

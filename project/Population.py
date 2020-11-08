@@ -10,7 +10,7 @@ class Population(object):
         self.classifierCommittee = committee
         self.genLength = gen_length
         self.genNo = 0
-        self.mutation_ratio = 3
+        self.mutation_ratio = 0.3  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(self.classifierCommittee, gen_length) for i in range(self.size)]
         self.bestInGen = None
 
@@ -64,8 +64,8 @@ class Population(object):
                 positive_values.append(i)
             else:
                 negative_values.append(i)
-        mutate_ratio = random.randint(0, self.mutation_ratio)
-        for _ in range(mutate_ratio):
+        mutate_ratio = random.uniform(0, self.mutation_ratio)
+        for _ in range(mutate_ratio * self.classifierCommittee):
             positive_index = random.randint(0, len(positive_values) - 1)
             negative_index = random.randint(0, len(negative_values) - 1)
             negative_values.append(positive_values[positive_index])
@@ -141,9 +141,9 @@ class Population(object):
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
-            self.mutation_ratio = 7
+            self.mutation_ratio = 0.7
         else:
-            self.mutation_ratio = 3
+            self.mutation_ratio = 0.3
 
     def run(self):
         for phenotype in self.phenotypes:
