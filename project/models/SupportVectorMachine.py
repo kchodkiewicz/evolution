@@ -10,15 +10,10 @@ class SupportVectorMachine(Model):
         start_time = time.process_time()
 
         model = SVC()
-        model.fit(self.X_train, self.y_train)
+        score, predictions = self.runClassifier(model)
         model_dump = f'{time.process_time()}-default-svm.joblib'
 
-        predictions = model.predict(self.X_test)
-
-        score = self.calcScore(predictions)
-
         elapsed_time = time.process_time() - start_time
-        # TODO save results in db or some shit
 
         return score, elapsed_time, predictions, model_dump
 
@@ -28,10 +23,9 @@ class SupportVectorMachine(Model):
 
         model = LinearSVC()
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-default-svm.joblib'
+        model_dump = f'{time.process_time()}-linear-svm.joblib'
 
         elapsed_time = time.process_time() - start_time
-        # TODO save results in db or some shit
 
         return score, elapsed_time, predictions, model_dump
 
