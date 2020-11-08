@@ -13,6 +13,7 @@ class Population(object):
         self.mutation_ratio = 0.3  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(self.classifierCommittee, gen_length) for i in range(self.size)]
         self.bestInGen = None
+        # self.genFitness = []
 
     def classification_did_finish(self):
         for i in self.phenotypes:
@@ -82,6 +83,7 @@ class Population(object):
         for phenotype in self.phenotypes:
             if phenotype.fitness > best.fitness:
                 best = phenotype
+        self.bestInGen = best
         return best
 
     # Pick random phenotype from a weighted list of phenotypes

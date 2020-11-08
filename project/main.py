@@ -1,24 +1,34 @@
 from Population import Population
-from models import Model
+from models.Model import Model
+
+
+def fitness_is_progressing():
+    score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
+    score_avg = score_sum / 20
+    if score_avg == sorted(fitness_scores, reverse=True)[0]:
+        return False
+    return True
+
 
 if __name__ == '__main__':
-
+    # Values passed by user
     dataset = "dataset.csv"
-    model = Model.Model(dataset)
+    col_name = "column"
+    metrics = "f1_score"  # accuracy_score, auc, f1_score. Default f1
+
+    model = Model(dataset, col_name, metrics)
+    # TODO add loadPopulation method
     population = Population(size=10, committee=10, gen_length=100)
 
-    # population.test()
-    print("PreCross")
-    print(population.phenotypes[1].genes)
-    print(population.phenotypes[2].genes)
-    ch1, ch2 = population.cross(population.phenotypes[1], population.phenotypes[2])
-    print("PostCross")
-    print(ch1.genes)
-    print(ch2.genes)
+    fitness_scores = []
 
-    if population.classification_did_finish():
-        population.select()
-        population.validate()
-    else:
-        population.run()
-
+    while True:
+        if fitness_is_progressing():
+            if population.classification_did_finish():
+                population.select()
+                population.validate()
+            else:
+                population.run()
+                fitness_scores.append(population.bestInGen.fitness)
+        else:
+            break

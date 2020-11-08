@@ -1,8 +1,8 @@
 # returns f1 score / accuracy and time
-from models import Model
+from models.Model import Model
 
 
-class DecisionForest(Model.Model):
+class DecisionForest(Model):
 
     def func(self):
         print("DecisionForest")
