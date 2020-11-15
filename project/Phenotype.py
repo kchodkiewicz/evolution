@@ -2,7 +2,7 @@ import json
 import random
 import sys
 
-from models import DecisionForest, DecisionTree, AdaBoost, KNearestNeighbors,\
+from models import DecisionForest, DecisionTree, GaussianProcess, KNeighbors,\
     LinearDiscriminantAnalysis, NaiveBayes, PassiveAggressive,\
     Ridge, StochasticGradient, SupportVectorMachine
 

@@ -1,116 +1,117 @@
 import time
 from models.Model import Model
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
 
 
-class NaiveBayes(Model):
+class KNeighbors(Model):
 
-    def gaussian_nb(self):
-        print("NaiveBayes")
+    def k_neighbors(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = GaussianNB()
+        model = KNeighborsClassifier()
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def gaussian_nb_smoothing1(self):
-        print("NaiveBayes")
+    def k_neighbors_neighbors2(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = GaussianNB(var_smoothing=1)
+        model = KNeighborsClassifier(n_neighbors=2)
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def gaussian_nb_smoothing0(self):
-        print("NaiveBayes")
+    def k_neighbors_neighbors10(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = GaussianNB(var_smoothing=0)
+        model = KNeighborsClassifier(n_neighbors=10)
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def gaussian_nb_smoothingMax(self):
-        print("NaiveBayes")
+    def k_neighbors_weightsDistance(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = GaussianNB(var_smoothing=1e9)
+        model = KNeighborsClassifier(weights='distance')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb(self):
-        print("NaiveBayes")
+    def k_neighbors_algoBallTree(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB()
+        model = KNeighborsClassifier(algorithm='ball_tree')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb_alpha0(self):
-        print("NaiveBayes")
+    def k_neighbors_algoKDTree(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB(alpha=0)
+        model = KNeighborsClassifier(algorithm='kd_tree')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb_alpha10(self):
-        print("NaiveBayes")
+    def k_neighbors_algoBrute(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB(alpha=10)
+        model = KNeighborsClassifier(algorithm='brute')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb_fitpriorFalse(self):
-        print("NaiveBayes")
+    def k_neighbors_algoBallTree_weightsDistance(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB(fit_prior=False)
+        model = KNeighborsClassifier(algorithm='ball_tree', weights='distance')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb_alpha0_fitpriorFalse(self):
-        print("NaiveBayes")
+    def k_neighbors_algoKDTree_weightsDistance(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB(alpha=0, fit_prior=False)
+        model = KNeighborsClassifier(algorithm='kd_tree', weights='distance')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
 
-    def multinomial_nb_alpha10_fitpriorFalse(self):
-        print("NaiveBayes")
+    def k_neighbors_algoBrute_weightsDistance(self):
+        print("KNeighbors")
         start_time = time.process_time()
 
-        model = MultinomialNB(alpha=10, fit_prior=False)
+        model = KNeighborsClassifier(algorithm='brute', weights='distance')
         score, predictions = self.runClassifier(model)
-        model_dump = f'{time.process_time()}-naive-bayes.joblib'
+        model_dump = f'{time.process_time()}-k-neighbors.joblib'
 
         elapsed_time = time.process_time() - start_time
         return score, elapsed_time, predictions, model_dump
+
