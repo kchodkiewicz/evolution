@@ -13,7 +13,8 @@ class Model(object):
     METRICS_METHOD = "accuracy_score"
 
     def __init__(self, dataset_path, col, metrics):
-        self.dataset = pd.read_csv(dataset_path)  # maybe move to main - dunno if creating classifier class will invoke this init
+        self.dataset = pd.read_csv(dataset_path)  # TODO maybe move to main - dunno if creating classifier class will
+                                                  # invoke this init
         self.METRICS_METHOD = metrics
         # TODO clean dataset
 

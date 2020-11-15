@@ -16,19 +16,19 @@ if __name__ == '__main__':
     col_name = "column"
     metrics = "f1_score"  # accuracy_score, auc, f1_score. Default f1
 
+    print("Hello")
+
     model = Model(dataset, col_name, metrics)
     # TODO add loadPopulation method
     population = Population(size=10, committee=10, gen_length=100)
 
     fitness_scores = []
 
-    while True:
-        if fitness_is_progressing():
-            if population.classification_did_finish():
-                population.select()
-                population.validate()
-            else:
-                population.run()
-                fitness_scores.append(population.bestInGen.fitness)
+    while fitness_is_progressing():
+        if population.classification_did_finish():
+            population.select()
+            population.validate()
         else:
-            break
+            population.run()
+            fitness_scores.append(population.bestInGen.fitness)
+

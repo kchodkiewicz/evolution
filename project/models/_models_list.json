@@ -15,7 +15,7 @@
             },
         "1": {"name": "DecisionTree",
             "version": {
-                "0": "func",
+                "0": "default_decision_tree",
                 "1": "func",
                 "2": "func",
                 "3": "func",
@@ -43,14 +43,14 @@
             },
         "3": {"name": "SupportVectorMachine",
             "version": {
-                "0": "func",
-                "1": "func",
-                "2": "func",
-                "3": "func",
-                "4": "func",
-                "5": "func",
-                "6": "func",
-                "7": "func",
+                "0": "default_svm",
+                "1": "linear_svm",
+                "2": "kernel_rbf_svm",
+                "3": "kernel_rbf_svm_cMIN_gMIN",
+                "4": "kernel_rbf_svm_cMIN_gMIN",
+                "5": "kernel_polynomial_svm",
+                "6": "kernel_polynomial_svm_d1",
+                "7": "kernel_sigmoid_svm",
                 "8": "func",
                 "9": "func"
                 }
