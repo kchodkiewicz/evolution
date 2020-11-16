@@ -100,7 +100,7 @@ class Phenotype(object):
                 if i < 10:
                     s = "0" + str(i)
                 else:
-                    s = str(i)
+                    s = str(i + 10)
                 digit1st = s[0]
                 digit2nd = s[1]
                 # END

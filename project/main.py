@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     model = Model(dataset, col_name, metrics)
     # TODO add loadPopulation method
-    population = Population(size=10, committee=10, gen_length=100)
+    population = Population(size=1000, committee=10, gen_length=60)
 
     fitness_scores = []
 
