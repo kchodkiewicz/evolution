@@ -113,6 +113,7 @@ class Population(object):
             total_fitness += phenotype.fitness
 
         champ = self.find_best_in_gen()
+        self.bestInGen = champ
 
         for phenotype in self.phenotypes:
             phenotype.normalizedFitness = phenotype.fitness / total_fitness

@@ -13,13 +13,13 @@ class Model(object):
     METRICS_METHOD = "f1_score"
 
     def calcScore(self, predictions):
-        if self.METRICS_METHOD == "auc":
-            fpr, tpr, thresholds = roc_curve(self.y_test, predictions, pos_label=2)
+        if Model.METRICS_METHOD == "auc":
+            fpr, tpr, thresholds = roc_curve(Model.y_test, predictions, pos_label=2)
             score = auc(fpr, tpr)
-        elif self.METRICS_METHOD == "accuracy_score":
-            score = accuracy_score(self.y_test, predictions, average='micro')
+        elif Model.METRICS_METHOD == "accuracy_score":
+            score = accuracy_score(Model.y_test, predictions, average='micro')
         else:
-            score = f1_score(self.y_test, predictions, average='micro')
+            score = f1_score(Model.y_test, predictions, average='micro')
         return score
 
     # Not sure if good solution - some classifiers may need separate methods
