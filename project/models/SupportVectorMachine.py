@@ -117,7 +117,7 @@ class SupportVectorMachine(Model):
         print("SupportVectorMachine")
         start_time = time.process_time()
 
-        model = SVC(kernel='precomputed')
+        model = SVC(kernel='linear')
         score, predictions = self.runClassifier(model)
         model_dump = f'{time.process_time()}-default-svm.joblib'
 

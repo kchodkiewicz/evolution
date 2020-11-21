@@ -10,26 +10,16 @@ class Model(object):
     X_test = []
     y_train = []
     y_test = []
-    METRICS_METHOD = "accuracy_score"
-
-    def __init__(self, dataset_path, col, metrics):
-        self.dataset = pd.read_csv(dataset_path)  # TODO maybe move to main - dunno if creating classifier class will
-                                                  # invoke this init
-        self.METRICS_METHOD = metrics
-        # TODO clean dataset
-
-        X = self.dataset.drop(columns=col)
-        y = self.dataset[col]
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2)
+    METRICS_METHOD = "f1_score"
 
     def calcScore(self, predictions):
         if self.METRICS_METHOD == "auc":
             fpr, tpr, thresholds = roc_curve(self.y_test, predictions, pos_label=2)
             score = auc(fpr, tpr)
         elif self.METRICS_METHOD == "accuracy_score":
-            score = accuracy_score(self.y_test, predictions)
+            score = accuracy_score(self.y_test, predictions, average='micro')
         else:
-            score = f1_score(self.y_test, predictions)
+            score = f1_score(self.y_test, predictions, average='micro')
         return score
 
     # Not sure if good solution - some classifiers may need separate methods

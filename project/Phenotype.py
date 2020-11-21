@@ -1,10 +1,13 @@
 import json
 import random
 import sys
+import numpy
+import operator
 
 from models import DecisionForest, DecisionTree, GaussianProcess, KNeighbors,\
     LinearDiscriminantAnalysis, NaiveBayes, PassiveAggressive,\
     Ridge, StochasticGradient, SupportVectorMachine
+from models.Model import Model
 
 
 class Phenotype(object):
@@ -88,7 +91,20 @@ class Phenotype(object):
     # OR
     # Sum all scores and penalize time
     def calc_fitness(self):
-        pass
+        committee_answers = []
+        tmp = {}
+        for i in range(len(self.__predictions[0])):
+            for predicts in self.__predictions:
+                if predicts[i] in tmp.keys():
+                    tmp[predicts[i]] += 1
+                else:
+                    tmp[predicts[i]] = 1
+            inverse = [(value, key) for key, value in tmp.items()]
+            val = max(inverse)[1]
+            committee_answers.append(val)
+        print(committee_answers)
+        self.__fitness = Model.calcScore(Model.y_test, committee_answers)
+        print(self.__fitness)
 
     # choose classifiers from list and execute
     # then calculate fitness of all
@@ -97,21 +113,23 @@ class Phenotype(object):
         for i, gen in enumerate(self.genes):
             if gen:
                 # TODO make more robust (now works only between 0 - 99)
-                if i < 10:
-                    s = "0" + str(i)
-                else:
-                    s = str(i + 10)
+                #if i < 10:
+                    #s = "0" + str(i)
+                #else:
+                    #s = str(i)
+                s = str(i + 10)
                 digit1st = s[0]
                 digit2nd = s[1]
                 # END
+
                 # Get filename, classname and method name from json file and execute
-                # Fuck I think it works 🤪
                 classifier = self.__classifiers[digit1st]["version"][digit2nd]
                 filename = getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"])
                 classname = getattr(filename, self.__classifiers[digit1st]["name"])
                 class_object = classname()
                 method = getattr(class_object, classifier, lambda: "Invalid classifier")
                 score, time, predictions, model_dump = method()
+
                 self.__scores.append(score)
                 self.__times.append(time)
                 self.__predictions.append(predictions)
