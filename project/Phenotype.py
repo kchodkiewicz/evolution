@@ -18,7 +18,6 @@ class Phenotype(object):
         self.__genLength = gen_length
         self.__fitness = 0.0
         self.__normalizedFitness = 0.0
-        self.__isBest = False
         self.__isClassificationFinished = False
         self.__genes = [False for x in range(self.gen_length)]
         # classifier attributes
@@ -39,10 +38,6 @@ class Phenotype(object):
     @property
     def gen_length(self):
         return self.__genLength
-
-    @property
-    def is_best(self):
-        return self.__isBest
 
     @property
     def is_classification_finished(self):
@@ -75,6 +70,14 @@ class Phenotype(object):
         if 0.0 <= value <= 1.0:
             self.__normalizedFitness = value
 
+    def copy(self, donor):
+        self.__committee = donor.committee
+        self.__genLength = donor.gen_length
+        self.__fitness = donor.fitness
+        self.__normalizedFitness = donor.normalizedFitness
+        self.__isClassificationFinished = donor.is_classification_finished
+        self.__genes = donor.genes
+
     # generate 10 positive genes (classifiers)
     def create_random_genes(self):
         it = 0
@@ -88,8 +91,6 @@ class Phenotype(object):
         return self.__isClassificationFinished
 
     # Take results, vote for answer and calc score, then penalize time
-    # OR
-    # Sum all scores and penalize time
     def calc_fitness(self):
         committee_answers = []
         tmp = {}
@@ -102,12 +103,15 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = pow(Model.calcScore(Model.y_test, committee_answers), 2) / sum(self.__times)
-        print(self.__fitness)
+        self.__fitness = Model.calcScore(Model(), predictions=committee_answers)
 
     # choose classifiers from list and execute
     # then calculate fitness of all
     def run(self):
+        self.__scores.clear()
+        self.__times.clear()
+        self.__predictions.clear()
+        self.__trainedModels.clear()
         self.__isClassificationFinished = False
         for i, gen in enumerate(self.genes):
             if gen:
@@ -135,6 +139,7 @@ class Phenotype(object):
                 self.__trainedModels.append(model_dump)
         self.calc_fitness()
         self.__isClassificationFinished = True
+        return self.__fitness
 
     # Just for testing
     def test(self):

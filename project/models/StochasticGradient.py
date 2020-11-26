@@ -6,7 +6,6 @@ from sklearn.linear_model import SGDClassifier
 class StochasticGradient(Model):
 
     def stochastic_gradient(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier()
@@ -17,7 +16,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossLog(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='log')
@@ -28,7 +26,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossModifiedHumber(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='modified_huber')
@@ -39,7 +36,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossSquaredHinge(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='squared_hinge')
@@ -50,7 +46,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossPerception(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='perceptron')
@@ -61,7 +56,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_penaltyElasticNet(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(penalty='elasticnet')
@@ -72,7 +66,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossLog_penaltyElasticNet(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='log', penalty='elasticnet')
@@ -83,7 +76,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossModifiedHumber_penaltyElasticNet(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='modified_huber', penalty='elasticnet')
@@ -94,7 +86,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossSquaredHinge_penaltyElasticNet(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='squared_hinge', penalty='elasticnet')
@@ -105,7 +96,6 @@ class StochasticGradient(Model):
         return score, elapsed_time, predictions, model_dump
 
     def stochastic_gradient_lossPerception_penaltyElasticNet(self):
-        print("StochasticGradient")
         start_time = time.process_time()
 
         model = SGDClassifier(loss='perceptron', penalty='elasticnet')

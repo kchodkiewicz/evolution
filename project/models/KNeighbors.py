@@ -6,7 +6,6 @@ from sklearn.neighbors import KNeighborsClassifier
 class KNeighbors(Model):
 
     def k_neighbors(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier()
@@ -17,7 +16,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_neighbors2(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(n_neighbors=2)
@@ -28,7 +26,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_neighbors10(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(n_neighbors=10)
@@ -39,7 +36,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_weightsDistance(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(weights='distance')
@@ -50,7 +46,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoBallTree(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='ball_tree')
@@ -61,7 +56,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoKDTree(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='kd_tree')
@@ -72,7 +66,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoBrute(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='brute')
@@ -83,7 +76,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoBallTree_weightsDistance(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='ball_tree', weights='distance')
@@ -94,7 +86,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoKDTree_weightsDistance(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='kd_tree', weights='distance')
@@ -105,7 +96,6 @@ class KNeighbors(Model):
         return score, elapsed_time, predictions, model_dump
 
     def k_neighbors_algoBrute_weightsDistance(self):
-        print("KNeighbors")
         start_time = time.process_time()
 
         model = KNeighborsClassifier(algorithm='brute', weights='distance')

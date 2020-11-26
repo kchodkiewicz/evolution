@@ -6,7 +6,6 @@ from sklearn.tree import DecisionTreeClassifier
 class DecisionTree(Model):
 
     def decision_tree(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier()
@@ -17,7 +16,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_criterionEntropy(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(criterion='entropy')
@@ -28,7 +26,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_splitterRandom(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(splitter='random')
@@ -39,7 +36,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_splitterRandom_criterionEntropy(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(splitter='random', criterion='entropy')
@@ -50,7 +46,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_maxfeaturesSqrt(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(max_features='sqrt')
@@ -61,7 +56,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_maxfeaturesLog2(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(max_features='log2')
@@ -72,7 +66,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_criterionEntropy_maxfeaturesLog2(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(criterion='entropy', max_features='log2')
@@ -83,7 +76,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_splitterRandom_maxfeaturesLog2(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(splitter='random', max_features='log2')
@@ -94,7 +86,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_criterionEntropy_maxfeaturesSqrt(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(criterion='entropy', max_features='sqrt')
@@ -105,7 +96,6 @@ class DecisionTree(Model):
         return score, elapsed_time, predictions, model_dump
 
     def decision_tree_splitterRandom_maxfeaturesSqrt(self):
-        print("DecisionTree")
         start_time = time.process_time()
 
         model = DecisionTreeClassifier(splitter='random', max_features='sqrt')

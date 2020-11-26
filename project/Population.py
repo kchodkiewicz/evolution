@@ -11,9 +11,9 @@ class Population(object):
         self.genLength = gen_length
         self.genNo = 0
         self.mutation_ratio = 0.3  # max amount of changed genes in phenotype
-        self.phenotypes = [Phenotype(self.classifierCommittee, gen_length) for i in range(self.size)]
+        self.phenotypes = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
-        # self.genFitness = []
+        self.genFitness = []
 
     def classification_did_finish(self):
         for i in self.phenotypes:
@@ -27,29 +27,55 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    def cross(self, parent_first, parent_second):
+    def cross(self, parent_first, parent_second): # TODO fucked up shit
+        child1st = Phenotype(self.classifierCommittee, self.genLength)
+        child2nd = Phenotype(self.classifierCommittee, self.genLength)
+
+        genes1st = []
+        genes2nd = []
+
+        for i, gen in enumerate(parent_first):
+            if gen:
+                genes1st.append(i)
+        for i, gen in enumerate(parent_second):
+            if gen:
+                genes2nd.append(i)
+
+        for gen in child1st.genes:
+
+
+        return child1st, child2nd
+
+        """
         child_first = [False for _ in range(len(parent_first.genes))]
         child_second = [False for _ in range(len(parent_first.genes))]
         true_genes = []
         duplicates = []
+
         for i in range(len(parent_first.genes)):
             if parent_first.genes[i] or parent_second.genes[i]:
                 true_genes.append(i)
             if parent_first.genes[i] and parent_second.genes[i]:
                 duplicates.append(i)
+        print("true", true_genes, "len:", len(true_genes))
+        print("dups", duplicates, "len:", len(duplicates))
         for _ in range(self.classifierCommittee):
-            index = random.randint(0, len(true_genes) - 1)
-            child_first[true_genes[index]] = True
-            true_genes.pop(index)
+            #  index = random.randrange(len(true_genes))
+            if len(true_genes) > 0:
+                random.shuffle(true_genes)
+                index = true_genes.pop()
+                child_first[index] = True
+            #  true_genes.pop(index)
         for index in true_genes:
             child_second[index] = True
         for index in duplicates:
             child_second[index] = True
-        child1st = Phenotype(parent_first.committee, parent_first.gen_length)
-        child2nd = Phenotype(parent_second.committee, parent_second.gen_length)
+        child1st = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
+        child2nd = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
         child1st.genes = child_first
         child2nd.genes = child_second
         return child1st, child2nd
+        """
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -66,7 +92,7 @@ class Population(object):
             else:
                 negative_values.append(i)
         mutate_ratio = random.uniform(0, self.mutation_ratio)
-        for _ in range(mutate_ratio * self.classifierCommittee):
+        for _ in range(int(mutate_ratio * self.classifierCommittee)):
             positive_index = random.randint(0, len(positive_values) - 1)
             negative_index = random.randint(0, len(negative_values) - 1)
             negative_values.append(positive_values[positive_index])
@@ -79,7 +105,7 @@ class Population(object):
             phenotype.genes[index] = False
 
     def find_best_in_gen(self):
-        best = Phenotype(self.classifierCommittee, self.genLength)
+        best = self.phenotypes[0]
         for phenotype in self.phenotypes:
             if phenotype.fitness > best.fitness:
                 best = phenotype
@@ -94,7 +120,6 @@ class Population(object):
     def find_parent(self):
         sorted_phenotypes = sorted(self.phenotypes,
                                    key=lambda phenotype: phenotype.normalizedFitness, reverse=True)
-        # self.phenotypes.sort(key=lambda phenotype: phenotype.normalizedFitness, reverse=True)
         index = 0
         rand = random.uniform(0, 1)
         while rand > 0:
@@ -113,27 +138,38 @@ class Population(object):
             total_fitness += phenotype.fitness
 
         champ = self.find_best_in_gen()
-        self.bestInGen = champ
 
         for phenotype in self.phenotypes:
             phenotype.normalizedFitness = phenotype.fitness / total_fitness
 
-        new_generation = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
+        new_generation = []
 
         # TODO multi-threading
-        i = 0
-        while (i + 1) < len(self.phenotypes):
+        while len(new_generation) < len(self.phenotypes):
             first_parent = self.find_parent()
             second_parent = self.find_parent()
 
+            i = 0
+            j = 0
+            for it in first_parent.genes:
+                if it:
+                    i += 1
+            for jt in first_parent.genes:
+                if jt:
+                    j += 1
+            print("first", i)
+            print("second", j)
+
             child1st, child2nd = self.cross(first_parent, second_parent)
-            new_generation[i] = child1st
-            new_generation[i + 1] = child2nd
-            i += 2
+
+            new_generation.append(child1st)
+            new_generation.append(child2nd)
         for phenotype in self.phenotypes:
             self.mutate(phenotype)
-
-        new_generation[0] = champ
+        new_generation.pop(0)
+        new_generation.append(champ)
+        self.phenotypes = new_generation
+        print("Best in gen fitness:", self.bestInGen.fitness)
 
     # Check whether all phenotypes are getting similar fitness
     # i.e. max fitness is close to avg fitness
@@ -149,9 +185,12 @@ class Population(object):
             self.mutation_ratio = 0.3
 
     def run(self):
+        print("Gen No", self.genNo)
         for phenotype in self.phenotypes:
-            print("---------------------")
-            phenotype.run()
+            fit = phenotype.run()
+            self.genFitness.append(fit)
+        self.genNo += 1
+        print("Gen fitness", self.genFitness)
 
     def test(self):
         self.phenotypes[0].test()
