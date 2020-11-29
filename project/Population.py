@@ -1,3 +1,4 @@
+import copy
 import random
 
 from Phenotype import Phenotype
@@ -30,23 +31,20 @@ class Population(object):
     def cross(self, parent_first, parent_second): # TODO fucked up shit
         child1st = Phenotype(self.classifierCommittee, self.genLength)
         child2nd = Phenotype(self.classifierCommittee, self.genLength)
+        genes1 = []
+        genes2 = []
+        genes1.append(parent_first.genes[0:20].copy())
+        genes1.append(parent_second.genes[21:40].copy())
+        genes1.append(parent_first.genes[41:].copy())
+        genes2.append(parent_second.genes[0:20].copy())
+        genes2.append(parent_first.genes[21:40].copy())
+        genes2.append(parent_second.genes[41:].copy())
 
-        genes1st = []
-        genes2nd = []
-
-        for i, gen in enumerate(parent_first):
-            if gen:
-                genes1st.append(i)
-        for i, gen in enumerate(parent_second):
-            if gen:
-                genes2nd.append(i)
-
-        for gen in child1st.genes:
-
+        child1st.genes = genes1
+        child2nd.genes = genes2
 
         return child1st, child2nd
-
-        """
+    """
         child_first = [False for _ in range(len(parent_first.genes))]
         child_second = [False for _ in range(len(parent_first.genes))]
         true_genes = []
@@ -55,16 +53,17 @@ class Population(object):
         for i in range(len(parent_first.genes)):
             if parent_first.genes[i] or parent_second.genes[i]:
                 true_genes.append(i)
+        for i in range(len(parent_first.genes)):
             if parent_first.genes[i] and parent_second.genes[i]:
                 duplicates.append(i)
         print("true", true_genes, "len:", len(true_genes))
         print("dups", duplicates, "len:", len(duplicates))
         for _ in range(self.classifierCommittee):
             #  index = random.randrange(len(true_genes))
-            if len(true_genes) > 0:
-                random.shuffle(true_genes)
-                index = true_genes.pop()
-                child_first[index] = True
+            #if len(true_genes) > 0:
+            random.shuffle(true_genes)
+            index = true_genes.pop()
+            child_first[index] = True
             #  true_genes.pop(index)
         for index in true_genes:
             child_second[index] = True
@@ -72,10 +71,10 @@ class Population(object):
             child_second[index] = True
         child1st = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
         child2nd = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
-        child1st.genes = child_first
-        child2nd.genes = child_second
+        child1st.genes = child_first.copy()
+        child2nd.genes = child_second.copy()
         return child1st, child2nd
-        """
+    """
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -108,7 +107,7 @@ class Population(object):
         best = self.phenotypes[0]
         for phenotype in self.phenotypes:
             if phenotype.fitness > best.fitness:
-                best = phenotype
+                best = copy.deepcopy(phenotype)
         self.bestInGen = best
         return best
 
@@ -146,8 +145,8 @@ class Population(object):
 
         # TODO multi-threading
         while len(new_generation) < len(self.phenotypes):
-            first_parent = self.find_parent()
-            second_parent = self.find_parent()
+            first_parent = copy.deepcopy(self.find_parent())
+            second_parent = copy.deepcopy(self.find_parent())
 
             i = 0
             j = 0
@@ -162,13 +161,13 @@ class Population(object):
 
             child1st, child2nd = self.cross(first_parent, second_parent)
 
-            new_generation.append(child1st)
-            new_generation.append(child2nd)
+            new_generation.append(copy.deepcopy(child1st))
+            new_generation.append(copy.deepcopy(child2nd))
         for phenotype in self.phenotypes:
             self.mutate(phenotype)
         new_generation.pop(0)
-        new_generation.append(champ)
-        self.phenotypes = new_generation
+        new_generation.append(copy.deepcopy(champ))
+        self.phenotypes = new_generation.copy()
         print("Best in gen fitness:", self.bestInGen.fitness)
 
     # Check whether all phenotypes are getting similar fitness
