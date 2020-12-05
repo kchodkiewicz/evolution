@@ -1,7 +1,18 @@
 import copy
+import json
 import random
 
+from matplotlib.pyplot import plot
+
 from Phenotype import Phenotype
+
+
+def conv_genes(genes_bool):
+    arr = []
+    for i, gen in enumerate(genes_bool):
+        if gen:
+            arr.append(i)
+    return arr
 
 
 class Population(object):
@@ -15,6 +26,7 @@ class Population(object):
         self.phenotypes = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
         self.genFitness = []
+        self.output = {}
 
     def classification_did_finish(self):
         for i in self.phenotypes:
@@ -28,7 +40,7 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    def cross(self, parent_first, parent_second): # TODO fucked up shit
+    def cross(self, parent_first, parent_second):  # TODO fucked up shit
         child1st = Phenotype(self.classifierCommittee, self.genLength)
         child2nd = Phenotype(self.classifierCommittee, self.genLength)
         genes1 = []
@@ -167,8 +179,11 @@ class Population(object):
             self.mutate(phenotype)
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(champ))
-        self.phenotypes = new_generation.copy()
+        self.phenotypes = copy.deepcopy(new_generation)
         print("Best in gen fitness:", self.bestInGen.fitness)
+        self.output[self.genNo] = conv_genes(self.bestInGen.genes)
+        if self.genNo % 4 == 0:
+            print(json.dumps(self.output, indent=4))
 
     # Check whether all phenotypes are getting similar fitness
     # i.e. max fitness is close to avg fitness
@@ -189,7 +204,6 @@ class Population(object):
             fit = phenotype.run()
             self.genFitness.append(fit)
         self.genNo += 1
-        print("Gen fitness", self.genFitness)
 
     def test(self):
         self.phenotypes[0].test()

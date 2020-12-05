@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # Values passed by user
     dataset = "iris.csv"
     col = "Species"
-    metrics = "f1_score"  # accuracy_score, auc, f1_score. Default f1
+    metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
 
     Model.dataset = pd.read_csv(dataset)
     Model.METRICS_METHOD = metrics
