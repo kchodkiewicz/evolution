@@ -8,6 +8,7 @@ from models import DecisionForest, DecisionTree, GaussianProcess, KNeighbors,\
     LinearDiscriminantAnalysis, NaiveBayes, PassiveAggressive,\
     Ridge, StochasticGradient, SupportVectorMachine
 from models.Model import Model
+from models.instances import Instances
 
 
 class Phenotype(object):
@@ -108,6 +109,8 @@ class Phenotype(object):
     # choose classifiers from list and execute
     # then calculate fitness of all
     def run(self):
+        model = Model()
+        inst = Instances()
         self.__scores.clear()
         self.__times.clear()
         self.__predictions.clear()
@@ -115,6 +118,7 @@ class Phenotype(object):
         self.__isClassificationFinished = False
         for i, gen in enumerate(self.genes):
             if gen:
+                """
                 # TODO make more robust (now works only between 0 - 99)
                 #if i < 10:
                     #s = "0" + str(i)
@@ -132,20 +136,19 @@ class Phenotype(object):
                 class_object = classname()
                 method = getattr(class_object, classifier, lambda: "Invalid classifier")
                 score, time, predictions, model_dump = method()
+                """
+
+                # Different approach
+                score, predictions = model.runClassifier(inst.trained_classifiers[i])
 
                 self.__scores.append(score)
-                self.__times.append(time)
+                #  self.__times.append(time)
                 self.__predictions.append(predictions)
-                self.__trainedModels.append(model_dump)
+
         self.calc_fitness()
         self.__isClassificationFinished = True
         return self.__fitness
 
     # Just for testing
     def test(self):
-        digit1st = "0"
-        digit2nd = "0"
-        classifier = self.__classifiers[digit1st]["version"][digit2nd]
-        method = getattr(getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"]),
-                         classifier, lambda: "Invalid classifier")
-        a, b, c = method()
+        pass

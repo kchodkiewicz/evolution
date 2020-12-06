@@ -138,6 +138,16 @@ class Instances(object):
                    gaussianProcess9
                    ]
 
+    __trained_classifiers = []
+
+    @property
+    def trained_classifiers(self):
+        return self.__trained_classifiers
+
     @property
     def instances(self):
         return self.__instances
+
+    def trainClassifiers(self, X, y):
+        for instance in self.__instances:
+            self.__trained_classifiers.append(instance.fit(X, y))

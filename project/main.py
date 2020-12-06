@@ -3,6 +3,8 @@ from models.Model import Model
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from models.instances import Instances
+
 
 def fitness_is_progressing():
     score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
@@ -26,6 +28,9 @@ if __name__ == '__main__':
     X = Model.dataset.drop(columns=col)
     y = Model.dataset[col]
     Model.X_train, Model.X_test, Model.y_train, Model.y_test = train_test_split(X, y, test_size=0.2, random_state=10)
+
+    inst = Instances()
+    inst.trainClassifiers(Model.X_train, Model.y_train)
 
     # TODO add loadPopulation method
     population = Population(size=50, committee=10, gen_length=60)

@@ -16,12 +16,6 @@ class Model(Instances):
     y_test = []
     METRICS_METHOD = "f1_score"
 
-    trained_classifiers = []
-
-    def trainClassifiers(self):
-        for instance in self.instances:
-            self.trained_classifiers.append(instance.fit(self.X_train, self.y_train))
-
     def calcScore(self, predictions):
         if Model.METRICS_METHOD == "auc":
             fpr, tpr, thresholds = roc_curve(self.y_test, predictions, pos_label=2)
