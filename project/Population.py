@@ -1,12 +1,13 @@
 import copy
 import json
 import random
+import time
 
 from matplotlib.pyplot import plot
 
 from Phenotype import Phenotype
 
-
+# Return indexes of true genes
 def conv_genes(genes_bool):
     arr = []
     for i, gen in enumerate(genes_bool):
@@ -27,6 +28,7 @@ class Population(object):
         self.bestInGen = None
         self.genFitness = []
         self.output = {}
+        self.start_time = time.localtime()
 
     def classification_did_finish(self):
         for i in self.phenotypes:
@@ -40,7 +42,8 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    def cross(self, parent_first, parent_second):  # TODO fucked up shit
+    def cross(self, parent_first, parent_second):  # TODO tell me why
+
         child1st = Phenotype(self.classifierCommittee, self.genLength)
         child2nd = Phenotype(self.classifierCommittee, self.genLength)
         genes1 = []
@@ -54,9 +57,18 @@ class Population(object):
 
         child1st.genes = genes1
         child2nd.genes = genes2
+        it = 0
+        for i in child1st.genes:
+            if i:
+                it += 1
+        jt = 0
+        for j in child1st.genes:
+            if j:
+                jt += 1
+        print("Child1: ", it, "/", len(child1st.genes), " Child2: ", jt, "/", len(child2nd.genes))
 
         return child1st, child2nd
-    """
+        """
         child_first = [False for _ in range(len(parent_first.genes))]
         child_second = [False for _ in range(len(parent_first.genes))]
         true_genes = []
@@ -86,7 +98,7 @@ class Population(object):
         child1st.genes = child_first.copy()
         child2nd.genes = child_second.copy()
         return child1st, child2nd
-    """
+        """
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -159,20 +171,7 @@ class Population(object):
         while len(new_generation) < len(self.phenotypes):
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
-
-            i = 0
-            j = 0
-            for it in first_parent.genes:
-                if it:
-                    i += 1
-            for jt in first_parent.genes:
-                if jt:
-                    j += 1
-            print("first", i)
-            print("second", j)
-
             child1st, child2nd = self.cross(first_parent, second_parent)
-
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
         for phenotype in self.phenotypes:
@@ -182,8 +181,10 @@ class Population(object):
         self.phenotypes = copy.deepcopy(new_generation)
         print("Best in gen fitness:", self.bestInGen.fitness)
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
-        if self.genNo % 4 == 0:
-            print(json.dumps(self.output, indent=4))
+        if self.genNo % 5 == 0:
+            with open(f"output_files/gen_stats/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
+                      f"{self.start_time[3]}:{self.start_time[4]}:{self.start_time[5]}.json", "w") as gen_stats:
+                json.dump(self.output, gen_stats, indent=4)
 
     # Check whether all phenotypes are getting similar fitness
     # i.e. max fitness is close to avg fitness

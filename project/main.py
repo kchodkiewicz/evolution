@@ -10,8 +10,7 @@ def fitness_is_progressing():
     score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
     score_avg = score_sum / 20
     score_max = sorted(fitness_scores, reverse=True)[0]
-    print(fitness_scores)
-    if score_avg == score_max:
+    if abs(score_avg - score_max) < 0.1:
         return False
     return True
 
@@ -33,7 +32,7 @@ if __name__ == '__main__':
     inst.trainClassifiers(Model.X_train, Model.y_train)
 
     # TODO add loadPopulation method
-    population = Population(size=50, committee=10, gen_length=60)
+    population = Population(size=50, committee=3, gen_length=60)
 
     fitness_scores = []
 
