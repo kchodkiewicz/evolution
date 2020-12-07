@@ -1,4 +1,4 @@
-from Population import Population
+from Population import Population, conv_genes
 from models.Model import Model
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -17,14 +17,15 @@ def fitness_is_progressing():
 
 if __name__ == '__main__':
     # Values passed by user
-    dataset = "iris.csv"
-    col = "Species"
+    dataset = "csv_result-PhishingData.csv"
+    col = "Result"
     metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
 
     Model.dataset = pd.read_csv(dataset)
-    Model.METRICS_METHOD = metrics
+    #  Model.METRICS_METHOD = metrics
 
     X = Model.dataset.drop(columns=col)
+    X = X.drop(columns="id")
     y = Model.dataset[col]
     Model.X_train, Model.X_test, Model.y_train, Model.y_test = train_test_split(X, y, test_size=0.2, random_state=10)
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     inst.trainClassifiers(Model.X_train, Model.y_train)
 
     # TODO add loadPopulation method
-    population = Population(size=50, committee=3, gen_length=60)
+    population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
 
     fitness_scores = []
 
@@ -42,5 +43,6 @@ if __name__ == '__main__':
         population.validate()
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
+            print(conv_genes(population.bestInGen.genes))
             break
 

@@ -25,12 +25,12 @@ class Instances(object):
     naiveBayes1 = GaussianNB(var_smoothing=1)
     naiveBayes2 = GaussianNB(var_smoothing=0)
     naiveBayes3 = GaussianNB(var_smoothing=1e9)
-    naiveBayes4 = MultinomialNB()
-    naiveBayes5 = MultinomialNB(alpha=1e-10)
-    naiveBayes6 = MultinomialNB(alpha=1e10)
-    naiveBayes7 = MultinomialNB(fit_prior=False)
-    naiveBayes8 = MultinomialNB(alpha=1e-10, fit_prior=False)
-    naiveBayes9 = MultinomialNB(alpha=1e10, fit_prior=False)
+    #naiveBayes4 = MultinomialNB()
+    #naiveBayes5 = MultinomialNB(alpha=1e-10)
+    #naiveBayes6 = MultinomialNB(alpha=1e10)
+    #naiveBayes7 = MultinomialNB(fit_prior=False)
+    #naiveBayes8 = MultinomialNB(alpha=1e-10, fit_prior=False)
+    #naiveBayes9 = MultinomialNB(alpha=1e10, fit_prior=False)
 
     svm0 = SVC()
     svm1 = SVC(gamma='auto')
@@ -90,12 +90,12 @@ class Instances(object):
                    naiveBayes1,
                    naiveBayes2,
                    naiveBayes3,
-                   naiveBayes4,
-                   naiveBayes5,
-                   naiveBayes6,
-                   naiveBayes7,
-                   naiveBayes8,
-                   naiveBayes9,
+                   #naiveBayes4,
+                   #naiveBayes5,
+                   #naiveBayes6,
+                   #naiveBayes7,
+                   #naiveBayes8,
+                   #naiveBayes9,
                    svm0,
                    svm1,
                    svm2,
@@ -149,5 +149,9 @@ class Instances(object):
         return self.__instances
 
     def trainClassifiers(self, X, y):
+        for instance in self.__instances:
+            self.__trained_classifiers.append(instance.fit(X, y))
+
+    def predictClassifiers(self, X, y):
         for instance in self.__instances:
             self.__trained_classifiers.append(instance.fit(X, y))

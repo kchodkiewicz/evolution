@@ -27,8 +27,6 @@ class Model(Instances):
         return score
 
     def runClassifier(self, model):
-        #  model.fit(self.X_train, self.y_train)
         predictions = model.predict(self.X_test)
         score = self.calcScore(predictions)
-
         return score, predictions

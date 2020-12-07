@@ -1,11 +1,11 @@
 import copy
 import json
 import random
+import sys
 import time
-
 from matplotlib.pyplot import plot
-
 from Phenotype import Phenotype
+
 
 # Return indexes of true genes
 def conv_genes(genes_bool):
@@ -65,7 +65,6 @@ class Population(object):
         for j in child1st.genes:
             if j:
                 jt += 1
-        print("Child1: ", it, "/", len(child1st.genes), " Child2: ", jt, "/", len(child2nd.genes))
 
         return child1st, child2nd
         """
@@ -166,25 +165,35 @@ class Population(object):
             phenotype.normalizedFitness = phenotype.fitness / total_fitness
 
         new_generation = []
-
-        # TODO multi-threading
+        i = 0
         while len(new_generation) < len(self.phenotypes):
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
             child1st, child2nd = self.cross(first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
-        for phenotype in self.phenotypes:
+            sys.stdout.write("Crossing: [{0} / {1}]   \r".format(i + 2, len(self.phenotypes)))
+            sys.stdout.flush()
+            i += 2
+        for j, phenotype in enumerate(self.phenotypes):
             self.mutate(phenotype)
+            sys.stdout.write("Mutating: [{0} / {1}]   \r".format(j + 1, len(self.phenotypes)))
+            sys.stdout.flush()
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(champ))
         self.phenotypes = copy.deepcopy(new_generation)
-        print("Best in gen fitness:", self.bestInGen.fitness)
+        print("Best in gen fitness:", champ.fitness)
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         if self.genNo % 5 == 0:
             with open(f"output_files/gen_stats/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
                       f"{self.start_time[3]}:{self.start_time[4]}:{self.start_time[5]}.json", "w") as gen_stats:
                 json.dump(self.output, gen_stats, indent=4)
+            specimen = {}
+            for i, phenotype in enumerate(self.phenotypes):
+                specimen[i] = phenotype.genes
+            with open(f"output_files/population_dump/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
+                      f"{self.start_time[3]}:{self.start_time[4]}:{self.start_time[5]}.json", "w") as gen_stats:
+                json.dump(specimen, gen_stats, indent=4)
 
     # Check whether all phenotypes are getting similar fitness
     # i.e. max fitness is close to avg fitness
@@ -194,6 +203,7 @@ class Population(object):
         for phenotype in self.phenotypes:
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)
+        print("avg", avg_fitness, "max", self.bestInGen.fitness)
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
             self.mutation_ratio = 0.7
         else:

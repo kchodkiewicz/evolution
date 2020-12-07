@@ -1,6 +1,8 @@
 import json
 import random
 import sys
+import time
+
 import numpy
 import operator
 
@@ -24,9 +26,11 @@ class Phenotype(object):
         # classifier attributes
         self.__classifiers = {}
         self.__scores = []
-        self.__times = []
+        self.__time = 0.0
         self.__predictions = []
         self.__trainedModels = []
+        self.__model = Model()
+        self.__inst = Instances()
         # prep phase
         with open("models/_models_list.json") as f:
             self.__classifiers = json.load(f)
@@ -93,26 +97,33 @@ class Phenotype(object):
 
     # Take results, vote for answer and calc score, then penalize time
     def calc_fitness(self):
+
         committee_answers = []
-        tmp = {}
+        ans_tmp = []
         for i in range(len(self.__predictions[0])):
+            tmp = {}
             for predicts in self.__predictions:
                 if predicts[i] in tmp.keys():
                     tmp[predicts[i]] += 1
                 else:
                     tmp[predicts[i]] = 1
+            #ans_tmp.append(tmp)
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = Model.calcScore(Model(), predictions=committee_answers)
+        self.__fitness = self.__model.calcScore(predictions=committee_answers)
+        """
+        sumC = 0.0
+        for i in self.__scores:
+            sumC += i
+        self.__fitness = sumC
+        """
 
     # choose classifiers from list and execute
     # then calculate fitness of all
     def run(self):
-        model = Model()
-        inst = Instances()
         self.__scores.clear()
-        self.__times.clear()
+        self.__time = 0.0
         self.__predictions.clear()
         self.__trainedModels.clear()
         self.__isClassificationFinished = False
@@ -137,12 +148,12 @@ class Phenotype(object):
                 method = getattr(class_object, classifier, lambda: "Invalid classifier")
                 score, time, predictions, model_dump = method()
                 """
-
                 # Different approach
-                score, predictions = model.runClassifier(inst.trained_classifiers[i])
-
+                start_time = time.time()
+                score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
+                elapsed_time = time.time() - start_time
                 self.__scores.append(score)
-                #  self.__times.append(time)
+                self.__time += elapsed_time
                 self.__predictions.append(predictions)
 
         self.calc_fitness()
