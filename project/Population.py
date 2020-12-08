@@ -26,9 +26,19 @@ class Population(object):
         self.mutation_ratio = 0.3  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
-        self.genFitness = []
+        self.__genFitness = []
         self.output = {}
         self.start_time = time.localtime()
+
+    def load_population(self, filename):
+        with open(filename) as f:
+            file_genes = json.load(f)
+        for i, phenotype in enumerate(self.phenotypes):
+            phenotype.genes = file_genes[str(i)]
+
+    @property
+    def genFitness(self):
+        return self.__genFitness
 
     def classification_did_finish(self):
         for i in self.phenotypes:
@@ -213,7 +223,7 @@ class Population(object):
         print("Gen No", self.genNo)
         for phenotype in self.phenotypes:
             fit = phenotype.run()
-            self.genFitness.append(fit)
+            self.__genFitness.append(fit)
         self.genNo += 1
 
     def test(self):

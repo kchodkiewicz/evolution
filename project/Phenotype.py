@@ -99,7 +99,7 @@ class Phenotype(object):
     def calc_fitness(self):
 
         committee_answers = []
-        ans_tmp = []
+        #  ans_tmp = []
         for i in range(len(self.__predictions[0])):
             tmp = {}
             for predicts in self.__predictions:
@@ -107,17 +107,11 @@ class Phenotype(object):
                     tmp[predicts[i]] += 1
                 else:
                     tmp[predicts[i]] = 1
-            #ans_tmp.append(tmp)
+            #  ans_tmp.append(tmp)
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = self.__model.calcScore(predictions=committee_answers)
-        """
-        sumC = 0.0
-        for i in self.__scores:
-            sumC += i
-        self.__fitness = sumC
-        """
+        self.__fitness = pow(self.__model.calcScore(predictions=committee_answers), 2) / self.__time
 
     # choose classifiers from list and execute
     # then calculate fitness of all

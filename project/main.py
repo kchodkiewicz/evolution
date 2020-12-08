@@ -1,3 +1,6 @@
+import json
+import time
+
 from Population import Population, conv_genes
 from models.Model import Model
 import pandas as pd
@@ -7,11 +10,12 @@ from models.instances import Instances
 
 
 def fitness_is_progressing():
-    score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
-    score_avg = score_sum / 20
-    score_max = sorted(fitness_scores, reverse=True)[0]
-    if abs(score_avg - score_max) < 0.1:
-        return False
+    if len(fitness_scores) >= 20:
+        score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
+        score_avg = score_sum / 20
+        score_max = sorted(fitness_scores, reverse=True)[0]
+        if abs(score_avg - score_max) < 0.01:
+            return False
     return True
 
 
@@ -32,9 +36,9 @@ if __name__ == '__main__':
     inst = Instances()
     inst.trainClassifiers(Model.X_train, Model.y_train)
 
-    # TODO add loadPopulation method
     population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
-
+    # loading genes from file
+    #  population.load_population("output_files/population_dump/2020-12-8_19:29:51.json")
     fitness_scores = []
 
     while True:
@@ -44,5 +48,8 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
             print(conv_genes(population.bestInGen.genes))
+            with open(f"output_files/classifiers_scores/{time.localtime()[0]}-{time.localtime()[1]}-{time.localtime()[2]}_"
+                      f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as f:
+                json.dump(population.genFitness, f, indent=4)
             break
 
