@@ -97,9 +97,7 @@ class Phenotype(object):
 
     # Take results, vote for answer and calc score, then penalize time
     def calc_fitness(self):
-
         committee_answers = []
-        #  ans_tmp = []
         for i in range(len(self.__predictions[0])):
             tmp = {}
             for predicts in self.__predictions:
@@ -107,7 +105,6 @@ class Phenotype(object):
                     tmp[predicts[i]] += 1
                 else:
                     tmp[predicts[i]] = 1
-            #  ans_tmp.append(tmp)
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)

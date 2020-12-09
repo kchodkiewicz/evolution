@@ -49,9 +49,11 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
             break
-        if keyboard.is_pressed('q'):
+        try:
+            if keyboard.is_pressed('q'):
+                break
+        except:
             break
-
 
     print(conv_genes(population.bestInGen.genes))
     with open(f"output_files/classifiers_scores/{time.localtime()[0]}-{time.localtime()[1]}-"
