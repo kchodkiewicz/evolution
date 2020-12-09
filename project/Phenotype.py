@@ -140,9 +140,11 @@ class Phenotype(object):
                 score, time, predictions, model_dump = method()
                 """
                 # Different approach
+
                 start_time = time.time()
                 score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
                 elapsed_time = time.time() - start_time
+
                 self.__scores.append(score)
                 self.__time += elapsed_time
                 self.__predictions.append(predictions)

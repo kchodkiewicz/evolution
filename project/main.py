@@ -15,7 +15,7 @@ def fitness_is_progressing():
         score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
         score_avg = score_sum / 20
         score_max = sorted(fitness_scores, reverse=True)[0]
-        if abs(score_avg - score_max) < 0.01:
+        if abs(score_avg - score_max) < 0.1:
             return False
     return True
 
@@ -48,11 +48,6 @@ if __name__ == '__main__':
         population.select()
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
-            break
-        try:
-            if keyboard.is_pressed('q'):
-                break
-        except:
             break
 
     print(conv_genes(population.bestInGen.genes))

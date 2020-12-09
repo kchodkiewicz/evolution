@@ -151,9 +151,10 @@ class Instances(object):
     def trainClassifiers(self, X, y):
         for instance in self.__instances:
             try:
-                self.__trained_classifiers.append(instance.fit(X, y))
-            except Exception:
-                break
+                trained_model = instance.fit(X, y)
+            except:
+                continue
+            self.__trained_classifiers.append(trained_model)
 
     def predictClassifiers(self, X, y):
         for instance in self.__instances:

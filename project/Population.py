@@ -3,6 +3,8 @@ import json
 import random
 import sys
 import time
+from time import sleep
+
 from matplotlib.pyplot import plot
 from Phenotype import Phenotype
 
@@ -155,6 +157,8 @@ class Population(object):
         index = 0
         rand = random.uniform(0, 1)
         while rand > 0:
+            if index >= len(sorted_phenotypes):
+                return self.phenotypes[0]
             rand = rand - sorted_phenotypes[index].normalizedFitness
             index += 1
 
@@ -182,11 +186,13 @@ class Population(object):
             new_generation.append(copy.deepcopy(child2nd))
             sys.stdout.write("Crossing: [{0} / {1}]   \r".format(i + 2, len(self.phenotypes)))
             sys.stdout.flush()
+            sleep(0.05)
             i += 2
         for j, phenotype in enumerate(self.phenotypes):
             self.mutate(phenotype)
             sys.stdout.write("Mutating: [{0} / {1}]   \r".format(j + 1, len(self.phenotypes)))
             sys.stdout.flush()
+            sleep(0.05)
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
