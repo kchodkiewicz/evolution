@@ -1,5 +1,6 @@
 import json
 import time
+import keyboard
 
 from Population import Population, conv_genes
 from models.Model import Model
@@ -43,13 +44,17 @@ if __name__ == '__main__':
 
     while True:
         population.run()
-        population.select()
         population.validate()
+        population.select()
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
-            print(conv_genes(population.bestInGen.genes))
-            with open(f"output_files/classifiers_scores/{time.localtime()[0]}-{time.localtime()[1]}-{time.localtime()[2]}_"
-                      f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as f:
-                json.dump(population.genFitness, f, indent=4)
+            break
+        if keyboard.is_pressed('q'):
             break
 
+
+    print(conv_genes(population.bestInGen.genes))
+    with open(f"output_files/classifiers_scores/{time.localtime()[0]}-{time.localtime()[1]}-"
+              f"{time.localtime()[2]}_"
+              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as f:
+        json.dump(population.genFitness, f, indent=4)

@@ -169,8 +169,6 @@ class Population(object):
         for phenotype in self.phenotypes:
             total_fitness += phenotype.fitness
 
-        champ = self.find_best_in_gen()
-
         for phenotype in self.phenotypes:
             phenotype.normalizedFitness = phenotype.fitness / total_fitness
 
@@ -190,9 +188,9 @@ class Population(object):
             sys.stdout.write("Mutating: [{0} / {1}]   \r".format(j + 1, len(self.phenotypes)))
             sys.stdout.flush()
         new_generation.pop(0)
-        new_generation.append(copy.deepcopy(champ))
+        new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
-        print("Best in gen fitness:", champ.fitness)
+        print("Best in gen fitness:", self.bestInGen.fitness)
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         if self.genNo % 5 == 0:
             with open(f"output_files/gen_stats/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
@@ -210,6 +208,7 @@ class Population(object):
     # If so then increase mutation ratio to eliminate similarity
     def validate(self):
         sum_fitness = 0
+        champ = self.find_best_in_gen()
         for phenotype in self.phenotypes:
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)

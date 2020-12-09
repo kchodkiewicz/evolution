@@ -150,7 +150,10 @@ class Instances(object):
 
     def trainClassifiers(self, X, y):
         for instance in self.__instances:
-            self.__trained_classifiers.append(instance.fit(X, y))
+            try:
+                self.__trained_classifiers.append(instance.fit(X, y))
+            except Exception:
+                break
 
     def predictClassifiers(self, X, y):
         for instance in self.__instances:
