@@ -1,8 +1,11 @@
 import copy
 import json
+import math
+import multiprocessing
 import random
 import sys
 import time
+from queue import Queue
 from time import sleep
 
 from matplotlib.pyplot import plot
@@ -25,7 +28,7 @@ class Population(object):
         self.classifierCommittee = committee
         self.genLength = gen_length
         self.genNo = 0
-        self.mutation_ratio = 0.3  # max amount of changed genes in phenotype
+        self.mutation_ratio = 0.2  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
         self.__genFitness = []
@@ -224,11 +227,48 @@ class Population(object):
         else:
             self.mutation_ratio = 0.3
 
-    def run(self):
-        print("Gen No", self.genNo)
+    def recalculate_fitness(self):
+        sum_times = 0
         for phenotype in self.phenotypes:
-            fit = phenotype.run()
-            self.__genFitness.append(fit)
+            sum_times += phenotype.time
+        avg_time = sum_times / len(self.phenotypes)
+
+        for phenotype in self.phenotypes:
+            phenotype.fitness += (phenotype.time - avg_time) * 10
+
+    def run_async(self, nprocs):
+        def run(chunk, out_q):
+            out = []
+            for phenotype in chunk:
+                fit = phenotype.run()
+                self.__genFitness.append(fit)
+                out.append(phenotype)
+            out_q.put(out)
+
+        print("Gen No", self.genNo)
+        out_q = Queue()
+        chunk_size = int(math.ceil(len(self.phenotypes) / float(nprocs)))
+        process_arr = []
+
+        for i in range(nprocs):
+            print("Im here")
+            p = multiprocessing.Process(
+                target=run,
+                args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
+                      out_q))
+            process_arr.append(p)
+            p.start()
+        result = []
+        for i in range(nprocs):
+            print("And also here")
+            result.append(out_q.get())
+
+        for p in process_arr:
+            print("But am i here. Yeah")
+            p.join()
+
+        self.phenotypes = copy.deepcopy(result)
+        self.recalculate_fitness()
         self.genNo += 1
 
     def test(self):

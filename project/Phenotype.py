@@ -1,7 +1,10 @@
 import json
+import math
+import multiprocessing
 import random
 import sys
 import time
+from queue import Queue
 
 import numpy
 import operator
@@ -58,6 +61,10 @@ class Phenotype(object):
             self.__genes = value
 
     @property
+    def time(self):
+        return self.__time
+
+    @property
     def fitness(self):
         return self.__fitness
 
@@ -108,7 +115,8 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = pow(self.__model.calcScore(predictions=committee_answers), 2) / self.__time
+        self.__fitness = pow(self.__model.calcScore(predictions=committee_answers), 2)
+        return self.__fitness
 
     # choose classifiers from list and execute
     # then calculate fitness of all
@@ -118,40 +126,19 @@ class Phenotype(object):
         self.__predictions.clear()
         self.__trainedModels.clear()
         self.__isClassificationFinished = False
+
         for i, gen in enumerate(self.genes):
             if gen:
-                """
-                # TODO make more robust (now works only between 0 - 99)
-                #if i < 10:
-                    #s = "0" + str(i)
-                #else:
-                    #s = str(i)
-                s = str(i + 10)
-                digit1st = s[0]
-                digit2nd = s[1]
-                # END
-
-                # Get filename, classname and method name from json file and execute
-                classifier = self.__classifiers[digit1st]["version"][digit2nd]
-                filename = getattr(sys.modules[__name__], self.__classifiers[digit1st]["name"])
-                classname = getattr(filename, self.__classifiers[digit1st]["name"])
-                class_object = classname()
-                method = getattr(class_object, classifier, lambda: "Invalid classifier")
-                score, time, predictions, model_dump = method()
-                """
                 # Different approach
-
                 start_time = time.time()
                 score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
                 elapsed_time = time.time() - start_time
-
                 self.__scores.append(score)
                 self.__time += elapsed_time
                 self.__predictions.append(predictions)
 
-        self.calc_fitness()
         self.__isClassificationFinished = True
-        return self.__fitness
+        return self.calc_fitness()
 
     # Just for testing
     def test(self):

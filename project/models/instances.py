@@ -1,3 +1,6 @@
+import sys
+from time import sleep
+
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import SGDClassifier
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
@@ -149,11 +152,8 @@ class Instances(object):
         return self.__instances
 
     def trainClassifiers(self, X, y):
-        for instance in self.__instances:
-            try:
-                trained_model = instance.fit(X, y)
-            except:
-                continue
+        for i, instance in enumerate(self.__instances):
+            trained_model = instance.fit(X, y)
             self.__trained_classifiers.append(trained_model)
 
     def predictClassifiers(self, X, y):
