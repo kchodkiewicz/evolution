@@ -18,8 +18,9 @@ from models.instances import Instances
 
 class Phenotype(object):
 
-    def __init__(self, committee, gen_length):
+    def __init__(self, phenotype_id, committee, gen_length):
         # phenotype attributes
+        self.__id = phenotype_id
         self.__committee = committee
         self.__genLength = gen_length
         self.__fitness = 0.0

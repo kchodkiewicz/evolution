@@ -152,7 +152,9 @@ class Instances(object):
         return self.__instances
 
     def trainClassifiers(self, X, y):
+        #  TODO parallelize training
         for i, instance in enumerate(self.__instances):
+            print(i, "/", len(self.__instances))
             trained_model = instance.fit(X, y)
             self.__trained_classifiers.append(trained_model)
 

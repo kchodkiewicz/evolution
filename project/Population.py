@@ -1,11 +1,10 @@
 import copy
 import json
 import math
-import multiprocessing
+import multiprocessing as mp
 import random
 import sys
 import time
-from queue import Queue
 from time import sleep
 
 from matplotlib.pyplot import plot
@@ -29,7 +28,7 @@ class Population(object):
         self.genLength = gen_length
         self.genNo = 0
         self.mutation_ratio = 0.2  # max amount of changed genes in phenotype
-        self.phenotypes = [Phenotype(self.classifierCommittee, self.genLength) for i in range(self.size)]
+        self.phenotypes = [Phenotype(i, self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
         self.__genFitness = []
         self.output = {}
@@ -57,10 +56,10 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    def cross(self, parent_first, parent_second):  # TODO tell me why
+    def cross(self, cross_id, parent_first, parent_second):  # TODO tell me why
 
-        child1st = Phenotype(self.classifierCommittee, self.genLength)
-        child2nd = Phenotype(self.classifierCommittee, self.genLength)
+        child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
+        child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
         genes1 = []
         genes2 = []
         genes1.append(parent_first.genes[0:20].copy())
@@ -182,18 +181,18 @@ class Population(object):
         new_generation = []
         i = 0
         while len(new_generation) < len(self.phenotypes):
+            sys.stdout.write("Crossing: [{0} / {1}]   \r".format(i + 2, len(self.phenotypes)))
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
-            child1st, child2nd = self.cross(first_parent, second_parent)
+            child1st, child2nd = self.cross(i, first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
-            sys.stdout.write("Crossing: [{0} / {1}]   \r".format(i + 2, len(self.phenotypes)))
             sys.stdout.flush()
             sleep(0.05)
             i += 2
         for j, phenotype in enumerate(self.phenotypes):
-            self.mutate(phenotype)
             sys.stdout.write("Mutating: [{0} / {1}]   \r".format(j + 1, len(self.phenotypes)))
+            self.mutate(phenotype)
             sys.stdout.flush()
             sleep(0.05)
         new_generation.pop(0)
@@ -236,32 +235,38 @@ class Population(object):
         for phenotype in self.phenotypes:
             phenotype.fitness += (phenotype.time - avg_time) * 10
 
+    def run_normally(self, measure_time):
+        print("Gen No", self.genNo)
+        for phenotype in self.phenotypes:
+            fit = phenotype.run()
+            self.__genFitness.append(fit)
+        if measure_time:
+            self.recalculate_fitness()
+        self.genNo += 1
+
     def run_async(self, nprocs):
-        def run(chunk, out_q):
+        #  TODO parallelize predicting
+        def run(chunk, out_queue):
             out = []
             for phenotype in chunk:
                 fit = phenotype.run()
                 self.__genFitness.append(fit)
                 out.append(phenotype)
-            out_q.put(out)
+            out_queue.put(out)
+            print("doin that")
+            exit(0)
 
         print("Gen No", self.genNo)
-        out_q = Queue()
+        out_q = mp.Queue()
         chunk_size = int(math.ceil(len(self.phenotypes) / float(nprocs)))
-        process_arr = []
 
-        for i in range(nprocs):
-            print("Im here")
-            p = multiprocessing.Process(
-                target=run,
-                args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
-                      out_q))
-            process_arr.append(p)
+        process_arr = [mp.Process(target=run, args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
+                       out_q)) for i in range(nprocs)]
+
+        for p in process_arr:
             p.start()
-        result = []
-        for i in range(nprocs):
-            print("And also here")
-            result.append(out_q.get())
+
+        result = [out_q.get() for p in process_arr]
 
         for p in process_arr:
             print("But am i here. Yeah")
