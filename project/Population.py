@@ -6,10 +6,15 @@ import random
 import sys
 import time
 from time import sleep
-from main import write_to_json
-
 from matplotlib.pyplot import plot
 from Phenotype import Phenotype
+
+
+def write_to_json(path, content):
+    with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
+              f"{time.localtime()[2]}_"
+              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
+        json.dump(content, filename, indent=4)
 
 
 # Return indexes of true genes
@@ -58,18 +63,22 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    def cross(self, cross_id, parent_first, parent_second):  # TODO tell me why
-
+    # TODO crossing - test it (cut points and committee length) !!!
+    def cross(self, cross_id, parent_first, parent_second):
         child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
+        cut_point1 = random.randint(1, self.genLength - 2)
+        cut_point2 = random.randint(1, self.genLength - 2)
+        if cut_point1 == cut_point2:
+            cut_point2 = cut_point2 + random.randint(1, self.genLength - 1 - cut_point2)
         genes1 = []
         genes2 = []
-        genes1.append(parent_first.genes[0:20].copy())
-        genes1.append(parent_second.genes[21:40].copy())
-        genes1.append(parent_first.genes[41:].copy())
-        genes2.append(parent_second.genes[0:20].copy())
-        genes2.append(parent_first.genes[21:40].copy())
-        genes2.append(parent_second.genes[41:].copy())
+        genes1.append(parent_first.genes[0:cut_point1].copy())
+        genes1.append(parent_second.genes[cut_point1 + 1:cut_point2].copy())
+        genes1.append(parent_first.genes[cut_point2 + 1:].copy())
+        genes2.append(parent_second.genes[0:cut_point1].copy())
+        genes2.append(parent_first.genes[cut_point1 + 1:cut_point2].copy())
+        genes2.append(parent_second.genes[cut_point2 + 1:].copy())
 
         child1st.genes = genes1
         child2nd.genes = genes2
@@ -77,43 +86,14 @@ class Population(object):
         for i in child1st.genes:
             if i:
                 it += 1
+        child1st.committee = it
         jt = 0
         for j in child1st.genes:
             if j:
                 jt += 1
+        child2nd.committee = jt
 
         return child1st, child2nd
-        """
-        child_first = [False for _ in range(len(parent_first.genes))]
-        child_second = [False for _ in range(len(parent_first.genes))]
-        true_genes = []
-        duplicates = []
-
-        for i in range(len(parent_first.genes)):
-            if parent_first.genes[i] or parent_second.genes[i]:
-                true_genes.append(i)
-        for i in range(len(parent_first.genes)):
-            if parent_first.genes[i] and parent_second.genes[i]:
-                duplicates.append(i)
-        print("true", true_genes, "len:", len(true_genes))
-        print("dups", duplicates, "len:", len(duplicates))
-        for _ in range(self.classifierCommittee):
-            #  index = random.randrange(len(true_genes))
-            #if len(true_genes) > 0:
-            random.shuffle(true_genes)
-            index = true_genes.pop()
-            child_first[index] = True
-            #  true_genes.pop(index)
-        for index in true_genes:
-            child_second[index] = True
-        for index in duplicates:
-            child_second[index] = True
-        child1st = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
-        child2nd = Phenotype(committee=self.classifierCommittee, gen_length=self.genLength)
-        child1st.genes = child_first.copy()
-        child2nd.genes = child_second.copy()
-        return child1st, child2nd
-        """
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -130,7 +110,7 @@ class Population(object):
             else:
                 negative_values.append(i)
         mutate_ratio = random.uniform(0, self.mutation_ratio)
-        for _ in range(int(mutate_ratio * self.classifierCommittee)):
+        for _ in range(int(mutate_ratio * phenotype.committee)):
             positive_index = random.randint(0, len(positive_values) - 1)
             negative_index = random.randint(0, len(negative_values) - 1)
             negative_values.append(positive_values[positive_index])
@@ -184,8 +164,8 @@ class Population(object):
         i = 0
         while len(new_generation) < len(self.phenotypes):
             if i == 0:
-                print("Crossing:", i + 2, " / ", len(self.phenotypes), end='', flush=True)
-            print("\rCrossing:", i + 2, " / ", len(self.phenotypes), end='', flush=True)
+                print("Crossing:", i + 2, "/", len(self.phenotypes), end='', flush=True)
+            print("\rCrossing:", i + 2, "/", len(self.phenotypes), end='', flush=True)
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
             child1st, child2nd = self.cross(i, first_parent, second_parent)
@@ -195,8 +175,8 @@ class Population(object):
         print('')
         for j, phenotype in enumerate(self.phenotypes):
             if j == 0:
-                print("Mutating:", j + 1, " / ", len(self.phenotypes), end='', flush=True)
-            print("\rMutating:", j + 1, " / ", len(self.phenotypes), end='', flush=True)
+                print("Mutating:", j + 1, "/", len(self.phenotypes), end='', flush=True)
+            print("\rMutating:", j + 1, "/", len(self.phenotypes), end='', flush=True)
             self.mutate(phenotype)
         print('')
         new_generation.pop(0)
@@ -216,7 +196,7 @@ class Population(object):
     # If so then increase mutation ratio to eliminate similarity
     def validate(self):
         sum_fitness = 0
-        champ = self.find_best_in_gen()
+        self.find_best_in_gen()
         for phenotype in self.phenotypes:
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)
@@ -228,24 +208,13 @@ class Population(object):
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
             self.mutation_ratio = 0.7
         else:
-            self.mutation_ratio = 0.3
+            self.mutation_ratio = 0.2
 
-    def recalculate_fitness(self):
-        sum_times = 0
-        for phenotype in self.phenotypes:
-            sum_times += phenotype.time
-        avg_time = sum_times / len(self.phenotypes)
-
-        for phenotype in self.phenotypes:
-            phenotype.fitness += (phenotype.time - avg_time)
-
-    def run_normally(self, measure_time):
+    def run_normally(self):
         print("Gen No", self.genNo, end=' ')
         for phenotype in self.phenotypes:
             fit = phenotype.run()
             self.__genFitness.append(fit)
-        if measure_time:
-            self.recalculate_fitness()
         self.genNo += 1
 
     def run_async(self, nprocs):
@@ -265,7 +234,7 @@ class Population(object):
         chunk_size = int(math.ceil(len(self.phenotypes) / float(nprocs)))
 
         process_arr = [mp.Process(target=run, args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
-                       out_q)) for i in range(nprocs)]
+                                                    out_q)) for i in range(nprocs)]
 
         for p in process_arr:
             p.start()
@@ -277,7 +246,6 @@ class Population(object):
             p.join()
 
         self.phenotypes = copy.deepcopy(result)
-        self.recalculate_fitness()
         self.genNo += 1
 
     def test(self):

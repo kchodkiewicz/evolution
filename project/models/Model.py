@@ -12,8 +12,10 @@ class Model(Instances):
     dataset = None
     X_train = []
     X_test = []
+    X_validate = []
     y_train = []
     y_test = []
+    y_validate = []
     METRICS_METHOD = "f1_score"
 
     def calcScore(self, predictions):

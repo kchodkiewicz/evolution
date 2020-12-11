@@ -2,19 +2,11 @@ import json
 import time
 import keyboard
 
-from Population import Population, conv_genes
+from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
 from models.instances import Instances
-
-
-def write_to_json(path, content):
-    with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
-              f"{time.localtime()[2]}_"
-              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
-        json.dump(content, filename, indent=4)
 
 
 def fitness_is_progressing():
@@ -38,7 +30,8 @@ if __name__ == '__main__':
     X = Model.dataset.drop(columns=col)
     X = X.drop(columns="id")
     y = Model.dataset[col]
-    Model.X_train, Model.X_test, Model.y_train, Model.y_test = train_test_split(X, y, test_size=0.2, random_state=10)
+    X_in, Model.X_validate, y_in, Model.y_validate = train_test_split(X, y, test_size=0.2)
+    Model.X_train, Model.X_test, Model.y_train, Model.y_test = train_test_split(X_in, y_in, test_size=0.2)
     """
     dataset = "dataset-har-PUC-Rio-ugulino.csv"
     col = "class"
@@ -76,7 +69,7 @@ if __name__ == '__main__':
     population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
     fitness_scores = []
     while True:
-        population.run_normally(True)
+        population.run_normally()
         # population.run_async(4)
         population.validate()
         population.select()

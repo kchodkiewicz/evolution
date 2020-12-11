@@ -30,7 +30,6 @@ class Phenotype(object):
         # classifier attributes
         self.__classifiers = {}
         self.__scores = []
-        self.__time = 0.0
         self.__predictions = []
         self.__trainedModels = []
         self.__model = Model()
@@ -43,6 +42,11 @@ class Phenotype(object):
     @property
     def committee(self):
         return self.__committee
+
+    @committee.setter
+    def committee(self, value):
+        if value > 0:
+            self.__committee = value
 
     @property
     def gen_length(self):
@@ -116,14 +120,13 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = pow(self.__model.calcScore(predictions=committee_answers), 2)
+        self.__fitness = self.__model.calcScore(predictions=committee_answers) * (self.gen_length / self.__committee)
         return self.__fitness
 
     # choose classifiers from list and execute
     # then calculate fitness of all
     def run(self):
         self.__scores.clear()
-        self.__time = 0.0
         self.__predictions.clear()
         self.__trainedModels.clear()
         self.__isClassificationFinished = False
@@ -131,11 +134,8 @@ class Phenotype(object):
         for i, gen in enumerate(self.genes):
             if gen:
                 # Different approach
-                start_time = time.time()
                 score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
-                elapsed_time = time.time() - start_time
                 self.__scores.append(score)
-                self.__time += elapsed_time
                 self.__predictions.append(predictions)
 
         self.__isClassificationFinished = True
