@@ -1,1 +1,1 @@
-output_files/*.json
+output_files/**/*.json
