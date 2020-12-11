@@ -134,9 +134,10 @@ class Phenotype(object):
         for i, gen in enumerate(self.genes):
             if gen:
                 # Different approach
-                score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
-                self.__scores.append(score)
-                self.__predictions.append(predictions)
+                #  score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
+                #  self.__scores.append(score)
+                #  self.__predictions.append(predictions)
+                self.__predictions.append(self.__inst.predictions_arr[i])
 
         self.__isClassificationFinished = True
         return self.calc_fitness()

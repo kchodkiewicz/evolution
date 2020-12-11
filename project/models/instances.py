@@ -149,6 +149,10 @@ class Instances(object):
         return self.__trained_classifiers
 
     @property
+    def predictions_arr(self):
+        return self.__predictions_classifiers
+
+    @property
     def instances(self):
         return self.__instances
 
@@ -162,7 +166,7 @@ class Instances(object):
 
     def predictClassifiers(self, X):
         for i, instance in enumerate(self.__trained_classifiers):
-            print("\rMaking predictions:", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
+            print("\rPredicting:", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
             predictions = instance.predict(X)
             self.__predictions_classifiers.append(predictions)
         print('')

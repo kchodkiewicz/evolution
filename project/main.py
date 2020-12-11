@@ -47,6 +47,7 @@ if __name__ == '__main__':
 
     inst = Instances()
     inst.trainClassifiers(Model.X_train, Model.y_train)
+    inst.predictClassifiers(Model.X_test)
 
     """
     population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
@@ -76,7 +77,10 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
             break
-
+    for i, gen in enumerate(population.bestInGen.genes):
+        if gen:
+            # TODO calc fitness for validation
+            Model.calcScore(Model(), inst.predictions_arr[i])
     print(conv_genes(population.bestInGen.genes))
     write_to_json("classifiers_scores", population.genFitness)
 
