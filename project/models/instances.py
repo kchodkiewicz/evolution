@@ -142,6 +142,7 @@ class Instances(object):
                    ]
 
     __trained_classifiers = []
+    __predictions_classifiers = []
 
     @property
     def trained_classifiers(self):
@@ -154,10 +155,14 @@ class Instances(object):
     def trainClassifiers(self, X, y):
         #  TODO parallelize training
         for i, instance in enumerate(self.__instances):
-            print(i, "/", len(self.__instances))
+            print("\rTraining: ", i + 1, "/", len(self.__instances), end='', flush=True)
             trained_model = instance.fit(X, y)
             self.__trained_classifiers.append(trained_model)
+        print('')
 
-    def predictClassifiers(self, X, y):
-        for instance in self.__instances:
-            self.__trained_classifiers.append(instance.fit(X, y))
+    def predictClassifiers(self, X):
+        for i, instance in enumerate(self.__trained_classifiers):
+            print("\rMaking predictions: ", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
+            predictions = instance.predict(X)
+            self.__predictions_classifiers.append(predictions)
+        print('')

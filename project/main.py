@@ -10,6 +10,13 @@ from sklearn.model_selection import train_test_split
 from models.instances import Instances
 
 
+def write_to_json(path, content):
+    with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
+              f"{time.localtime()[2]}_"
+              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
+        json.dump(content, filename, indent=4)
+
+
 def fitness_is_progressing():
     if len(fitness_scores) >= 20:
         score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
@@ -25,7 +32,6 @@ if __name__ == '__main__':
 
     dataset = "csv_result-PhishingData.csv"
     col = "Result"
-
     metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
     Model.dataset = pd.read_csv(dataset)
     #  Model.METRICS_METHOD = metrics
@@ -49,11 +55,12 @@ if __name__ == '__main__':
     inst = Instances()
     inst.trainClassifiers(Model.X_train, Model.y_train)
 
+    """
     population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
     # loading genes from file
     #  population.load_population("output_files/population_dump/2020-12-8_19:29:51.json")
     fitness_scores = []
-
+    
     while True:
         population.run_normally(False)
         # population.run_async(4)
@@ -62,12 +69,9 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
             break
-
     print(conv_genes(population.bestInGen.genes))
-    with open(f"output_files/classifiers_scores/{time.localtime()[0]}-{time.localtime()[1]}-"
-              f"{time.localtime()[2]}_"
-              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as f:
-        json.dump(population.genFitness, f, indent=4)
+    write_to_json("classifiers_scores", population.genFitness)
+    """
 
     population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
     fitness_scores = []
@@ -81,7 +85,6 @@ if __name__ == '__main__':
             break
 
     print(conv_genes(population.bestInGen.genes))
-    with open(f"output_files/classifiers_scores/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
-              f"{time.localtime()[2]}_"
-              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as f:
-        json.dump(population.genFitness, f, indent=4)
+    write_to_json("classifiers_scores", population.genFitness)
+
+

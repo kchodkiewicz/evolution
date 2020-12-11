@@ -6,6 +6,7 @@ import random
 import sys
 import time
 from time import sleep
+from main import write_to_json
 
 from matplotlib.pyplot import plot
 from Phenotype import Phenotype
@@ -33,6 +34,7 @@ class Population(object):
         self.__genFitness = []
         self.output = {}
         self.start_time = time.localtime()
+        self.__validation_res = {}
 
     def load_population(self, filename):
         with open(filename) as f:
@@ -181,35 +183,33 @@ class Population(object):
         new_generation = []
         i = 0
         while len(new_generation) < len(self.phenotypes):
-            sys.stdout.write("Crossing: [{0} / {1}]   \r".format(i + 2, len(self.phenotypes)))
+            if i == 0:
+                print("Crossing:", i + 2, " / ", len(self.phenotypes), end='', flush=True)
+            print("\rCrossing:", i + 2, " / ", len(self.phenotypes), end='', flush=True)
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
             child1st, child2nd = self.cross(i, first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
-            sys.stdout.flush()
-            sleep(0.05)
             i += 2
+        print('')
         for j, phenotype in enumerate(self.phenotypes):
-            sys.stdout.write("Mutating: [{0} / {1}]   \r".format(j + 1, len(self.phenotypes)))
+            if j == 0:
+                print("Mutating:", j + 1, " / ", len(self.phenotypes), end='', flush=True)
+            print("\rMutating:", j + 1, " / ", len(self.phenotypes), end='', flush=True)
             self.mutate(phenotype)
-            sys.stdout.flush()
-            sleep(0.05)
+        print('')
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
         print("Best in gen fitness:", self.bestInGen.fitness)
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         if self.genNo % 5 == 0:
-            with open(f"output_files/gen_stats/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
-                      f"{self.start_time[3]}:{self.start_time[4]}:{self.start_time[5]}.json", "w") as gen_stats:
-                json.dump(self.output, gen_stats, indent=4)
+            write_to_json("gen_stats", self.output)
             specimen = {}
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
-            with open(f"output_files/population_dump/{self.start_time[0]}-{self.start_time[1]}-{self.start_time[2]}_"
-                      f"{self.start_time[3]}:{self.start_time[4]}:{self.start_time[5]}.json", "w") as gen_stats:
-                json.dump(specimen, gen_stats, indent=4)
+            write_to_json("population_dump", specimen)
 
     # Check whether all phenotypes are getting similar fitness
     # i.e. max fitness is close to avg fitness
@@ -220,7 +220,11 @@ class Population(object):
         for phenotype in self.phenotypes:
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)
-        print("avg", avg_fitness, "max", self.bestInGen.fitness)
+        #  print("avg", avg_fitness, "max", self.bestInGen.fitness)
+        self.__validation_res[self.genNo] = {}
+        self.__validation_res[self.genNo]["avg"] = avg_fitness
+        self.__validation_res[self.genNo]["max"] = self.bestInGen.fitness
+        write_to_json("validation_res", self.__validation_res)
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
             self.mutation_ratio = 0.7
         else:
@@ -233,10 +237,10 @@ class Population(object):
         avg_time = sum_times / len(self.phenotypes)
 
         for phenotype in self.phenotypes:
-            phenotype.fitness += (phenotype.time - avg_time) * 10
+            phenotype.fitness += (phenotype.time - avg_time)
 
     def run_normally(self, measure_time):
-        print("Gen No", self.genNo)
+        print("Gen No", self.genNo, end=' ')
         for phenotype in self.phenotypes:
             fit = phenotype.run()
             self.__genFitness.append(fit)
