@@ -4,11 +4,10 @@ import sys
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
-from models.instances import Instances
 
 
 # Handler for file opening, cleaning data, splitting dataset etc.
-class Model(Instances):
+class Model(object):
     dataset = None
     X_train = []
     X_test = []

@@ -9,9 +9,6 @@ from queue import Queue
 import numpy
 import operator
 
-from models import DecisionForest, DecisionTree, GaussianProcess, KNeighbors,\
-    LinearDiscriminantAnalysis, NaiveBayes, PassiveAggressive,\
-    Ridge, StochasticGradient, SupportVectorMachine
 from models.Model import Model
 from models.instances import Instances
 
@@ -64,10 +61,6 @@ class Phenotype(object):
     def genes(self, value):
         if len(value) == self.gen_length:
             self.__genes = value
-
-    @property
-    def time(self):
-        return self.__time
 
     @property
     def fitness(self):

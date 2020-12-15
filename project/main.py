@@ -6,7 +6,7 @@ from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from models.instances import Instances
+from models.instances import Instances, predictSelected
 
 
 def fitness_is_progressing():
@@ -14,7 +14,7 @@ def fitness_is_progressing():
         score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
         score_avg = score_sum / 20
         score_max = sorted(fitness_scores, reverse=True)[0]
-        if abs(score_avg - score_max) < score_max * 0.1:
+        if abs(score_avg - score_max) < 0.01:
             return False
     return True
 
@@ -30,8 +30,8 @@ if __name__ == '__main__':
     X = Model.dataset.drop(columns=col)
     X = X.drop(columns="id")
     y = Model.dataset[col]
-    X_in, Model.X_validate, y_in, Model.y_validate = train_test_split(X, y, test_size=0.2)
-    Model.X_train, Model.X_test, Model.y_train, Model.y_test = train_test_split(X_in, y_in, test_size=0.2)
+    Model.X_train, X_in, Model.y_train, y_in = train_test_split(X, y, test_size=0.3)
+    Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=1/3)
     """
     dataset = "dataset-har-PUC-Rio-ugulino.csv"
     col = "class"
@@ -77,11 +77,30 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing():
             break
+
+    final_models = []
     for i, gen in enumerate(population.bestInGen.genes):
         if gen:
-            # TODO calc fitness for validation
-            Model.calcScore(Model(), inst.predictions_arr[i])
-    print(conv_genes(population.bestInGen.genes))
+            final_models.append(inst.trained_classifiers[i])
+    final_predicts = predictSelected(final_models, Model.X_validate)
+    committee_answers = []
+    for i in range(len(final_predicts)):
+        tmp = {}
+        for predicts in final_predicts:
+            if predicts[i] in tmp.keys():
+                tmp[predicts[i]] += 1
+            else:
+                tmp[predicts[i]] = 1
+        inverse = [(value, key) for key, value in tmp.items()]
+        val = max(inverse)[1]
+        committee_answers.append(val)
+    model = Model()
+    score = model.calcScore(predictions=committee_answers)
+
+
+    print("Classifiers:", conv_genes(population.bestInGen.genes))
+    print("Score:", score)
+    print("Separate scores:", inst.scores)
     write_to_json("classifiers_scores", population.genFitness)
 
 

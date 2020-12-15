@@ -12,6 +12,17 @@ from sklearn.tree import DecisionTreeClassifier
 # Instances of all supported classifiers
 # If desired classifier is not listed add by creating instance
 # with unique name and append it to __instances list
+from models.Model import Model
+
+
+def predictSelected(classifiers_arr, X):
+    res = []
+    for i, instance in enumerate(classifiers_arr):
+        predictions = instance.predict(X)
+        res.append(predictions)
+    return res
+
+
 class Instances(object):
     decisionTree0 = DecisionTreeClassifier()
     decisionTree1 = DecisionTreeClassifier(criterion='entropy')
@@ -143,6 +154,7 @@ class Instances(object):
 
     __trained_classifiers = []
     __predictions_classifiers = []
+    __scores = []
 
     @property
     def trained_classifiers(self):
@@ -156,6 +168,10 @@ class Instances(object):
     def instances(self):
         return self.__instances
 
+    @property
+    def scores(self):
+        return self.__scores
+
     def trainClassifiers(self, X, y):
         #  TODO parallelize training
         for i, instance in enumerate(self.__instances):
@@ -165,8 +181,10 @@ class Instances(object):
         print('')
 
     def predictClassifiers(self, X):
+        model = Model()
         for i, instance in enumerate(self.__trained_classifiers):
             print("\rPredicting:", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
             predictions = instance.predict(X)
+            self.__scores.append(model.calcScore(predictions))
             self.__predictions_classifiers.append(predictions)
         print('')
