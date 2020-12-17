@@ -2,7 +2,7 @@ import sys
 from time import sleep
 
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.linear_model import SGDClassifier
+from sklearn.linear_model import SGDClassifier, LogisticRegression
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -24,16 +24,16 @@ def predictSelected(classifiers_arr, X):
 
 
 class Instances(object):
-    decisionTree0 = DecisionTreeClassifier()
-    decisionTree1 = DecisionTreeClassifier(criterion='entropy')
-    decisionTree2 = DecisionTreeClassifier(splitter='random')
-    decisionTree3 = DecisionTreeClassifier(splitter='random', criterion='entropy')
-    decisionTree4 = DecisionTreeClassifier(max_features='sqrt')
-    decisionTree5 = DecisionTreeClassifier(max_features='log2')
-    decisionTree6 = DecisionTreeClassifier(criterion='entropy', max_features='log2')
-    decisionTree7 = DecisionTreeClassifier(splitter='random', max_features='log2')
-    decisionTree8 = DecisionTreeClassifier(criterion='entropy', max_features='sqrt')
-    decisionTree9 = DecisionTreeClassifier(splitter='random', max_features='sqrt')
+    decisionTree0 = DecisionTreeClassifier(max_depth=1, criterion='entropy')
+    decisionTree1 = DecisionTreeClassifier(criterion='entropy', max_depth=1)
+    decisionTree2 = DecisionTreeClassifier(splitter='random', max_depth=1)
+    decisionTree3 = DecisionTreeClassifier(splitter='random', criterion='entropy', max_depth=1)
+    decisionTree4 = DecisionTreeClassifier(max_features='sqrt', max_depth=1)
+    decisionTree5 = DecisionTreeClassifier(max_features='log2', max_depth=1)
+    decisionTree6 = DecisionTreeClassifier(criterion='entropy', max_features='log2', max_depth=1)
+    decisionTree7 = DecisionTreeClassifier(splitter='random', max_features='log2', max_depth=1)
+    decisionTree8 = DecisionTreeClassifier(criterion='entropy', max_features='sqrt', max_depth=1)
+    decisionTree9 = DecisionTreeClassifier(splitter='random', max_features='sqrt', max_depth=1)
 
     naiveBayes0 = GaussianNB()
     naiveBayes1 = GaussianNB(var_smoothing=1)
@@ -90,7 +90,84 @@ class Instances(object):
     gaussianProcess8 = GaussianProcessClassifier(max_iter_predict=10)
     gaussianProcess9 = GaussianProcessClassifier(n_restarts_optimizer=5)
 
+    logisticRegression0 = LogisticRegression()
+    logisticRegression3 = LogisticRegression(penalty='none')
+    logisticRegression2 = LogisticRegression(solver='liblinear', penalty='l1')
+    logisticRegression4 = LogisticRegression(solver='newton-cg')
+    logisticRegression1 = LogisticRegression(solver='saga', penalty='l1')
+    logisticRegression5 = LogisticRegression(solver='saga', penalty='none')
+    logisticRegression6 = LogisticRegression(solver='saga')
+    logisticRegression7 = LogisticRegression(solver='liblinear', penalty='l2')
+    logisticRegression8 = LogisticRegression(solver='sag', penalty='none')
+    logisticRegression9 = LogisticRegression(solver='sag')
+
     __instances = [decisionTree0,
+                  gaussianProcess8,
+                  svm8,
+                  svm9,
+                  stochasticGradient0,
+                  stochasticGradient1,
+                  stochasticGradient2,
+                  stochasticGradient6,
+                  stochasticGradient7,
+                  gaussianProcess4,
+                  gaussianProcess5,
+                  kNeighbors1,
+                  kNeighbors2,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  ]
+
+    __instance = [decisionTree0,
                    decisionTree1,
                    decisionTree2,
                    decisionTree3,
@@ -149,7 +226,17 @@ class Instances(object):
                    gaussianProcess6,
                    gaussianProcess7,
                    gaussianProcess8,
-                   gaussianProcess9
+                   gaussianProcess9,
+                   logisticRegression0,
+                   logisticRegression1,
+                   logisticRegression2,
+                   logisticRegression3,
+                   logisticRegression4,
+                   logisticRegression5,
+                   logisticRegression6,
+                   logisticRegression7,
+                   logisticRegression8,
+                   logisticRegression9,
                    ]
 
     __trained_classifiers = []
@@ -185,6 +272,6 @@ class Instances(object):
         for i, instance in enumerate(self.__trained_classifiers):
             print("\rPredicting:", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
             predictions = instance.predict(X)
-            self.__scores.append(model.calcScore(predictions))
+            self.__scores.append(model.calcScore(predictions, verify=False))
             self.__predictions_classifiers.append(predictions)
         print('')

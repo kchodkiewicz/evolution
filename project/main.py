@@ -14,24 +14,23 @@ def fitness_is_progressing():
         score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
         score_avg = score_sum / 20
         score_max = sorted(fitness_scores, reverse=True)[0]
-        if abs(score_avg - score_max) < 0.01:
+        if abs(score_avg - score_max) < 0.0001:
             return False
     return True
 
 
 if __name__ == '__main__':
     # Values passed by user
-
     dataset = "csv_result-PhishingData.csv"
     col = "Result"
     metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
     Model.dataset = pd.read_csv(dataset)
-    #  Model.METRICS_METHOD = metrics
+    Model.METRICS_METHOD = metrics
     X = Model.dataset.drop(columns=col)
     X = X.drop(columns="id")
     y = Model.dataset[col]
     Model.X_train, X_in, Model.y_train, y_in = train_test_split(X, y, test_size=0.3)
-    Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=1/3)
+    Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=0.3)
     """
     dataset = "dataset-har-PUC-Rio-ugulino.csv"
     col = "class"
@@ -67,7 +66,7 @@ if __name__ == '__main__':
     write_to_json("classifiers_scores", population.genFitness)
     """
 
-    population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
+    population = Population(size=1000, committee=10, gen_length=len(inst.trained_classifiers))
     fitness_scores = []
     while True:
         population.run_normally()
@@ -78,13 +77,16 @@ if __name__ == '__main__':
         if not fitness_is_progressing():
             break
 
+    # create final list of models
     final_models = []
     for i, gen in enumerate(population.bestInGen.genes):
         if gen:
             final_models.append(inst.trained_classifiers[i])
+    # make predictions for final models
     final_predicts = predictSelected(final_models, Model.X_validate)
+    # create list of answers for final committee
     committee_answers = []
-    for i in range(len(final_predicts)):
+    for i in range(len(final_predicts[0])):
         tmp = {}
         for predicts in final_predicts:
             if predicts[i] in tmp.keys():
@@ -95,12 +97,25 @@ if __name__ == '__main__':
         val = max(inverse)[1]
         committee_answers.append(val)
     model = Model()
-    score = model.calcScore(predictions=committee_answers)
+    # calculate score of committee
+    score = model.calcScore(predictions=committee_answers, verify=True)
 
+    # create list of models used in final list
+    separated_models = []
+    for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
+        separated_models.append(inst.trained_classifiers[conv_genes(population.bestInGen.genes)[i]])
+    # make predictions for every model
+    separated_predicts = predictSelected(separated_models, Model.X_validate)
+    # calculate separate score for every model
+    separated_scores = []
+    for mod in separated_predicts:
+        separated_scores.append(model.calcScore(mod, verify=True))
 
     print("Classifiers:", conv_genes(population.bestInGen.genes))
     print("Score:", score)
-    print("Separate scores:", inst.scores)
+    print("Separate scores:", separated_scores)
     write_to_json("classifiers_scores", population.genFitness)
 
-
+    # TODO check adaboost
+    # TODO VotingClassifier <- may be refactor ??
+    adaboost = AdaBoost()

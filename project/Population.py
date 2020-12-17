@@ -63,7 +63,7 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    # TODO crossing - test it (cut points and committee length) !!!
+    # TODO crossing - test it (cut points) !!!
     def cross(self, cross_id, parent_first, parent_second):
         child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
@@ -102,6 +102,7 @@ class Population(object):
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
+        """
         positive_values = []
         negative_values = []
         for i in range(len(phenotype.genes)):
@@ -121,6 +122,11 @@ class Population(object):
             phenotype.genes[index] = True
         for index in negative_values:
             phenotype.genes[index] = False
+        """
+        mutate_ratio = random.uniform(0, self.mutation_ratio)
+        for _ in range(int(mutate_ratio * phenotype.committee)):
+            index = random.randint(0, len(phenotype.genes) - 1)
+            phenotype.genes[index] = not phenotype.genes[index]
 
     def find_best_in_gen(self):
         best = self.phenotypes[0]
@@ -182,7 +188,7 @@ class Population(object):
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
-        print("Best in gen fitness:", self.bestInGen.fitness)
+        print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         if self.genNo % 5 == 0:
             write_to_json("gen_stats", self.output)

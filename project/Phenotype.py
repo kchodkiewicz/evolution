@@ -100,7 +100,7 @@ class Phenotype(object):
     def classification_did_finish(self):
         return self.__isClassificationFinished
 
-    # Take results, vote for answer and calc score, then penalize time
+    # Take results, vote for answer and calc score, then penalize bigger committees
     def calc_fitness(self):
         committee_answers = []
         for i in range(len(self.__predictions[0])):
@@ -113,7 +113,7 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = self.__model.calcScore(predictions=committee_answers) * (self.gen_length / self.__committee)
+        self.__fitness = self.__model.calcScore(predictions=committee_answers, verify=False) * (self.gen_length / self.__committee)
         return self.__fitness
 
     # choose classifiers from list and execute
