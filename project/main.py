@@ -118,4 +118,27 @@ if __name__ == '__main__':
 
     # TODO check adaboost
     # TODO VotingClassifier <- may be refactor ??
-    adaboost = AdaBoost()
+    # adaboost = AdaBoost()
+
+    # create final list of models
+    final_models = []
+    for i in range(10):
+        final_models.append(inst.trained_classifiers[i])
+    # make predictions for final models
+    final_predicts = predictSelected(final_models, Model.X_validate)
+    # create list of answers for final committee
+    committee_answers = []
+    for i in range(len(final_predicts[0])):
+        tmp = {}
+        for predicts in final_predicts:
+            if predicts[i] in tmp.keys():
+                tmp[predicts[i]] += 1
+            else:
+                tmp[predicts[i]] = 1
+        inverse = [(value, key) for key, value in tmp.items()]
+        val = max(inverse)[1]
+        committee_answers.append(val)
+    model = Model()
+    # calculate score of committee
+    score = model.calcScore(predictions=committee_answers, verify=True)
+    print("Teoretical:", score)

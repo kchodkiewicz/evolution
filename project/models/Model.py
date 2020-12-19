@@ -3,7 +3,7 @@ import sys
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
+from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve, classification_report
 
 
 # Handler for file opening, cleaning data, splitting dataset etc.

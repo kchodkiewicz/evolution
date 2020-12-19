@@ -24,7 +24,7 @@ def predictSelected(classifiers_arr, X):
 
 
 class Instances(object):
-    decisionTree0 = DecisionTreeClassifier(max_depth=1, criterion='entropy')
+    decisionTree0 = DecisionTreeClassifier(max_depth=1)
     decisionTree1 = DecisionTreeClassifier(criterion='entropy', max_depth=1)
     decisionTree2 = DecisionTreeClassifier(splitter='random', max_depth=1)
     decisionTree3 = DecisionTreeClassifier(splitter='random', criterion='entropy', max_depth=1)
