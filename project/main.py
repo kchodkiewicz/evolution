@@ -1,6 +1,7 @@
 import json
 import time
 import keyboard
+from sklearn.feature_selection import VarianceThreshold
 
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
@@ -26,8 +27,18 @@ if __name__ == '__main__':
     metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
     Model.dataset = pd.read_csv(dataset)
     Model.METRICS_METHOD = metrics
+
+    # remove features with low variance (same value in 90% of samples)
+    sel = VarianceThreshold(0.9 * (1 - 0.9))
+    Model.dataset = sel.fit_transform(Model.dataset)
+
     X = Model.dataset.drop(columns=col)
-    X = X.drop(columns="id")
+    X = X.drop(columns="id", errors='ignore')
+    X = X.drop(columns="Id", errors='ignore')
+    X = X.drop(columns="ID", errors='ignore')
+    X = X.drop(columns="Identification", errors='ignore')
+    X = X.drop(columns="identification", errors='ignore')
+
     y = Model.dataset[col]
     Model.X_train, X_in, Model.y_train, y_in = train_test_split(X, y, test_size=0.3)
     Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=0.3)

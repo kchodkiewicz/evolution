@@ -127,6 +127,11 @@ class Population(object):
         for _ in range(int(mutate_ratio * phenotype.committee)):
             index = random.randint(0, len(phenotype.genes) - 1)
             phenotype.genes[index] = not phenotype.genes[index]
+        it = 0
+        for i in phenotype.genes:
+            if i:
+                it += 1
+        phenotype.committee = it
 
     def find_best_in_gen(self):
         best = self.phenotypes[0]
