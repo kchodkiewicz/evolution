@@ -113,7 +113,7 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = 0.8 * pow(self.__model.calcScore(predictions=committee_answers, verify=False + 1), 2) + \
+        self.__fitness = 0.8 * pow(self.__model.calcScore(predictions=committee_answers, verify=False) + 1, 2) + \
                          0.2 * 0.05 * (self.gen_length / self.__committee)
         return self.__fitness
 

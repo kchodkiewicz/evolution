@@ -1,18 +1,11 @@
-import sys
-from time import sleep
-
 from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import SGDClassifier, LogisticRegression
 from sklearn.naive_bayes import GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
-
-
-# Instances of all supported classifiers
-# If desired classifier is not listed add by creating instance
-# with unique name and append it to __instances list
-from models.Model import Model
+from models.Model import Model, print_progress
+from sklearn import exceptions
 
 
 def predictSelected(classifiers_arr, X):
@@ -23,6 +16,9 @@ def predictSelected(classifiers_arr, X):
     return res
 
 
+# Instances of all supported classifiers
+# If desired classifier is not listed add by creating instance
+# with unique name and append it to __instances list
 class Instances(object):
     decisionTree0 = DecisionTreeClassifier(max_depth=1)
     decisionTree1 = DecisionTreeClassifier(criterion='entropy', max_depth=1)
@@ -39,12 +35,12 @@ class Instances(object):
     naiveBayes1 = GaussianNB(var_smoothing=1)
     naiveBayes2 = GaussianNB(var_smoothing=0)
     naiveBayes3 = GaussianNB(var_smoothing=1e9)
-    #naiveBayes4 = MultinomialNB()
-    #naiveBayes5 = MultinomialNB(alpha=1e-10)
-    #naiveBayes6 = MultinomialNB(alpha=1e10)
-    #naiveBayes7 = MultinomialNB(fit_prior=False)
-    #naiveBayes8 = MultinomialNB(alpha=1e-10, fit_prior=False)
-    #naiveBayes9 = MultinomialNB(alpha=1e10, fit_prior=False)
+    # naiveBayes4 = MultinomialNB()
+    # naiveBayes5 = MultinomialNB(alpha=1e-10)
+    # naiveBayes6 = MultinomialNB(alpha=1e10)
+    # naiveBayes7 = MultinomialNB(fit_prior=False)
+    # naiveBayes8 = MultinomialNB(alpha=1e-10, fit_prior=False)
+    # naiveBayes9 = MultinomialNB(alpha=1e10, fit_prior=False)
 
     svm0 = SVC()
     svm1 = SVC(gamma='auto')
@@ -102,142 +98,142 @@ class Instances(object):
     logisticRegression9 = LogisticRegression(solver='sag')
 
     __instances = [decisionTree0,
-                  gaussianProcess8,
-                  svm8,
-                  svm9,
-                  stochasticGradient0,
-                  stochasticGradient1,
-                  stochasticGradient2,
-                  stochasticGradient6,
-                  stochasticGradient7,
-                  gaussianProcess4,
-                  gaussianProcess5,
-                  kNeighbors1,
-                  kNeighbors2,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  decisionTree0,
-                  ]
-
-    __instance = [decisionTree0,
-                   decisionTree1,
-                   decisionTree2,
-                   decisionTree3,
-                   decisionTree4,
-                   decisionTree5,
-                   decisionTree6,
-                   decisionTree7,
-                   decisionTree8,
-                   decisionTree9,
-                   naiveBayes0,
-                   naiveBayes1,
-                   naiveBayes2,
-                   naiveBayes3,
-                   #naiveBayes4,
-                   #naiveBayes5,
-                   #naiveBayes6,
-                   #naiveBayes7,
-                   #naiveBayes8,
-                   #naiveBayes9,
-                   svm0,
-                   svm1,
-                   svm2,
-                   svm3,
-                   svm4,
-                   svm5,
-                   svm6,
-                   svm7,
+                   gaussianProcess8,
                    svm8,
                    svm9,
                    stochasticGradient0,
                    stochasticGradient1,
                    stochasticGradient2,
-                   stochasticGradient3,
-                   stochasticGradient4,
-                   stochasticGradient5,
                    stochasticGradient6,
                    stochasticGradient7,
-                   stochasticGradient8,
-                   stochasticGradient9,
-                   kNeighbors0,
-                   kNeighbors1,
-                   kNeighbors2,
-                   kNeighbors3,
-                   kNeighbors4,
-                   kNeighbors5,
-                   kNeighbors6,
-                   kNeighbors7,
-                   kNeighbors8,
-                   kNeighbors9,
-                   gaussianProcess0,
-                   gaussianProcess1,
-                   gaussianProcess2,
-                   gaussianProcess3,
                    gaussianProcess4,
                    gaussianProcess5,
-                   gaussianProcess6,
-                   gaussianProcess7,
-                   gaussianProcess8,
-                   gaussianProcess9,
-                   logisticRegression0,
-                   logisticRegression1,
-                   logisticRegression2,
-                   logisticRegression3,
-                   logisticRegression4,
-                   logisticRegression5,
-                   logisticRegression6,
-                   logisticRegression7,
-                   logisticRegression8,
-                   logisticRegression9,
+                   kNeighbors1,
+                   kNeighbors2,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
+                   decisionTree0,
                    ]
+
+    __instance = [decisionTree0,
+                  decisionTree1,
+                  decisionTree2,
+                  decisionTree3,
+                  decisionTree4,
+                  decisionTree5,
+                  decisionTree6,
+                  decisionTree7,
+                  decisionTree8,
+                  decisionTree9,
+                  naiveBayes0,
+                  naiveBayes1,
+                  naiveBayes2,
+                  naiveBayes3,
+                  # naiveBayes4,
+                  # naiveBayes5,
+                  # naiveBayes6,
+                  # naiveBayes7,
+                  # naiveBayes8,
+                  # naiveBayes9,
+                  svm0,
+                  svm1,
+                  svm2,
+                  svm3,
+                  svm4,
+                  svm5,
+                  svm6,
+                  svm7,
+                  svm8,
+                  svm9,
+                  stochasticGradient0,
+                  stochasticGradient1,
+                  stochasticGradient2,
+                  stochasticGradient3,
+                  stochasticGradient4,
+                  stochasticGradient5,
+                  stochasticGradient6,
+                  stochasticGradient7,
+                  stochasticGradient8,
+                  stochasticGradient9,
+                  kNeighbors0,
+                  kNeighbors1,
+                  kNeighbors2,
+                  kNeighbors3,
+                  kNeighbors4,
+                  kNeighbors5,
+                  kNeighbors6,
+                  kNeighbors7,
+                  kNeighbors8,
+                  kNeighbors9,
+                  gaussianProcess0,
+                  gaussianProcess1,
+                  gaussianProcess2,
+                  gaussianProcess3,
+                  gaussianProcess4,
+                  gaussianProcess5,
+                  gaussianProcess6,
+                  gaussianProcess7,
+                  gaussianProcess8,
+                  gaussianProcess9,
+                  logisticRegression0,
+                  logisticRegression1,
+                  logisticRegression2,
+                  logisticRegression3,
+                  logisticRegression4,
+                  logisticRegression5,
+                  logisticRegression6,
+                  logisticRegression7,
+                  logisticRegression8,
+                  logisticRegression9,
+                  ]
 
     __trained_classifiers = []
     __predictions_classifiers = []
@@ -260,18 +256,26 @@ class Instances(object):
         return self.__scores
 
     def trainClassifiers(self, X, y):
-        #  TODO parallelize training
         for i, instance in enumerate(self.__instances):
-            print("\rTraining:", i + 1, "/", len(self.__instances), end='', flush=True)
-            trained_model = instance.fit(X, y)
-            self.__trained_classifiers.append(trained_model)
+            try:
+                print_progress(i + 1, len(self.__instances), "Training")
+                trained_model = instance.fit(X, y)
+            except exceptions.FitFailedWarning as e:
+                print("An error occurred while training classifiers. Omitting.", e)
+            else:
+                self.__trained_classifiers.append(trained_model)
         print('')
 
     def predictClassifiers(self, X):
         model = Model()
         for i, instance in enumerate(self.__trained_classifiers):
-            print("\rPredicting:", i + 1, "/", len(self.__trained_classifiers), end='', flush=True)
-            predictions = instance.predict(X)
-            self.__scores.append(model.calcScore(predictions, verify=False))
-            self.__predictions_classifiers.append(predictions)
+            try:
+                print_progress(i + 1, len(self.__trained_classifiers), "Predicting")
+                predictions = instance.predict(X)
+            except exceptions.NotFittedError as e:
+                print("An error occurred while estimating classes. Omitting.", e)
+            else:
+                self.__scores.append(model.calcScore(predictions, verify=False))
+                self.__predictions_classifiers.append(predictions)
         print('')
+

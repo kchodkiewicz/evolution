@@ -1,11 +1,11 @@
-import json
-import time
-import keyboard
+import sys, getopt
+
 from sklearn.feature_selection import VarianceThreshold
 
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 import pandas as pd
+from pandas import errors
 from sklearn.model_selection import train_test_split
 from models.instances import Instances, predictSelected
 
@@ -20,19 +20,87 @@ def fitness_is_progressing():
     return True
 
 
+def parse_args(argv):
+    dataset_name = ''
+    col_name = ''
+    metrics_method = 'accuracy_score'
+    pop_size = 1000
+    committee_len = 10
+    try:
+        opts, args = getopt.getopt(argv, "hi:c:m:p:s", ["if=", "column="])
+    except getopt.GetoptError:
+        print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
+            print("-i, --if= - path and name of .csv file containing dataset, REQUIRED")
+            print("-c, --column= - name of column containing correct classes, REQUIRED")
+            print("-m - metrics method used for evaluating performance [accuracy_score, f1_score], default : "
+                  "accuracy_score")
+            print("-p - size of population, default : 1000")
+            print("-s - size of initial committee, default 10")
+            sys.exit()
+        elif opt in ("-i", "--if"):
+            try:
+                with open(arg) as f:
+                    dataset_name = arg
+            except FileNotFoundError as e:
+                print(e)
+        elif opt in ("-c", "--column"):
+            col_name = arg
+        elif opt in "-m":
+            if arg == "accuracy_score" or arg == "f1_score":
+                col_name = arg
+            else:
+                print('Incorrect metrics method')
+                sys.exit(2)
+        elif opt in "-p":
+            if not arg.isnumeric():
+                print("Incorrect population size")
+                sys.exit(2)
+            else:
+                pop_size = arg
+        elif opt in "-s":
+            if not arg.isnumeric():
+                print("Incorrect committee size")
+                sys.exit(2)
+            else:
+                committee_len = arg
+
+    if dataset_name == '' or col_name == '':
+        print('Dataset and column name are required')
+        sys.exit(2)
+    return dataset_name, col_name, metrics_method, pop_size, committee_len
+
+
+def variance_threshold_selector(data, threshold=0.9):
+    selector = VarianceThreshold(threshold)
+    selector.fit(data)
+    return data[data.columns[selector.get_support(indices=True)]]
+
+
 if __name__ == '__main__':
-    # Values passed by user
-    dataset = "csv_result-PhishingData.csv"
-    col = "Result"
-    metrics = "accuracy_score"  # accuracy_score, auc, f1_score. Default f1
-    Model.dataset = pd.read_csv(dataset)
+
+    dataset, col, metrics, pop, comm = parse_args(sys.argv[1:])
+
+    try:
+        Model.dataset = pd.read_csv(dataset)
+    except pd.errors.ParserError:
+        print("Incorrect path to file")
+        sys.exit(2)
     Model.METRICS_METHOD = metrics
 
     # remove features with low variance (same value in 90% of samples)
-    sel = VarianceThreshold(0.9 * (1 - 0.9))
-    Model.dataset = sel.fit_transform(Model.dataset)
+    #sel = VarianceThreshold(0.9 * (1 - 0.9))
+    #Model.dataset = sel.fit_transform(Model.dataset)
+    variance_threshold_selector(Model.dataset, 0.9)
+    try:
+        X = Model.dataset.drop(columns=col)
+    except AttributeError:
+        print("Incorrect column name")
+        sys.exit(2)
 
-    X = Model.dataset.drop(columns=col)
     X = X.drop(columns="id", errors='ignore')
     X = X.drop(columns="Id", errors='ignore')
     X = X.drop(columns="ID", errors='ignore')

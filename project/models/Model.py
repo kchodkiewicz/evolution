@@ -1,9 +1,14 @@
 import json
 import sys
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve, classification_report
+
+
+def print_progress(i, end, msg):
+    if i == 0:
+        print(msg, i, "/", end, end='', flush=True)
+    print("\r", msg, i, "/", end, end='', flush=True)
 
 
 # Handler for file opening, cleaning data, splitting dataset etc.

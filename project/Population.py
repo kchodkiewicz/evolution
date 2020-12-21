@@ -8,13 +8,17 @@ import time
 from time import sleep
 from matplotlib.pyplot import plot
 from Phenotype import Phenotype
+from models.Model import print_progress
 
 
 def write_to_json(path, content):
-    with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
-              f"{time.localtime()[2]}_"
-              f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
-        json.dump(content, filename, indent=4)
+    try:
+        with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
+                  f"{time.localtime()[2]}_"
+                  f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
+            json.dump(content, filename, indent=4)
+    except Exception as e:
+        print(e)
 
 
 # Return indexes of true genes
@@ -42,10 +46,14 @@ class Population(object):
         self.__validation_res = {}
 
     def load_population(self, filename):
-        with open(filename) as f:
-            file_genes = json.load(f)
-        for i, phenotype in enumerate(self.phenotypes):
-            phenotype.genes = file_genes[str(i)]
+        try:
+            with open(filename) as f:
+                file_genes = json.load(f)
+        except FileNotFoundError as e:
+            print(e)
+        else:
+            for i, phenotype in enumerate(self.phenotypes):
+                phenotype.genes = file_genes[str(i)]
 
     @property
     def genFitness(self):
@@ -174,9 +182,7 @@ class Population(object):
         new_generation = []
         i = 0
         while len(new_generation) < len(self.phenotypes):
-            if i == 0:
-                print("Crossing:", i + 2, "/", len(self.phenotypes), end='', flush=True)
-            print("\rCrossing:", i + 2, "/", len(self.phenotypes), end='', flush=True)
+            print_progress(i + 2, len(self.phenotypes), "Crossing")
             first_parent = copy.deepcopy(self.find_parent())
             second_parent = copy.deepcopy(self.find_parent())
             child1st, child2nd = self.cross(i, first_parent, second_parent)
@@ -185,9 +191,7 @@ class Population(object):
             i += 2
         print('')
         for j, phenotype in enumerate(self.phenotypes):
-            if j == 0:
-                print("Mutating:", j + 1, "/", len(self.phenotypes), end='', flush=True)
-            print("\rMutating:", j + 1, "/", len(self.phenotypes), end='', flush=True)
+            print_progress(j + 1, len(self.phenotypes), "Mutating")
             self.mutate(phenotype)
         print('')
         new_generation.pop(0)
