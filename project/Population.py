@@ -37,7 +37,7 @@ class Population(object):
         self.classifierCommittee = committee
         self.genLength = gen_length
         self.genNo = 0
-        self.mutation_ratio = 0.2  # max amount of changed genes in phenotype
+        self.mutation_ratio = 1/gen_length  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(i, self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
         self.__genFitness = []
@@ -154,9 +154,7 @@ class Population(object):
     # Check if phenotype's normalized fitness is greater than random number
     # If it is then return this phenotype
     # If not then try for another phenotype (keep the same random number)
-    def find_parent(self):
-        sorted_phenotypes = sorted(self.phenotypes,
-                                   key=lambda phenotype: phenotype.normalizedFitness, reverse=True)
+    def find_parent(self, sorted_phenotypes):
         index = 0
         rand = random.uniform(0, 1)
         while rand > 0:
@@ -178,13 +176,14 @@ class Population(object):
 
         for phenotype in self.phenotypes:
             phenotype.normalizedFitness = phenotype.fitness / total_fitness
-
+        sorted_phenotypes = sorted(self.phenotypes,
+                                   key=lambda p: phenotype.normalizedFitness, reverse=True)
         new_generation = []
         i = 0
         while len(new_generation) < len(self.phenotypes):
             print_progress(i + 2, len(self.phenotypes), "Crossing")
-            first_parent = copy.deepcopy(self.find_parent())
-            second_parent = copy.deepcopy(self.find_parent())
+            first_parent = copy.deepcopy(self.find_parent(sorted_phenotypes))
+            second_parent = copy.deepcopy(self.find_parent(sorted_phenotypes))
             child1st, child2nd = self.cross(i, first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
@@ -221,9 +220,9 @@ class Population(object):
         self.__validation_res[self.genNo]["max"] = self.bestInGen.fitness
         write_to_json("validation_res", self.__validation_res)
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
-            self.mutation_ratio = 0.7
+            self.mutation_ratio = 10/self.genLength
         else:
-            self.mutation_ratio = 0.2
+            self.mutation_ratio = 1/self.genLength
 
     def run_normally(self):
         print("Gen No", self.genNo, end=' ')

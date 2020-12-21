@@ -27,12 +27,14 @@ def parse_args(argv):
     pop_size = 1000
     committee_len = 10
     try:
-        opts, args = getopt.getopt(argv, "hi:c:m:p:s", ["if=", "column="])
-    except getopt.GetoptError:
+        opts, args = getopt.getopt(argv, "hi:c:m:p:s:", ["help", "if=", "column=", "metrics=", "pop_size=",
+                                                         "committee_size="])
+    except getopt.GetoptError as e:
         print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
+        print(e)
         sys.exit(2)
     for opt, arg in opts:
-        if opt == '-h':
+        if opt == ("-h", "--help"):
             print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
             print("-i, --if= - path and name of .csv file containing dataset, REQUIRED")
             print("-c, --column= - name of column containing correct classes, REQUIRED")
@@ -49,24 +51,38 @@ def parse_args(argv):
                 print(e)
         elif opt in ("-c", "--column"):
             col_name = arg
-        elif opt in "-m":
+        elif opt in ("-m", "--metrics"):
             if arg == "accuracy_score" or arg == "f1_score":
-                col_name = arg
+                metrics_method = arg
             else:
                 print('Incorrect metrics method')
                 sys.exit(2)
-        elif opt in "-p":
+        elif opt in ("-p", "--pop_size"):
             if not arg.isnumeric():
                 print("Incorrect population size")
                 sys.exit(2)
             else:
-                pop_size = arg
-        elif opt in "-s":
+                try:
+                    tmp_p = int(arg)
+                    if tmp_p < 0:
+                        raise ValueError
+                except ValueError:
+                    print("Population size must be a positive integer")
+                else:
+                    pop_size = tmp_p
+        elif opt in ("-s", "--committee_size"):
             if not arg.isnumeric():
                 print("Incorrect committee size")
                 sys.exit(2)
             else:
-                committee_len = arg
+                try:
+                    tmp_c = int(arg)
+                    if tmp_c < 0:
+                        raise ValueError
+                except ValueError:
+                    print("Committee size must be a positive integer")
+                else:
+                    committee_len = tmp_c
 
     if dataset_name == '' or col_name == '':
         print('Dataset and column name are required')
@@ -84,6 +100,9 @@ if __name__ == '__main__':
 
     dataset, col, metrics, pop, comm = parse_args(sys.argv[1:])
 
+    print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
+          "\n* population size:", pop, "\n* committee size:", comm)
+
     try:
         Model.dataset = pd.read_csv(dataset)
     except pd.errors.ParserError:
@@ -92,13 +111,14 @@ if __name__ == '__main__':
     Model.METRICS_METHOD = metrics
 
     # remove features with low variance (same value in 90% of samples)
-    #sel = VarianceThreshold(0.9 * (1 - 0.9))
-    #Model.dataset = sel.fit_transform(Model.dataset)
     variance_threshold_selector(Model.dataset, 0.9)
     try:
         X = Model.dataset.drop(columns=col)
     except AttributeError:
-        print("Incorrect column name")
+        print("Column with name:", col, "not found in provided dataset")
+        sys.exit(2)
+    except KeyError:
+        print("Column with name:", col, "not found in provided dataset")
         sys.exit(2)
 
     X = X.drop(columns="id", errors='ignore')
@@ -144,8 +164,14 @@ if __name__ == '__main__':
     print(conv_genes(population.bestInGen.genes))
     write_to_json("classifiers_scores", population.genFitness)
     """
-
-    population = Population(size=1000, committee=10, gen_length=len(inst.trained_classifiers))
+    try:
+        if comm > len(inst.trained_classifiers):
+            raise ValueError
+        population = Population(size=pop, committee=comm, gen_length=len(inst.trained_classifiers))
+    except ValueError:
+        print("Committee size cannot be greater than amount of different classifiers (",
+              len(inst.trained_classifiers), ")")
+        sys.exit(2)
     fitness_scores = []
     while True:
         population.run_normally()
