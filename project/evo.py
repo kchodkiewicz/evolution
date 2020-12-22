@@ -9,17 +9,19 @@ from utils import parse_args, variance_threshold_selector, fitness_is_progressin
 
 if __name__ == '__main__':
 
-    dataset, col, metrics, pop, comm, load_file = parse_args(sys.argv[1:])
+    dataset, col, metrics, pop, comm, load_file, verbose = parse_args(sys.argv[1:])
 
     inst = Instances()
     model = Model()
 
+    Model.verbose = verbose
+
     try:
-        model.dataset = pd.read_csv(dataset)
+        Model.dataset = pd.read_csv(dataset)
     except pd.errors.ParserError:
         print("Incorrect path to file")
         sys.exit(2)
-    model.METRICS_METHOD = metrics
+    Model.METRICS_METHOD = metrics
 
     # remove features with low variance (same value in 90% of samples)
     variance_threshold_selector(model.dataset, 0.9)
@@ -52,6 +54,9 @@ if __name__ == '__main__':
     Model.X_train, X_in, Model.y_train, y_in = train_test_split(X, y, test_size=0.3)
     Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=0.3)
 
+    print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
+          "\n* population size:", pop, "\n* committee size:", comm, "\n* load_genes:", load_file)
+
     inst.trainClassifiers(model.X_train, model.y_train)
     inst.predictClassifiers(model.X_test)
 
@@ -70,9 +75,6 @@ if __name__ == '__main__':
         except Exception as e:
             print(e)
             print("Couldn't open genes file. Running default mode.")
-
-    print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
-          "\n* population size:", pop, "\n* committee size:", comm, "\n* load_genes:", load_file)
 
     # EVOLUTION --------------------------------------------------------
     fitness_scores = []
@@ -113,8 +115,16 @@ if __name__ == '__main__':
     theoretical_score = vote(theoretical_models, model.X_validate)
 
     # OUTPUT -----------------------------------------------------------
+    def human_readable_genes(genes_index):
+        p = []
+        for it in genes_index:
+            p.append(inst.trained_classifiers[it].__class__.__name__)
+        return p
+
     print("Classifiers:", conv_genes(population.bestInGen.genes))
+    print(human_readable_genes(conv_genes(population.bestInGen.genes)))
     print("Score:", score, "in", population.genNo, "iterations")
-    print("Separate scores:", separated_scores)
+    print("Separate scores:", separated_scores[:5])
+    print(separated_scores[5:])
     write_to_json("classifiers_scores", population.genFitness)
     print("Theoretical (assume: first 10 are best):", theoretical_score)

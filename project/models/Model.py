@@ -1,4 +1,4 @@
-# Handler for file opening, cleaning data, splitting dataset etc.
+# Program wide structure containing dataset, subsets and metrics method
 from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
 
 
@@ -11,6 +11,7 @@ class Model(object):
     y_test = []
     y_validate = []
     METRICS_METHOD = "f1_score"
+    verbose = False
 
     def calcScore(self, predictions, **kwargs):
         def calc(y, predicts):

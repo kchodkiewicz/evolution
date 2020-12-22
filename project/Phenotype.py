@@ -1,4 +1,3 @@
-import json
 import random
 from models.Model import Model
 from models.instances import Instances
@@ -67,7 +66,7 @@ class Phenotype(object):
         self.__normalizedFitness = donor.normalizedFitness
         self.__genes = donor.genes
 
-    # generate 10 positive genes (classifiers)
+    # generate <gen_length> positive genes (classifiers)
     def create_random_genes(self):
         it = 0
         while it < self.committee:
@@ -93,20 +92,11 @@ class Phenotype(object):
                          0.2 * 0.05 * (self.gen_length / self.__committee)
         return self.__fitness
 
-    # choose classifiers from list and execute
-    # then calculate fitness of all
+    # choose classifiers from list
+    # then vote and calculate fitness
     def run(self):
         self.__predictions.clear()
         for i, gen in enumerate(self.genes):
             if gen:
-                # Different approach
-                #  score, predictions = self.__model.runClassifier(self.__inst.trained_classifiers[i])
-                #  self.__scores.append(score)
-                #  self.__predictions.append(predictions)
                 self.__predictions.append(self.__inst.predictions_arr[i])
-
         return self.calc_fitness()
-
-    # Just for testing
-    def test(self):
-        pass

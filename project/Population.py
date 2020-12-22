@@ -6,6 +6,7 @@ import time
 import multiprocessing as mp
 from Phenotype import Phenotype
 from utils import print_progress, conv_genes, write_to_json
+from models.Model import Model
 
 
 class Population(object):
@@ -147,7 +148,8 @@ class Population(object):
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
-        print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
+        if Model.verbose:
+            print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         if self.genNo % 5 == 0:
             write_to_json("gen_stats", self.output)
@@ -175,38 +177,8 @@ class Population(object):
             self.mutation_ratio = 1/self.genLength
 
     def run_normally(self):
-        print("Gen No", self.genNo, end=' ')
+        print("Gen No", self.genNo, end=' ', flush=True)
         for phenotype in self.phenotypes:
             fit = phenotype.run()
             self.__genFitness.append(fit)
-        self.genNo += 1
-
-    def run_async(self, nprocs):
-        #  TODO parallelize predicting
-        def run(chunk, out_queue):
-            out = []
-            for phenotype in chunk:
-                fit = phenotype.run()
-                self.__genFitness.append(fit)
-                out.append(phenotype)
-            out_queue.put(out)
-            print("doin that")
-            exit(0)
-
-        print("Gen No", self.genNo)
-        out_q = mp.Queue()
-        chunk_size = int(math.ceil(len(self.phenotypes) / float(nprocs)))
-
-        process_arr = [mp.Process(target=run, args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
-                                                    out_q)) for i in range(nprocs)]
-        for p in process_arr:
-            p.start()
-
-        result = [out_q.get() for _ in process_arr]
-
-        for p in process_arr:
-            print("But am i here. Yeah")
-            p.join()
-
-        self.phenotypes = copy.deepcopy(result)
         self.genNo += 1

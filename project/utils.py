@@ -3,10 +3,10 @@ import json
 import sys
 import time
 from sklearn.feature_selection import VarianceThreshold
-
 from models.Model import Model
 
 
+# Validate if fitness of last 20 classifiers is getting better
 def fitness_is_progressing(fitness_scores_arr):
     if len(fitness_scores_arr) >= 20:
         score_sum = sum(fitness_scores_arr[len(fitness_scores_arr) - 20:])
@@ -17,6 +17,7 @@ def fitness_is_progressing(fitness_scores_arr):
     return True
 
 
+# Parse user input
 def parse_args(argv):
     dataset_name = ''
     col_name = ''
@@ -24,12 +25,13 @@ def parse_args(argv):
     pop_size = 1000
     committee_len = 10
     load_f = None
+    verbose = False
     try:
-        opts, args = getopt.getopt(argv, "hi:c:m:p:s:l:", ["help", "if=", "column=", "metrics=", "pop_size=",
-                                                           "committee_size=", "load_genes="])
+        opts, args = getopt.getopt(argv, "hi:c:m:p:s:l:v", ["help", "if=", "column=", "metrics=", "pop_size=",
+                                                            "committee_size=", "load_genes=", "verbose"])
     except getopt.GetoptError as e:
         print('evo.py -i <infile.csv> -c <column> [-m <metrics> -p <population_size> -s <committee_size> -l '
-              '<genes_file.json>]')
+              '<genes_file.json> -v]')
         print(e)
         sys.exit(2)
     for opt, arg in opts:
@@ -42,6 +44,7 @@ def parse_args(argv):
             print("-p, --pop_size= - size of population, default : 1000")
             print("-s, --committee_size= - size of initial committee, default 10")
             print("-l, --load_genes= - path and name of .json file containing genes")
+            print("-v, --verbose - show progress info")
             sys.exit()
         elif opt in ("-i", "--if"):
             try:
@@ -89,19 +92,23 @@ def parse_args(argv):
                     load_f = arg
             except FileNotFoundError as e:
                 print(e)
+        elif opt in ("-v", "--verbose"):
+            verbose = True
 
     if dataset_name == '' or col_name == '':
         print('Dataset and column name are required')
         sys.exit(2)
-    return dataset_name, col_name, metrics_method, pop_size, committee_len, load_f
+    return dataset_name, col_name, metrics_method, pop_size, committee_len, load_f, verbose
 
 
+# Remove columns with same data (low variance)
 def variance_threshold_selector(data, threshold=0.9):
     selector = VarianceThreshold(threshold)
     selector.fit(data)
     return data[data.columns[selector.get_support(indices=True)]]
 
 
+# Write to specified .json file
 def write_to_json(path, content):
     try:
         with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
@@ -121,6 +128,7 @@ def conv_genes(genes_bool):
     return arr
 
 
+# Make predictions for selected group of classifiers
 def predictSelected(classifiers_arr, X):
     res = []
     for i, instance in enumerate(classifiers_arr):
@@ -129,10 +137,16 @@ def predictSelected(classifiers_arr, X):
     return res
 
 
+# Print progress bar
 def print_progress(i, end, msg):
-    if i == 0:
-        print(msg, i, "/", end, end='', flush=True)
-    print("\r", msg, i, "/", end, end='', flush=True)
+    if Model.verbose:
+        bar_len = 10
+        block = int(round((i / end) * bar_len))
+        if i == 0:
+            print('{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', end, end='',
+                  flush=True)
+        print("\r", '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', end, end='',
+              flush=True)
 
 
 def vote(models_arr, X):
