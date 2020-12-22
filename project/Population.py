@@ -1,33 +1,11 @@
 import copy
 import json
 import math
-import multiprocessing as mp
 import random
-import sys
 import time
-from time import sleep
-from matplotlib.pyplot import plot
+import multiprocessing as mp
 from Phenotype import Phenotype
-from models.Model import print_progress
-
-
-def write_to_json(path, content):
-    try:
-        with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
-                  f"{time.localtime()[2]}_"
-                  f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
-            json.dump(content, filename, indent=4)
-    except Exception as e:
-        print(e)
-
-
-# Return indexes of true genes
-def conv_genes(genes_bool):
-    arr = []
-    for i, gen in enumerate(genes_bool):
-        if gen:
-            arr.append(i)
-    return arr
+from utils import print_progress, conv_genes, write_to_json
 
 
 class Population(object):
@@ -37,6 +15,8 @@ class Population(object):
         self.classifierCommittee = committee
         self.genLength = gen_length
         self.genNo = 0
+        if gen_length < committee:
+            raise ValueError
         self.mutation_ratio = 1/gen_length  # max amount of changed genes in phenotype
         self.phenotypes = [Phenotype(i, self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
@@ -58,14 +38,6 @@ class Population(object):
     @property
     def genFitness(self):
         return self.__genFitness
-
-    def classification_did_finish(self):
-        for i in self.phenotypes:
-            if not i.is_classification_finished:
-                break
-        else:
-            return True
-        return False
 
     # Create list of indexes of true values in both parents
     # choose genes for child1 and remove them from true_genes
@@ -110,27 +82,6 @@ class Population(object):
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
-        """
-        positive_values = []
-        negative_values = []
-        for i in range(len(phenotype.genes)):
-            if phenotype.genes[i]:
-                positive_values.append(i)
-            else:
-                negative_values.append(i)
-        mutate_ratio = random.uniform(0, self.mutation_ratio)
-        for _ in range(int(mutate_ratio * phenotype.committee)):
-            positive_index = random.randint(0, len(positive_values) - 1)
-            negative_index = random.randint(0, len(negative_values) - 1)
-            negative_values.append(positive_values[positive_index])
-            positive_values.pop(positive_index)
-            positive_values.append(negative_values[negative_index])
-            negative_values.pop(negative_index)
-        for index in positive_values:
-            phenotype.genes[index] = True
-        for index in negative_values:
-            phenotype.genes[index] = False
-        """
         mutate_ratio = random.uniform(0, self.mutation_ratio)
         for _ in range(int(mutate_ratio * phenotype.committee)):
             index = random.randint(0, len(phenotype.genes) - 1)
@@ -214,7 +165,6 @@ class Population(object):
         for phenotype in self.phenotypes:
             sum_fitness += phenotype.fitness
         avg_fitness = sum_fitness / len(self.phenotypes)
-        #  print("avg", avg_fitness, "max", self.bestInGen.fitness)
         self.__validation_res[self.genNo] = {}
         self.__validation_res[self.genNo]["avg"] = avg_fitness
         self.__validation_res[self.genNo]["max"] = self.bestInGen.fitness
@@ -249,11 +199,10 @@ class Population(object):
 
         process_arr = [mp.Process(target=run, args=(self.phenotypes[chunk_size * i: chunk_size * (i + 1)],
                                                     out_q)) for i in range(nprocs)]
-
         for p in process_arr:
             p.start()
 
-        result = [out_q.get() for p in process_arr]
+        result = [out_q.get() for _ in process_arr]
 
         for p in process_arr:
             print("But am i here. Yeah")
@@ -261,6 +210,3 @@ class Population(object):
 
         self.phenotypes = copy.deepcopy(result)
         self.genNo += 1
-
-    def test(self):
-        self.phenotypes[0].test()

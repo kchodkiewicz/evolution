@@ -1,24 +1,18 @@
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.linear_model import SGDClassifier, LogisticRegression
-from sklearn.naive_bayes import GaussianNB, MultinomialNB
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from models.Model import Model, print_progress
-from sklearn import exceptions
-
-
-def predictSelected(classifiers_arr, X):
-    res = []
-    for i, instance in enumerate(classifiers_arr):
-        predictions = instance.predict(X)
-        res.append(predictions)
-    return res
-
-
 # Instances of all supported classifiers
 # If desired classifier is not listed add by creating instance
 # with unique name and append it to __instances list
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.linear_model import SGDClassifier, LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from models.Model import Model
+from sklearn import exceptions
+
+from utils import print_progress
+
+
 class Instances(object):
     decisionTree0 = DecisionTreeClassifier(max_depth=1)
     decisionTree1 = DecisionTreeClassifier(criterion='entropy', max_depth=1)
@@ -35,12 +29,6 @@ class Instances(object):
     naiveBayes1 = GaussianNB(var_smoothing=1)
     naiveBayes2 = GaussianNB(var_smoothing=0)
     naiveBayes3 = GaussianNB(var_smoothing=1e9)
-    # naiveBayes4 = MultinomialNB()
-    # naiveBayes5 = MultinomialNB(alpha=1e-10)
-    # naiveBayes6 = MultinomialNB(alpha=1e10)
-    # naiveBayes7 = MultinomialNB(fit_prior=False)
-    # naiveBayes8 = MultinomialNB(alpha=1e-10, fit_prior=False)
-    # naiveBayes9 = MultinomialNB(alpha=1e10, fit_prior=False)
 
     svm0 = SVC()
     svm1 = SVC(gamma='auto')
@@ -97,8 +85,7 @@ class Instances(object):
     logisticRegression8 = LogisticRegression(solver='sag', penalty='none')
     logisticRegression9 = LogisticRegression(solver='sag')
 
-    __instances = [decisionTree0,
-                   gaussianProcess8,
+    __instances = [gaussianProcess8,
                    svm8,
                    svm9,
                    stochasticGradient0,
@@ -110,6 +97,7 @@ class Instances(object):
                    gaussianProcess5,
                    kNeighbors1,
                    kNeighbors2,
+                   decisionTree0,
                    decisionTree0,
                    decisionTree0,
                    decisionTree0,
@@ -177,12 +165,6 @@ class Instances(object):
                   naiveBayes1,
                   naiveBayes2,
                   naiveBayes3,
-                  # naiveBayes4,
-                  # naiveBayes5,
-                  # naiveBayes6,
-                  # naiveBayes7,
-                  # naiveBayes8,
-                  # naiveBayes9,
                   svm0,
                   svm1,
                   svm2,
@@ -275,7 +257,10 @@ class Instances(object):
             except exceptions.NotFittedError as e:
                 print("An error occurred while estimating classes. Omitting.", e)
             else:
-                self.__scores.append(model.calcScore(predictions, verify=False))
-                self.__predictions_classifiers.append(predictions)
+                try:
+                    self.__scores.append(model.calcScore(predictions, verify=False))
+                except ValueError as e:
+                    print(" Couldn't calculate score. Omitting.", e)
+                else:
+                    self.__predictions_classifiers.append(predictions)
         print('')
-

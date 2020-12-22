@@ -1,14 +1,5 @@
 import json
-import math
-import multiprocessing
 import random
-import sys
-import time
-from queue import Queue
-
-import numpy
-import operator
-
 from models.Model import Model
 from models.instances import Instances
 
@@ -22,18 +13,11 @@ class Phenotype(object):
         self.__genLength = gen_length
         self.__fitness = 0.0
         self.__normalizedFitness = 0.0
-        self.__isClassificationFinished = False
         self.__genes = [False for x in range(self.gen_length)]
-        # classifier attributes
-        self.__classifiers = {}
-        self.__scores = []
+        # classifier attribute
         self.__predictions = []
-        self.__trainedModels = []
         self.__model = Model()
         self.__inst = Instances()
-        # prep phase
-        with open("models/_models_list.json") as f:
-            self.__classifiers = json.load(f)
         self.create_random_genes()
 
     @property
@@ -48,10 +32,6 @@ class Phenotype(object):
     @property
     def gen_length(self):
         return self.__genLength
-
-    @property
-    def is_classification_finished(self):
-        return self.__isClassificationFinished
 
     @property
     def genes(self):
@@ -85,7 +65,6 @@ class Phenotype(object):
         self.__genLength = donor.gen_length
         self.__fitness = donor.fitness
         self.__normalizedFitness = donor.normalizedFitness
-        self.__isClassificationFinished = donor.is_classification_finished
         self.__genes = donor.genes
 
     # generate 10 positive genes (classifiers)
@@ -96,9 +75,6 @@ class Phenotype(object):
             if not self.genes[index]:
                 self.genes[index] = True
                 it += 1
-
-    def classification_did_finish(self):
-        return self.__isClassificationFinished
 
     # Take results, vote for answer and calc score, then penalize bigger committees
     def calc_fitness(self):
@@ -120,11 +96,7 @@ class Phenotype(object):
     # choose classifiers from list and execute
     # then calculate fitness of all
     def run(self):
-        self.__scores.clear()
         self.__predictions.clear()
-        self.__trainedModels.clear()
-        self.__isClassificationFinished = False
-
         for i, gen in enumerate(self.genes):
             if gen:
                 # Different approach
@@ -133,7 +105,6 @@ class Phenotype(object):
                 #  self.__predictions.append(predictions)
                 self.__predictions.append(self.__inst.predictions_arr[i])
 
-        self.__isClassificationFinished = True
         return self.calc_fitness()
 
     # Just for testing

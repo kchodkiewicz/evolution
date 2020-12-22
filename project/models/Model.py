@@ -1,17 +1,7 @@
-import json
-import sys
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve, classification_report
-
-
-def print_progress(i, end, msg):
-    if i == 0:
-        print(msg, i, "/", end, end='', flush=True)
-    print("\r", msg, i, "/", end, end='', flush=True)
-
-
 # Handler for file opening, cleaning data, splitting dataset etc.
+from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
+
+
 class Model(object):
     dataset = None
     X_train = []
@@ -23,26 +13,16 @@ class Model(object):
     METRICS_METHOD = "f1_score"
 
     def calcScore(self, predictions, **kwargs):
+        def calc(y, predicts):
+            if Model.METRICS_METHOD == "auc":
+                fpr, tpr, thresholds = roc_curve(y, predicts, pos_label=2)
+                score = auc(fpr, tpr)
+            elif Model.METRICS_METHOD == "accuracy_score":
+                score = accuracy_score(y, predicts)
+            else:
+                score = f1_score(y, predicts, average='micro')
+            return score
         if kwargs['verify']:
-            if Model.METRICS_METHOD == "auc":
-                fpr, tpr, thresholds = roc_curve(self.y_validate, predictions, pos_label=2)
-                score = auc(fpr, tpr)
-            elif Model.METRICS_METHOD == "accuracy_score":
-                score = accuracy_score(self.y_validate, predictions)
-            else:
-                score = f1_score(self.y_validate, predictions, average='micro')
-            return score
+            return calc(self.y_validate, predictions)
         else:
-            if Model.METRICS_METHOD == "auc":
-                fpr, tpr, thresholds = roc_curve(self.y_test, predictions, pos_label=2)
-                score = auc(fpr, tpr)
-            elif Model.METRICS_METHOD == "accuracy_score":
-                score = accuracy_score(self.y_test, predictions)
-            else:
-                score = f1_score(self.y_test, predictions, average='micro')
-            return score
-
-    def runClassifier(self, model):
-        predictions = model.predict(self.X_test)
-        score = self.calcScore(predictions)
-        return score, predictions
+            return calc(self.y_test, predictions)
