@@ -261,7 +261,7 @@ class Instances(object):
                 print_progress(i + 1, len(self.__instances), "Training")
                 trained_model = instance.fit(X, y)
             except exceptions.FitFailedWarning as e:
-                print("An error occurred while training classifiers. Omitting.", e)
+                print("An error occurred while training classifier. Omitting.", e)
             else:
                 self.__trained_classifiers.append(trained_model)
         print('')

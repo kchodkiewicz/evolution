@@ -10,11 +10,11 @@ from sklearn.model_selection import train_test_split
 from models.instances import Instances, predictSelected
 
 
-def fitness_is_progressing():
-    if len(fitness_scores) >= 20:
-        score_sum = sum(fitness_scores[len(fitness_scores) - 20:])
+def fitness_is_progressing(fitness_scores_arr):
+    if len(fitness_scores_arr) >= 20:
+        score_sum = sum(fitness_scores_arr[len(fitness_scores_arr) - 20:])
         score_avg = score_sum / 20
-        score_max = sorted(fitness_scores, reverse=True)[0]
+        score_max = sorted(fitness_scores_arr, reverse=True)[0]
         if abs(score_avg - score_max) < 0.0001:
             return False
     return True
@@ -26,11 +26,13 @@ def parse_args(argv):
     metrics_method = 'accuracy_score'
     pop_size = 1000
     committee_len = 10
+    load_f = None
     try:
-        opts, args = getopt.getopt(argv, "hi:c:m:p:s:", ["help", "if=", "column=", "metrics=", "pop_size=",
-                                                         "committee_size="])
+        opts, args = getopt.getopt(argv, "hi:c:m:p:s:l:", ["help", "if=", "column=", "metrics=", "pop_size=",
+                                                           "committee_size=", "load_genes="])
     except getopt.GetoptError as e:
-        print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
+        print('evo.py -i <infile.csv> -c <column> [-m <metrics> -p <population_size> -s <committee_size> -l '
+              '<genes_file.json>]')
         print(e)
         sys.exit(2)
     for opt, arg in opts:
@@ -38,10 +40,11 @@ def parse_args(argv):
             print('evo.py -i <infile> -c <column> -m <metrics> -p <population_size> -s <committee_size>')
             print("-i, --if= - path and name of .csv file containing dataset, REQUIRED")
             print("-c, --column= - name of column containing correct classes, REQUIRED")
-            print("-m - metrics method used for evaluating performance [accuracy_score, f1_score], default : "
-                  "accuracy_score")
-            print("-p - size of population, default : 1000")
-            print("-s - size of initial committee, default 10")
+            print("-m, --metrics= - metrics method used for evaluating performance [accuracy_score, f1_score], "
+                  "default : accuracy_score")
+            print("-p, --pop_size= - size of population, default : 1000")
+            print("-s, --committee_size= - size of initial committee, default 10")
+            print("-l, --load_genes= - path and name of .json file containing genes")
             sys.exit()
         elif opt in ("-i", "--if"):
             try:
@@ -83,11 +86,17 @@ def parse_args(argv):
                     print("Committee size must be a positive integer")
                 else:
                     committee_len = tmp_c
+        elif opt in ("-l", "--load_genes"):
+            try:
+                with open(arg) as f:
+                    load_f = arg
+            except FileNotFoundError as e:
+                print(e)
 
     if dataset_name == '' or col_name == '':
         print('Dataset and column name are required')
         sys.exit(2)
-    return dataset_name, col_name, metrics_method, pop_size, committee_len
+    return dataset_name, col_name, metrics_method, pop_size, committee_len, load_file
 
 
 def variance_threshold_selector(data, threshold=0.9):
@@ -98,10 +107,7 @@ def variance_threshold_selector(data, threshold=0.9):
 
 if __name__ == '__main__':
 
-    dataset, col, metrics, pop, comm = parse_args(sys.argv[1:])
-
-    print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
-          "\n* population size:", pop, "\n* committee size:", comm)
+    dataset, col, metrics, pop, comm, load_file = parse_args(sys.argv[1:])
 
     try:
         Model.dataset = pd.read_csv(dataset)
@@ -147,23 +153,6 @@ if __name__ == '__main__':
     inst.trainClassifiers(Model.X_train, Model.y_train)
     inst.predictClassifiers(Model.X_test)
 
-    """
-    population = Population(size=100, committee=10, gen_length=len(inst.trained_classifiers))
-    # loading genes from file
-    #  population.load_population("output_files/population_dump/2020-12-8_19:29:51.json")
-    fitness_scores = []
-    
-    while True:
-        population.run_normally(False)
-        # population.run_async(4)
-        population.validate()
-        population.select()
-        fitness_scores.append(population.bestInGen.fitness)
-        if not fitness_is_progressing():
-            break
-    print(conv_genes(population.bestInGen.genes))
-    write_to_json("classifiers_scores", population.genFitness)
-    """
     try:
         if comm > len(inst.trained_classifiers):
             raise ValueError
@@ -172,6 +161,17 @@ if __name__ == '__main__':
         print("Committee size cannot be greater than amount of different classifiers (",
               len(inst.trained_classifiers), ")")
         sys.exit(2)
+
+    if load_file is not None:
+        try:
+            population.load_population(load_file)
+        except Exception as e:
+            print(e)
+            print("Couldn't open genes file. Running default mode.")
+
+    print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
+          "\n* population size:", pop, "\n* committee size:", comm, "\n* load_genes:", load_file)
+
     fitness_scores = []
     while True:
         population.run_normally()
@@ -221,10 +221,6 @@ if __name__ == '__main__':
     print("Separate scores:", separated_scores)
     write_to_json("classifiers_scores", population.genFitness)
 
-    # TODO check adaboost
-    # TODO VotingClassifier <- may be refactor ??
-    # adaboost = AdaBoost()
-
     # create final list of models
     final_models = []
     for i in range(10):
@@ -246,4 +242,4 @@ if __name__ == '__main__':
     model = Model()
     # calculate score of committee
     score = model.calcScore(predictions=committee_answers, verify=True)
-    print("Teoretical:", score)
+    print("Theoretical (assume: first 10 are best):", score)
