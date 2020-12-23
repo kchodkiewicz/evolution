@@ -1,4 +1,6 @@
 import sys
+import time
+
 import pandas as pd
 from pandas import errors
 from sklearn.model_selection import train_test_split
@@ -6,24 +8,25 @@ from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 from models.instances import Instances
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote
-from plotting import plot_scores_progress
+from plotting import plot_scores_progress, plot_best_phenotype_genes_progress
 
 if __name__ == '__main__':
-
-    plot_scores_progress()
-    sys.exit(1)
-
+    plot_best_phenotype_genes_progress()
     dataset, col, metrics, pop, comm, load_file, verbose = parse_args(sys.argv[1:])
 
     inst = Instances()
     model = Model()
 
+
     Model.verbose = verbose
+    # Add id for run
+    timestamp = time.time()
+    Model.RUN_ID = str(timestamp).replace('.', '-')
 
     try:
         Model.dataset = pd.read_csv(dataset)
     except pd.errors.ParserError:
-        print("Incorrect path to file")
+        print('\033[93m' + "Incorrect path to file" + '\033[0m')
         sys.exit(2)
     Model.METRICS_METHOD = metrics
 
@@ -33,10 +36,10 @@ if __name__ == '__main__':
     try:
         X = model.dataset.drop(columns=col)
     except AttributeError:
-        print("Column with name:", col, "not found in provided dataset")
+        print('\033[93m' + "Column with name: " + str(col) + " not found in provided dataset" + '\033[0m')
         sys.exit(2)
     except KeyError:
-        print("Column with name:", col, "not found in provided dataset")
+        print('\033[93m' + "Column with name: " + str(col) + " not found in provided dataset" + '\033[0m')
         sys.exit(2)
 
     X = X.drop(columns="id", errors='ignore')
@@ -69,16 +72,15 @@ if __name__ == '__main__':
             raise ValueError
         population = Population(size=pop, committee=comm, gen_length=len(inst.predictions_arr))
     except ValueError:
-        print("Committee size cannot be greater than amount of different classifiers (",
-              len(inst.predictions_arr), ")")
+        print('\033[93m' + "Committee size cannot be greater than amount of different classifiers (" +
+              str(len(inst.predictions_arr)) + ")" + '\033[0m')
         sys.exit(2)
 
     if load_file is not None:
         try:
             population.load_population(load_file)
         except Exception as e:
-            print(e)
-            print("Couldn't open genes file. Running default mode.")
+            print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
 
     # EVOLUTION --------------------------------------------------------
     fitness_scores = []
@@ -132,3 +134,6 @@ if __name__ == '__main__':
     print(separated_scores[5:])
     write_to_json("classifiers_scores", population.genFitness)
     print("Theoretical (assume: first 10 are best):", theoretical_score)
+
+    plot_scores_progress()
+    plot_best_phenotype_genes_progress()

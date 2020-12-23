@@ -1,5 +1,6 @@
 import getopt
 import json
+import os
 import sys
 import time
 from sklearn.feature_selection import VarianceThreshold
@@ -32,7 +33,7 @@ def parse_args(argv):
     except getopt.GetoptError as e:
         print('evo.py -i <infile.csv> -c <column> [-m <metrics> -p <population_size> -s <committee_size> -l '
               '<genes_file.json> -v]')
-        print(e)
+        print('\033[93m' + str(e) + '\033[0m')
         sys.exit(2)
     for opt, arg in opts:
         if opt == ("-h", "--help"):
@@ -51,18 +52,18 @@ def parse_args(argv):
                 with open(arg) as f:
                     dataset_name = arg
             except FileNotFoundError as e:
-                print(e)
+                print('\033[93m' + str(e) + '\033[0m')
         elif opt in ("-c", "--column"):
             col_name = arg
         elif opt in ("-m", "--metrics"):
             if arg == "accuracy_score" or arg == "f1_score":
                 metrics_method = arg
             else:
-                print('Incorrect metrics method')
+                print('\033[93m' + 'Incorrect metrics method: ' + str(arg) + '\033[0m')
                 sys.exit(2)
         elif opt in ("-p", "--pop_size"):
             if not arg.isnumeric():
-                print("Incorrect population size")
+                print('\033[93m' + "Incorrect population size: " + str(arg) + '\033[0m')
                 sys.exit(2)
             else:
                 try:
@@ -70,12 +71,12 @@ def parse_args(argv):
                     if tmp_p < 0:
                         raise ValueError
                 except ValueError:
-                    print("Population size must be a positive integer")
+                    print('\033[93m' + "Population size must be a positive integer. Provided: " + str(arg) + '\033[0m')
                 else:
                     pop_size = tmp_p
         elif opt in ("-s", "--committee_size"):
             if not arg.isnumeric():
-                print("Incorrect committee size")
+                print('\033[93m' + "Incorrect committee size. Provided: " + str(arg) + '\033[0m')
                 sys.exit(2)
             else:
                 try:
@@ -83,7 +84,7 @@ def parse_args(argv):
                     if tmp_c < 0:
                         raise ValueError
                 except ValueError:
-                    print("Committee size must be a positive integer")
+                    print('\033[93m' + "Committee size must be a positive integer. Provided: " + str(arg) + '\033[0m')
                 else:
                     committee_len = tmp_c
         elif opt in ("-l", "--load_genes"):
@@ -91,12 +92,12 @@ def parse_args(argv):
                 with open(arg) as f:
                     load_f = arg
             except FileNotFoundError as e:
-                print(e)
+                print('\033[93m' + str(e) + '\033[0m')
         elif opt in ("-v", "--verbose"):
             verbose = True
 
     if dataset_name == '' or col_name == '':
-        print('Dataset and column name are required')
+        print('\033[93m' + 'Dataset and column name are required' + '\033[0m')
         sys.exit(2)
     return dataset_name, col_name, metrics_method, pop_size, committee_len, load_f, verbose
 
@@ -110,13 +111,22 @@ def variance_threshold_selector(data, threshold=0.9):
 
 # Write to specified .json file
 def write_to_json(path, content):
+    if Model.RUN_ID is None:
+        print('\033[93m' + "An error occurred while writing to a file. Aborting" + '\033[0m')
+        sys.exit(2)
+    dir_path = os.path.join(f'output_files/{path}', str(Model.RUN_ID))
     try:
-        with open(f"output_files/{path}/timed-{time.localtime()[0]}-{time.localtime()[1]}-"
-                  f"{time.localtime()[2]}_"
-                  f"{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json", "w") as filename:
-            json.dump(content, filename, indent=4)
-    except Exception as e:
-        print(e)
+        os.mkdir(dir_path, 0o777)
+    except FileExistsError as e:
+        pass
+    finally:
+        try:
+            with open(f'{dir_path}/{time.localtime()[0]}-{time.localtime()[1]}-'
+                      f'{time.localtime()[2]}_'
+                      f'{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json', 'w') as filename:
+                json.dump(content, filename, indent=4)
+        except Exception as e:
+            print('\033[93m' + str(e) + '\033[0m')
 
 
 # Return indexes of true genes
@@ -142,10 +152,17 @@ def print_progress(i, end, msg):
     if Model.verbose:
         bar_len = 10
         block = int(round((i / end) * bar_len))
+        if i != end:
+            dots = ('.' * (i % 3 + 1))
+        else:
+            dots = ' [DONE]'
+
         if i == 0:
-            print('{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', end, end='',
+            print('{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
+                  dots, end='',
                   flush=True)
-        print("\r", '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', end, end='',
+        print("\r", '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
+              dots, end='',
               flush=True)
 
 

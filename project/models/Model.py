@@ -12,6 +12,7 @@ class Model(object):
     y_validate = []
     METRICS_METHOD = "f1_score"
     verbose = False
+    RUN_ID = None
 
     def calcScore(self, predictions, **kwargs):
         def calc(y, predicts):

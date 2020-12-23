@@ -151,8 +151,8 @@ class Population(object):
         if Model.verbose:
             print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
+        write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
-            write_to_json("gen_stats", self.output)
             specimen = {}
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
