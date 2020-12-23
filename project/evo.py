@@ -6,8 +6,12 @@ from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 from models.instances import Instances
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote
+from plotting import plot_scores_progress
 
 if __name__ == '__main__':
+
+    plot_scores_progress()
+    sys.exit(1)
 
     dataset, col, metrics, pop, comm, load_file, verbose = parse_args(sys.argv[1:])
 

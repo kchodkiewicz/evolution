@@ -1,8 +1,10 @@
 # Instances of all supported classifiers
 # If desired classifier is not listed add by creating instance
 # with unique name and append it to __instances list
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.linear_model import SGDClassifier, LogisticRegression
+from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier, PassiveAggressiveClassifier, \
+    LassoLars
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -82,140 +84,231 @@ class Instances(object):
     logisticRegression5 = LogisticRegression(solver='saga', penalty='none')
     logisticRegression6 = LogisticRegression(solver='saga')
     logisticRegression7 = LogisticRegression(solver='liblinear', penalty='l2')
-    logisticRegression8 = LogisticRegression(solver='sag', penalty='none')
-    logisticRegression9 = LogisticRegression(solver='sag')
+    #logisticRegression8 = LogisticRegression(solver='sag', penalty='none')
+    #logisticRegression9 = LogisticRegression(solver='sag')
 
-    __instances = [gaussianProcess8,
-                   svm8,
-                   svm9,
-                   stochasticGradient0,
-                   stochasticGradient1,
-                   stochasticGradient2,
-                   stochasticGradient6,
-                   stochasticGradient7,
-                   gaussianProcess4,
-                   gaussianProcess5,
-                   kNeighbors1,
-                   kNeighbors2,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   decisionTree0,
-                   ]
+    ridgeClassification0 = RidgeClassifier(copy_X=True)
+    #ridgeClassification1 = RidgeClassifier(copy_X=True, tol=1, solver='cholesky')
+    #ridgeClassification2 = RidgeClassifier(copy_X=True, tol=1e-1, solver='cholesky')
+    ridgeClassification3 = RidgeClassifier(copy_X=True, tol=1, solver='sparse_cg')
+    ridgeClassification4 = RidgeClassifier(copy_X=True, tol=1e-1, solver='sparse_cg')
+    #ridgeClassification5 = RidgeClassifier(copy_X=True, solver='cholesky')
+    #ridgeClassification6 = RidgeClassifier(copy_X=True, solver='sag')
+    ridgeClassification7 = RidgeClassifier(copy_X=True, solver='saga')
+    #ridgeClassification8 = RidgeClassifier(copy_X=True, solver='sag', random_state=0)
+    ridgeClassification9 = RidgeClassifier(copy_X=True, solver='saga', random_state=42)
 
-    __instance = [decisionTree0,
-                  decisionTree1,
-                  decisionTree2,
-                  decisionTree3,
-                  decisionTree4,
-                  decisionTree5,
-                  decisionTree6,
-                  decisionTree7,
-                  decisionTree8,
-                  decisionTree9,
-                  naiveBayes0,
-                  naiveBayes1,
-                  naiveBayes2,
-                  naiveBayes3,
-                  svm0,
-                  svm1,
-                  svm2,
-                  svm3,
-                  svm4,
-                  svm5,
-                  svm6,
-                  svm7,
+    passiveAggressive0 = PassiveAggressiveClassifier()
+    passiveAggressive1 = PassiveAggressiveClassifier(C=10)
+    passiveAggressive2 = PassiveAggressiveClassifier(C=10, loss='hinge')
+    passiveAggressive3 = PassiveAggressiveClassifier(loss='squared_hinge')
+    passiveAggressive4 = PassiveAggressiveClassifier(early_stopping=True)
+    passiveAggressive5 = PassiveAggressiveClassifier(C=10, early_stopping=True)
+    passiveAggressive6 = PassiveAggressiveClassifier(C=10, loss='hinge', early_stopping=True)
+    passiveAggressive7 = PassiveAggressiveClassifier(loss='squared_hinge', early_stopping=True)
+    passiveAggressive8 = PassiveAggressiveClassifier(n_iter_no_change=1)
+
+    quadraticDiscriminantAnalysis0 = QuadraticDiscriminantAnalysis()
+    quadraticDiscriminantAnalysis1 = QuadraticDiscriminantAnalysis(store_covariance=True)
+    quadraticDiscriminantAnalysis2 = QuadraticDiscriminantAnalysis(tol=1.0e-1)
+    quadraticDiscriminantAnalysis3 = QuadraticDiscriminantAnalysis(tol=1.0e-1, store_covariance=True)
+
+    linearDiscriminantAnalysis0 = LinearDiscriminantAnalysis()
+    linearDiscriminantAnalysis1 = LinearDiscriminantAnalysis(store_covariance=True)
+    linearDiscriminantAnalysis2 = LinearDiscriminantAnalysis(n_components=1)
+    linearDiscriminantAnalysis3 = LinearDiscriminantAnalysis(solver='lsqr')
+    linearDiscriminantAnalysis4 = LinearDiscriminantAnalysis(solver='lsqr', shrinkage='auto')
+    linearDiscriminantAnalysis5 = LinearDiscriminantAnalysis(solver='lsqr', shrinkage=1.0)
+    linearDiscriminantAnalysis6 = LinearDiscriminantAnalysis(solver='eigen')
+    linearDiscriminantAnalysis7 = LinearDiscriminantAnalysis(solver='eigen', shrinkage='auto')
+    linearDiscriminantAnalysis8 = LinearDiscriminantAnalysis(solver='eigen', shrinkage=1.0)
+
+    lasso0 = LassoLars(copy_X=True)
+    lasso1 = LassoLars(copy_X=True, alpha=0.5)
+    lasso2 = LassoLars(copy_X=True, fit_intercept=False)
+    lasso3 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False)
+    lasso4 = LassoLars(copy_X=True, fit_path=False)
+    lasso5 = LassoLars(copy_X=True, alpha=0.5, fit_path=False)
+    lasso6 = LassoLars(copy_X=True, fit_intercept=False, fit_path=False)
+    lasso7 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False, fit_path=False)
+    lasso8 = LassoLars(copy_X=True, jitter=1)
+    lasso9 = LassoLars(copy_X=True, fit_intercept=False, positive=True)
+    lasso10 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False, positive=True)
+
+    __instance = [gaussianProcess8,
                   svm8,
                   svm9,
                   stochasticGradient0,
                   stochasticGradient1,
                   stochasticGradient2,
-                  stochasticGradient3,
-                  stochasticGradient4,
-                  stochasticGradient5,
                   stochasticGradient6,
                   stochasticGradient7,
-                  stochasticGradient8,
-                  stochasticGradient9,
-                  kNeighbors0,
-                  kNeighbors1,
-                  kNeighbors2,
-                  kNeighbors3,
-                  kNeighbors4,
-                  kNeighbors5,
-                  kNeighbors6,
-                  kNeighbors7,
-                  kNeighbors8,
-                  kNeighbors9,
-                  gaussianProcess0,
-                  gaussianProcess1,
-                  gaussianProcess2,
-                  gaussianProcess3,
                   gaussianProcess4,
                   gaussianProcess5,
-                  gaussianProcess6,
-                  gaussianProcess7,
-                  gaussianProcess8,
-                  gaussianProcess9,
-                  logisticRegression0,
-                  logisticRegression1,
-                  logisticRegression2,
-                  logisticRegression3,
-                  logisticRegression4,
-                  logisticRegression5,
-                  logisticRegression6,
-                  logisticRegression7,
-                  logisticRegression8,
-                  logisticRegression9,
+                  kNeighbors1,
+                  kNeighbors2,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
+                  decisionTree0,
                   ]
+
+    __instances = [decisionTree0,
+                   decisionTree1,
+                   decisionTree2,
+                   decisionTree3,
+                   decisionTree4,
+                   decisionTree5,
+                   decisionTree6,
+                   decisionTree7,
+                   decisionTree8,
+                   decisionTree9,
+                   naiveBayes0,
+                   naiveBayes1,
+                   naiveBayes2,
+                   naiveBayes3,
+                   svm0,
+                   svm1,
+                   svm2,
+                   svm3,
+                   svm4,
+                   svm5,
+                   svm6,
+                   svm7,
+                   svm8,
+                   svm9,
+                   stochasticGradient0,
+                   stochasticGradient1,
+                   stochasticGradient2,
+                   stochasticGradient3,
+                   stochasticGradient4,
+                   stochasticGradient5,
+                   stochasticGradient6,
+                   stochasticGradient7,
+                   stochasticGradient8,
+                   stochasticGradient9,
+                   kNeighbors0,
+                   kNeighbors1,
+                   kNeighbors2,
+                   kNeighbors3,
+                   kNeighbors4,
+                   kNeighbors5,
+                   kNeighbors6,
+                   kNeighbors7,
+                   kNeighbors8,
+                   kNeighbors9,
+                   gaussianProcess0,
+                   gaussianProcess1,
+                   gaussianProcess2,
+                   gaussianProcess3,
+                   gaussianProcess4,
+                   gaussianProcess5,
+                   gaussianProcess6,
+                   gaussianProcess7,
+                   gaussianProcess8,
+                   gaussianProcess9,
+                   logisticRegression0,
+                   logisticRegression1,
+                   logisticRegression2,
+                   logisticRegression3,
+                   logisticRegression4,
+                   logisticRegression5,
+                   logisticRegression6,
+                   logisticRegression7,
+                   #logisticRegression8,
+                   #logisticRegression9,
+                   #ridgeClassification0,
+                   #ridgeClassification1,
+                   #ridgeClassification2,
+                   #ridgeClassification3,
+                   #ridgeClassification4,
+                   #ridgeClassification5,
+                   #ridgeClassification6,
+                   #ridgeClassification7,
+                   #ridgeClassification8,
+                   #ridgeClassification9,
+                   passiveAggressive0,
+                   passiveAggressive1,
+                   passiveAggressive2,
+                   passiveAggressive3,
+                   passiveAggressive4,
+                   passiveAggressive5,
+                   passiveAggressive6,
+                   passiveAggressive7,
+                   passiveAggressive8,
+                   quadraticDiscriminantAnalysis0,
+                   quadraticDiscriminantAnalysis1,
+                   quadraticDiscriminantAnalysis2,
+                   quadraticDiscriminantAnalysis3,
+                   linearDiscriminantAnalysis0,
+                   linearDiscriminantAnalysis1,
+                   linearDiscriminantAnalysis2,
+                   linearDiscriminantAnalysis3,
+                   linearDiscriminantAnalysis4,
+                   linearDiscriminantAnalysis5,
+                   linearDiscriminantAnalysis6,
+                   linearDiscriminantAnalysis7,
+                   linearDiscriminantAnalysis8,
+                   #lasso0,
+                   #lasso1,
+                   #lasso2,
+                   #lasso3,
+                   #lasso4,
+                   #lasso5,
+                   #lasso6,
+                   #lasso7,
+                   #lasso8,
+                   #lasso9,
+                   #lasso10,
+                   ]
 
     __trained_classifiers = []
     __predictions_classifiers = []
