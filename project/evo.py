@@ -8,15 +8,14 @@ from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 from models.instances import Instances
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote
-from plotting import plot_scores_progress, plot_best_phenotype_genes_progress
+from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
+    plot_avg_max_distance_progress
 
 if __name__ == '__main__':
-    plot_best_phenotype_genes_progress()
     dataset, col, metrics, pop, comm, load_file, verbose = parse_args(sys.argv[1:])
 
     inst = Instances()
     model = Model()
-
 
     Model.verbose = verbose
     # Add id for run
@@ -137,3 +136,5 @@ if __name__ == '__main__':
 
     plot_scores_progress()
     plot_best_phenotype_genes_progress()
+    plot_genes_in_last_gen()
+    plot_avg_max_distance_progress()
