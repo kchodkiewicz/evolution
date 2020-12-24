@@ -110,11 +110,12 @@ class Population(object):
         rand = random.uniform(0, 1)
         while rand > 0:
             if index >= len(sorted_phenotypes):
-                return self.phenotypes[0]
+                sorted_phenotypes[0].counter = 1
+                return sorted_phenotypes[0]
             rand = rand - sorted_phenotypes[index].normalizedFitness
             index += 1
-
-        return self.phenotypes[index - 1]
+        sorted_phenotypes[index - 1].counter = 1
+        return sorted_phenotypes[index - 1]
 
     # Create sorted (based on fitness) list of all phenotypes
     # Generate weighted list with best phenotypes having most slots

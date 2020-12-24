@@ -19,6 +19,20 @@ class Phenotype(object):
         self.__model = Model()
         self.__inst = Instances()
         self.create_random_genes()
+        # testing
+        self.__counter = 0
+
+    @property
+    def counter(self):
+        return self.__counter
+
+    @counter.setter
+    def counter(self, value):
+        self.__counter += value
+
+    @property
+    def phenotype_id(self):
+        return self.__id
 
     @property
     def committee(self):

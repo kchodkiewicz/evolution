@@ -17,6 +17,25 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
 if __name__ == '__main__':
     dataset, col, metrics, pop, comm, load_file, verbose, testing = parse_args(sys.argv[1:])
 
+    # TESTING GROUND ---------------------------------------------------------------------------------------------------
+    # test_inst = Instances()
+    # test_inst.trainClassifiers(model.X_train, model.y_train)
+    # test_inst.predictClassifiers(model.X_test)
+    test_pop = Population(10, 10, 100)
+    arr = []
+    for i, phenotype in enumerate(test_pop.phenotypes):
+        phenotype.normalizedFitness = i / len(test_pop.phenotypes)
+
+    for i in range(100):
+        arr.append(test_pop.find_parent(test_pop.phenotypes))
+    print('nr osobnika', 'ilosc wybrań', 'prawdopodobieństwo')
+
+    for elem in arr:
+        print(elem.phenotype_id, elem.counter, elem.normalizedFitness)
+
+    sys.exit(1)
+    # END TESTING GROUND -----------------------------------------------------------------------------------------------
+
     inst = Instances()
     model = Model()
 
