@@ -161,5 +161,5 @@ if __name__ == '__main__':
     plot_genes_in_last_gen()
     plot_avg_max_distance_progress()
     plot_best_phenotype_genes_progress()
-    print('\033[94m' + f'All processes finished. Results may be found in output_files/plots/'
-                       f'\033[1m{Model.RUN_ID}\033[0m')
+    print('\033[94m' + f'All processes finished. Results may be found in output_files/plots/' + '\033[0m' +
+                       '\033[1m' + f'{Model.RUN_ID}' + '\033[0m')
