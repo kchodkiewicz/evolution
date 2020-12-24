@@ -116,29 +116,32 @@ def variance_threshold_selector(data, threshold=0.9):
 def clear_outs():
     pathname = ''
     try:
-        pathname = os.path.abspath(os.path.join('output_files/', 'plots/'))
+        for root, dirs, files in os.walk('output_files/', topdown=False):
+            for name in files:
+                os.remove(os.path.join(root, name))
+            for name in dirs:
+                os.rmdir(os.path.join(root, name))
+        """
+        pathname = os.path.abspath(os.path.join('output_files/', ''))
         if pathname.startswith('output_files/'):
             os.remove(pathname)
+        test = os.listdir(pathname)
+        for images in test:
+            if images.endswith(".png"):
+                os.remove(os.path.join(pathname, images))
+            if images.endswith(".json"):
+                print(images)
+                os.remove(os.path.join(pathname, images))
+        """
     except OSError as e:
         print('\033[93m' + str(e) + '\033[0m')
     print("DELETED DIRECTORIES at " + str(pathname))
+
     try:
         os.mkdir('output_files/gen_stats', 0o777)
-    except FileExistsError:
-        pass
-    try:
         os.mkdir('output_files/plots', 0o777)
-    except FileExistsError:
-        pass
-    try:
         os.mkdir('output_files/classifiers_scores', 0o777)
-    except FileExistsError:
-        pass
-    try:
         os.mkdir('output_files/population_dump', 0o777)
-    except FileExistsError:
-        pass
-    try:
         os.mkdir('output_files/validation_res', 0o777)
     except FileExistsError:
         pass
