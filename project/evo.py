@@ -1,6 +1,8 @@
+# Main
 import sys
 import time
 
+import keyboard
 import pandas as pd
 from pandas import errors
 from sklearn.model_selection import train_test_split
@@ -12,7 +14,7 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
     plot_avg_max_distance_progress
 
 if __name__ == '__main__':
-    dataset, col, metrics, pop, comm, load_file, verbose = parse_args(sys.argv[1:])
+    dataset, col, metrics, pop, comm, load_file, verbose, testing = parse_args(sys.argv[1:])
 
     inst = Instances()
     model = Model()
@@ -21,6 +23,7 @@ if __name__ == '__main__':
     # Add id for run
     timestamp = time.time()
     Model.RUN_ID = str(timestamp).replace('.', '-')
+    Model.TEST = testing
 
     try:
         Model.dataset = pd.read_csv(dataset)
@@ -78,20 +81,37 @@ if __name__ == '__main__':
     if load_file is not None:
         try:
             population.load_population(load_file)
-        except Exception as e:
+        except FileNotFoundError as e:
             print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
+            sys.exit(2)
+        except ValueError as e:
+            print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
+            sys.exit(2)
+        except KeyError as e:
+            print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
+            sys.exit(2)
 
     # EVOLUTION --------------------------------------------------------
+
     fitness_scores = []
     while True:
-        population.run_normally()
-        # population.run_async(4)
-        population.validate()
-        population.select()
-        fitness_scores.append(population.bestInGen.fitness)
-        if not fitness_is_progressing(fitness_scores):
-            break
-
+        try:
+            population.run_normally()
+            # population.run_async(4)
+            population.validate()
+            population.select()
+            fitness_scores.append(population.bestInGen.fitness)
+            if not fitness_is_progressing(fitness_scores):
+                break
+            if keyboard.is_pressed('q'):  # if key 'q' is pressed
+                print('You Pressed A Key!')
+                break  # finishing the loop
+        except KeyboardInterrupt:
+            pass
+        except KeyError:
+            pass
+        except ImportError:
+            pass
     # SCORE OF EVOLVED MODELS ------------------------------------------
     # create final list of models
     final_models = []
@@ -135,6 +155,6 @@ if __name__ == '__main__':
     print("Theoretical (assume: first 10 are best):", theoretical_score)
 
     plot_scores_progress()
-    plot_best_phenotype_genes_progress()
     plot_genes_in_last_gen()
     plot_avg_max_distance_progress()
+    plot_best_phenotype_genes_progress()

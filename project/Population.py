@@ -1,9 +1,8 @@
+# Phenotypes list and methods for evolution
 import copy
 import json
-import math
 import random
 import time
-import multiprocessing as mp
 from Phenotype import Phenotype
 from utils import print_progress, conv_genes, write_to_json
 from models.Model import Model
@@ -31,7 +30,7 @@ class Population(object):
             with open(filename) as f:
                 file_genes = json.load(f)
         except FileNotFoundError as e:
-            print(e)
+            print('\033[93m' + str(e) + '\033[0m')
         else:
             for i, phenotype in enumerate(self.phenotypes):
                 phenotype.genes = file_genes[str(i)]

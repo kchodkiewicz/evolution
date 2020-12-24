@@ -1,3 +1,4 @@
+# Phenotype genes and methods for classification etc.
 import random
 from models.Model import Model
 from models.instances import Instances
@@ -12,7 +13,7 @@ class Phenotype(object):
         self.__genLength = gen_length
         self.__fitness = 0.0
         self.__normalizedFitness = 0.0
-        self.__genes = [False for x in range(self.gen_length)]
+        self.__genes = [False for _ in range(self.gen_length)]
         # classifier attribute
         self.__predictions = []
         self.__model = Model()

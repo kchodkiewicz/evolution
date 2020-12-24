@@ -1,3 +1,4 @@
+# Tools
 import getopt
 import json
 import os
@@ -27,9 +28,10 @@ def parse_args(argv):
     committee_len = 10
     load_f = None
     verbose = False
+    test = False
     try:
-        opts, args = getopt.getopt(argv, "hi:c:m:p:s:l:v", ["help", "if=", "column=", "metrics=", "pop_size=",
-                                                            "committee_size=", "load_genes=", "verbose"])
+        opts, args = getopt.getopt(argv, "hi:c:m:p:s:l:vt", ["help", "if=", "column=", "metrics=", "pop_size=",
+                                                             "committee_size=", "load_genes=", "verbose", "test"])
     except getopt.GetoptError as e:
         print('evo.py -i <infile.csv> -c <column> [-m <metrics> -p <population_size> -s <committee_size> -l '
               '<genes_file.json> -v]')
@@ -49,7 +51,7 @@ def parse_args(argv):
             sys.exit()
         elif opt in ("-i", "--if"):
             try:
-                with open(arg) as f:
+                with open(arg):
                     dataset_name = arg
             except FileNotFoundError as e:
                 print('\033[93m' + str(e) + '\033[0m')
@@ -89,17 +91,19 @@ def parse_args(argv):
                     committee_len = tmp_c
         elif opt in ("-l", "--load_genes"):
             try:
-                with open(arg) as f:
+                with open(arg):
                     load_f = arg
             except FileNotFoundError as e:
                 print('\033[93m' + str(e) + '\033[0m')
         elif opt in ("-v", "--verbose"):
             verbose = True
+        elif opt in ("-t", "--test"):
+            test = True
 
     if dataset_name == '' or col_name == '':
         print('\033[93m' + 'Dataset and column name are required' + '\033[0m')
         sys.exit(2)
-    return dataset_name, col_name, metrics_method, pop_size, committee_len, load_f, verbose
+    return dataset_name, col_name, metrics_method, pop_size, committee_len, load_f, verbose, test
 
 
 # Remove columns with same data (low variance)
@@ -117,7 +121,7 @@ def write_to_json(path, content):
     dir_path = os.path.join(f'output_files/{path}', str(Model.RUN_ID))
     try:
         os.mkdir(dir_path, 0o777)
-    except FileExistsError as e:
+    except FileExistsError:
         pass
     finally:
         try:

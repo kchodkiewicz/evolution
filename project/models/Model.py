@@ -1,4 +1,4 @@
-# Program wide structure containing dataset, subsets and metrics method
+# Program wide structure containing dataset, subsets and metrics method etc.
 from sklearn.metrics import f1_score, accuracy_score, auc, roc_curve
 
 
@@ -13,6 +13,7 @@ class Model(object):
     METRICS_METHOD = "f1_score"
     verbose = False
     RUN_ID = None
+    TEST = False
 
     def calcScore(self, predictions, **kwargs):
         def calc(y, predicts):
