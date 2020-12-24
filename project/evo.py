@@ -29,7 +29,16 @@ if __name__ == '__main__':
     for i in range(100):
         arr.append(test_pop.find_parent(test_pop.phenotypes))
     print('nr osobnika', 'ilosc wybrań', 'prawdopodobieństwo')
-
+    """
+    \begin{table}[]
+\begin{tabular}{lllll}
+\multicolumn{1}{c}{nr} & \multicolumn{1}{c}{il} & \multicolumn{1}{c}{p} &  &  \\
+2                      & 3                      & 45                    &  &  \\
+qw                     & ew                     & e                     &  &  \\
+                       &                        &                       &  & 
+\end{tabular}
+\end{table}
+    """
     for elem in arr:
         print(elem.phenotype_id, elem.counter, elem.normalizedFitness)
 
