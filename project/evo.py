@@ -9,9 +9,10 @@ from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 from models.instances import Instances
-from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote
+from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_outs
 from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
     plot_avg_max_distance_progress
+
 
 if __name__ == '__main__':
     dataset, col, metrics, pop, comm, load_file, verbose, testing = parse_args(sys.argv[1:])
@@ -23,7 +24,9 @@ if __name__ == '__main__':
     # Add id for run
     timestamp = time.time()
     Model.RUN_ID = str(timestamp).replace('.', '-')
+    print('Run identifier:', Model.RUN_ID)
     Model.TEST = testing
+    clear_outs()
 
     try:
         Model.dataset = pd.read_csv(dataset)
@@ -158,3 +161,5 @@ if __name__ == '__main__':
     plot_genes_in_last_gen()
     plot_avg_max_distance_progress()
     plot_best_phenotype_genes_progress()
+    print('\033[94m' + f'All processes finished. Results may be found in output_files/plots/'
+                       f'\033[1m{Model.RUN_ID}\033[0m')

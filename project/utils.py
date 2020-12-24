@@ -113,6 +113,47 @@ def variance_threshold_selector(data, threshold=0.9):
     return data[data.columns[selector.get_support(indices=True)]]
 
 
+def clear_outs():
+    pathname = ''
+    try:
+        pathname = os.path.abspath(os.path.join('output_files/', 'plots/'))
+        if pathname.startswith('output_files/'):
+            os.remove(pathname)
+    except OSError as e:
+        print('\033[93m' + str(e) + '\033[0m')
+    print("DELETED DIRECTORIES at " + str(pathname))
+    try:
+        os.mkdir('output_files/gen_stats', 0o777)
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir('output_files/plots', 0o777)
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir('output_files/classifiers_scores', 0o777)
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir('output_files/population_dump', 0o777)
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir('output_files/validation_res', 0o777)
+    except FileExistsError:
+        pass
+
+
+def create_dir(path, run_id):
+    dir_path = os.path.join(f'output_files/{path}', str(run_id))
+    try:
+        os.mkdir(dir_path, 0o777)
+    except FileExistsError:
+        pass
+    finally:
+        return dir_path
+
+
 # Write to specified .json file
 def write_to_json(path, content):
     if Model.RUN_ID is None:
