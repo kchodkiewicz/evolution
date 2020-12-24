@@ -114,37 +114,37 @@ def variance_threshold_selector(data, threshold=0.9):
 
 
 def clear_outs():
-    pathname = ''
+    pathname = 'output_files/'
     try:
-        for root, dirs, files in os.walk('output_files/', topdown=False):
+        for root, dirs, files in os.walk(pathname, topdown=False):
             for name in files:
                 os.remove(os.path.join(root, name))
             for name in dirs:
-                os.rmdir(os.path.join(root, name))
-        """
-        pathname = os.path.abspath(os.path.join('output_files/', ''))
-        if pathname.startswith('output_files/'):
-            os.remove(pathname)
-        test = os.listdir(pathname)
-        for images in test:
-            if images.endswith(".png"):
-                os.remove(os.path.join(pathname, images))
-            if images.endswith(".json"):
-                print(images)
-                os.remove(os.path.join(pathname, images))
-        """
+                if not name.startswith(os.path.join(root, 'plots')):
+                    os.rmdir(os.path.join(root, name))
     except OSError as e:
         print('\033[93m' + str(e) + '\033[0m')
-    print("DELETED DIRECTORIES at " + str(pathname))
-
+    print('Deleting directories at ' + str(pathname))
     try:
         os.mkdir('output_files/gen_stats', 0o777)
+    except FileExistsError as e:
+        print('\033[93m' + str(e) + '\033[0m')
+    try:
         os.mkdir('output_files/plots', 0o777)
+    except FileExistsError as e:
+        print('\033[93m' + str(e) + '\033[0m')
+    try:
         os.mkdir('output_files/classifiers_scores', 0o777)
+    except FileExistsError as e:
+        print('\033[93m' + str(e) + '\033[0m')
+    try:
         os.mkdir('output_files/population_dump', 0o777)
+    except FileExistsError as e:
+        print('\033[93m' + str(e) + '\033[0m')
+    try:
         os.mkdir('output_files/validation_res', 0o777)
-    except FileExistsError:
-        pass
+    except FileExistsError as e:
+        print('\033[93m' + str(e) + '\033[0m')
 
 
 def create_dir(path, run_id):
