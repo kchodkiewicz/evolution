@@ -28,20 +28,20 @@ if __name__ == '__main__':
 
     for i in range(100):
         arr.append(test_pop.find_parent(test_pop.phenotypes))
-    print('nr osobnika', 'ilosc wybrań', 'prawdopodobieństwo')
+
+    tab_start = """
+\\begin{table}[]
+\\begin{tabular}{lllll}
+\\multicolumn{1}{c}{nr osobnika} & \\multicolumn{1}{c}{il. wylosowań} & \\multicolumn{1}{c}{znormalizowany współczynnik przystosowania}\\\\
     """
-    \begin{table}[]
-\begin{tabular}{lllll}
-\multicolumn{1}{c}{nr} & \multicolumn{1}{c}{il} & \multicolumn{1}{c}{p} &  &  \\
-2                      & 3                      & 45                    &  &  \\
-qw                     & ew                     & e                     &  &  \\
-                       &                        &                       &  & 
+    tab_end = """
 \end{tabular}
 \end{table}
     """
+    print(tab_start)
     for elem in arr:
-        print(elem.phenotype_id, elem.counter, elem.normalizedFitness)
-
+        print(str(elem.phenotype_id) + '&' + str(elem.counter) + '&' + str(elem.normalizedFitness) + '\\\\')
+    print(tab_end)
     sys.exit(1)
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
