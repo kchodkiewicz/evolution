@@ -1,6 +1,8 @@
 # Main
 import sys
 import time
+from random import shuffle, random
+from re import search
 
 import keyboard
 import pandas as pd
@@ -12,7 +14,7 @@ from models.instances import Instances
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_outs
 from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
     plot_avg_max_distance_progress
-
+import numpy as np
 
 if __name__ == '__main__':
     dataset, col, metrics, pop, comm, load_file, verbose, testing = parse_args(sys.argv[1:])
@@ -21,28 +23,60 @@ if __name__ == '__main__':
     # test_inst = Instances()
     # test_inst.trainClassifiers(model.X_train, model.y_train)
     # test_inst.predictClassifiers(model.X_test)
-    test_pop = Population(10, 10, 100)
+    tab_start = """
+    \\begin{table}[h!] \\label{tab:select:test}
+    \\begin{center}
+    \\begin{tabular}{l l l l l}
+    \\textbf{nr osobnika} & \\textbf{$w$} & \\textbf{$P(w)$} & \\textbf{$P_{n,i}$}\\\\
+    \\hline
+        """
+    tab_end = """
+    \\end{tabular}
+    \\caption{Wynik testu sprawdzającego poprawność funkcji losującej osobniki do krzyżowania.}
+    \\end{center}
+    \\end{table}
+        """
+    test_pop = Population(10000, 10, 100)
     arr = []
     for i, phenotype in enumerate(test_pop.phenotypes):
-        phenotype.normalizedFitness = i / len(test_pop.phenotypes)
+        phenotype.fitness = random()
+    sum_p = 0
+    for i in test_pop.phenotypes:
+        sum_p += i.fitness
+    for phenotype in test_pop.phenotypes:
+        phenotype.normalizedFitness = phenotype.fitness / sum_p
+        #print(phenotype.normalizedFitness)
+    np.random.shuffle(test_pop.phenotypes)
+    test_count = 10000
+    for i in range(test_count):
+        arr.append(test_pop.tournament_selection())
 
-    for i in range(100):
-        arr.append(test_pop.find_parent(test_pop.phenotypes))
+    #print(tab_start)
+    arr.sort(key=lambda p: p.phenotype_id)
+    arr = list(dict.fromkeys(arr))
+    verifarr = []
 
-    tab_start = """
-\\begin{table}[]
-\\begin{tabular}{lllll}
-\\multicolumn{1}{c}{nr osobnika} & \\multicolumn{1}{c}{il. wylosowań} & \\multicolumn{1}{c}{znormalizowany współczynnik przystosowania}\\\\
-    """
-    tab_end = """
-\end{tabular}
-\end{table}
-    """
-    print(tab_start)
     for elem in arr:
-        print(str(elem.phenotype_id) + '&' + str(elem.counter) + '&' + str(elem.normalizedFitness) + '\\\\')
-    print(tab_end)
+        j = 0
+        cc = elem.normalizedFitness
+        while cc < 1:
+            cc = cc * 10
+            j += 1
+        # fancy_eq = len(search("\.(0*)", "{:06f}".format(arr[1].normalizedFitness)).group(1))
+        # prec = elem.normalizedFitness / int(np.math.log10(abs(elem.normalizedFitness)))
+        verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10**(-j) * 10)
+        print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10**(-j) * 2)
+    # for elem in arr:
+    #     print(str(elem.phenotype_id) + ' & ' + str(elem.counter) + ' & ' + str(elem.counter / test_count) + ' & ' +
+    #           '{:04f}'.format(elem.normalizedFitness) + ' \\\\')
+    i = 0
+    for elem in verifarr:
+        if elem:
+            i += 1
+    print(i)
+    #print(tab_end)
     sys.exit(1)
+
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
     inst = Instances()
@@ -170,12 +204,14 @@ if __name__ == '__main__':
         theoretical_models.append(inst.trained_classifiers[i])
     theoretical_score = vote(theoretical_models, model.X_validate)
 
+
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
         p = []
         for it in genes_index:
             p.append(inst.trained_classifiers[it].__class__.__name__)
         return p
+
 
     print("Classifiers:", conv_genes(population.bestInGen.genes))
     print(human_readable_genes(conv_genes(population.bestInGen.genes)))
@@ -190,4 +226,4 @@ if __name__ == '__main__':
     plot_avg_max_distance_progress()
     plot_best_phenotype_genes_progress()
     print('\033[94m' + f'All processes finished. Results may be found in output_files/plots/' + '\033[0m' +
-                       '\033[1m' + f'{Model.RUN_ID}' + '\033[0m')
+          '\033[1m' + f'{Model.RUN_ID}' + '\033[0m')

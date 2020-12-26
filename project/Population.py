@@ -105,17 +105,28 @@ class Population(object):
     # Check if phenotype's normalized fitness is greater than random number
     # If it is then return this phenotype
     # If not then try for another phenotype (keep the same random number)
-    def find_parent(self, sorted_phenotypes):
-        index = 0
+    def find_parent(self):
         rand = random.uniform(0, 1)
-        while rand > 0:
-            if index >= len(sorted_phenotypes):
-                sorted_phenotypes[0].counter = 1
-                return sorted_phenotypes[0]
-            rand = rand - sorted_phenotypes[index].normalizedFitness
-            index += 1
-        sorted_phenotypes[index - 1].counter = 1
-        return sorted_phenotypes[index - 1]
+        for phenotype in self.phenotypes:
+            if phenotype.normalizedFitness > rand:
+                phenotype.counter = phenotype.counter + 1
+                return phenotype
+        self.phenotypes[0].counter = self.phenotypes[0].counter + 1
+        return self.phenotypes[0]
+
+    def tournament_selection(self):
+        candidate1 = self.phenotypes[random.randint(0, len(self.phenotypes) - 1)]
+        candidate2 = self.phenotypes[random.randint(0, len(self.phenotypes) - 1)]
+
+        while candidate1 == candidate2:
+            candidate2 = self.phenotypes[random.randint(0, len(self.phenotypes) - 1)]
+
+        if candidate1.fitness > candidate2.fitness:
+            candidate1.counter = candidate1.counter + 1
+            return candidate1
+        else:
+            candidate2.counter = candidate2.counter + 1
+            return candidate2
 
     # Create sorted (based on fitness) list of all phenotypes
     # Generate weighted list with best phenotypes having most slots
@@ -128,14 +139,15 @@ class Population(object):
 
         for phenotype in self.phenotypes:
             phenotype.normalizedFitness = phenotype.fitness / total_fitness
-        sorted_phenotypes = sorted(self.phenotypes,
-                                   key=lambda p: phenotype.normalizedFitness, reverse=True)
+
         new_generation = []
         i = 0
         while len(new_generation) < len(self.phenotypes):
             print_progress(i + 2, len(self.phenotypes), "Crossing")
-            first_parent = copy.deepcopy(self.find_parent(sorted_phenotypes))
-            second_parent = copy.deepcopy(self.find_parent(sorted_phenotypes))
+            first_parent = copy.deepcopy(self.tournament_selection())
+            second_parent = copy.deepcopy(self.tournament_selection())
+            while first_parent == second_parent:
+                first_parent = copy.deepcopy(self.tournament_selection())
             child1st, child2nd = self.cross(i, first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))

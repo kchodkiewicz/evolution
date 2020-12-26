@@ -28,7 +28,7 @@ class Phenotype(object):
 
     @counter.setter
     def counter(self, value):
-        self.__counter += value
+        self.__counter = value
 
     @property
     def phenotype_id(self):
