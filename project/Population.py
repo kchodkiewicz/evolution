@@ -43,22 +43,21 @@ class Population(object):
     # choose genes for child1 and remove them from true_genes
     # get list of genes that duplicate in both parents (AND)
     # add to child2 all duplicated genes and remaining genes from true_genes
-    # TODO crossing - test it (cut points) !!!
     def cross(self, cross_id, parent_first, parent_second):
         child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
         cut_point1 = random.randint(1, self.genLength - 2)
-        cut_point2 = random.randint(1, self.genLength - 2)
-        if cut_point1 == cut_point2:
-            cut_point2 = cut_point2 + random.randint(1, self.genLength - 1 - cut_point2)
+        cut_point2 = random.randint(cut_point1, self.genLength - 2)
+        while cut_point1 == cut_point2:
+            cut_point2 = random.randint(cut_point1, self.genLength - 2)
         genes1 = []
         genes2 = []
-        genes1.append(parent_first.genes[0:cut_point1].copy())
-        genes1.append(parent_second.genes[cut_point1 + 1:cut_point2].copy())
-        genes1.append(parent_first.genes[cut_point2 + 1:].copy())
-        genes2.append(parent_second.genes[0:cut_point1].copy())
-        genes2.append(parent_first.genes[cut_point1 + 1:cut_point2].copy())
-        genes2.append(parent_second.genes[cut_point2 + 1:].copy())
+        genes1[0:cut_point1] = parent_first.genes[0:cut_point1].copy()
+        genes1[cut_point1:cut_point2] = parent_second.genes[cut_point1:cut_point2].copy()
+        genes1[cut_point2:] = parent_first.genes[cut_point2:].copy()
+        genes2[0:cut_point1] = parent_second.genes[0:cut_point1].copy()
+        genes2[cut_point1:cut_point2] = parent_first.genes[cut_point1:cut_point2].copy()
+        genes2[cut_point2:] = parent_second.genes[cut_point2:].copy()
 
         child1st.genes = genes1
         child2nd.genes = genes2
@@ -68,12 +67,12 @@ class Population(object):
                 it += 1
         child1st.committee = it
         jt = 0
-        for j in child1st.genes:
+        for j in child2nd.genes:
             if j:
                 jt += 1
         child2nd.committee = jt
-
-        return child1st, child2nd
+        return child1st, child2nd, cut_point1, cut_point2
+        #return child1st, child2nd
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -83,6 +82,7 @@ class Population(object):
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
         mutate_ratio = random.uniform(0, self.mutation_ratio)
+        print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', int(mutate_ratio * phenotype.committee))
         for _ in range(int(mutate_ratio * phenotype.committee)):
             index = random.randint(0, len(phenotype.genes) - 1)
             phenotype.genes[index] = not phenotype.genes[index]
@@ -148,7 +148,7 @@ class Population(object):
             second_parent = copy.deepcopy(self.tournament_selection())
             while first_parent == second_parent:
                 first_parent = copy.deepcopy(self.tournament_selection())
-            child1st, child2nd = self.cross(i, first_parent, second_parent)
+            child1st, child2nd, c1, c2 = self.cross(i, first_parent, second_parent)
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
             i += 2

@@ -45,13 +45,13 @@ if __name__ == '__main__':
         sum_p += i.fitness
     for phenotype in test_pop.phenotypes:
         phenotype.normalizedFitness = phenotype.fitness / sum_p
-        #print(phenotype.normalizedFitness)
+        # print(phenotype.normalizedFitness)
     np.random.shuffle(test_pop.phenotypes)
     test_count = 10000
     for i in range(test_count):
         arr.append(test_pop.tournament_selection())
 
-    #print(tab_start)
+    # print(tab_start)
     arr.sort(key=lambda p: p.phenotype_id)
     arr = list(dict.fromkeys(arr))
     verifarr = []
@@ -62,10 +62,9 @@ if __name__ == '__main__':
         while cc < 1:
             cc = cc * 10
             j += 1
-        # fancy_eq = len(search("\.(0*)", "{:06f}".format(arr[1].normalizedFitness)).group(1))
-        # prec = elem.normalizedFitness / int(np.math.log10(abs(elem.normalizedFitness)))
-        verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10**(-j) * 10)
-        print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10**(-j) * 2)
+
+        verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10 ** (-j) * 10)
+        print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10 ** (-j) * 2)
     # for elem in arr:
     #     print(str(elem.phenotype_id) + ' & ' + str(elem.counter) + ' & ' + str(elem.counter / test_count) + ' & ' +
     #           '{:04f}'.format(elem.normalizedFitness) + ' \\\\')
@@ -74,7 +73,22 @@ if __name__ == '__main__':
         if elem:
             i += 1
     print(i)
-    #print(tab_end)
+    # print(tab_end)
+    par1 = test_pop.phenotypes[0]
+    par2 = test_pop.phenotypes[1]
+    par1.genes = [True for i in range(len(par1.genes))]
+    par2.genes = [False for i in range(len(par2.genes))]
+    i = 0
+    print(par1.genes, par2.genes)
+    ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
+    print(cut1, cut2)
+    print(ch1.genes, ch2.genes)
+
+    print('\nMutate')
+    print(ch1.genes)
+    test_pop.mutate(ch1)
+    print(ch1.genes)
+
     sys.exit(1)
 
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
@@ -157,26 +171,21 @@ if __name__ == '__main__':
             sys.exit(2)
 
     # EVOLUTION --------------------------------------------------------
-
+    # TODO add tournament to dev branch
     fitness_scores = []
     while True:
-        try:
-            population.run_normally()
-            # population.run_async(4)
-            population.validate()
-            population.select()
-            fitness_scores.append(population.bestInGen.fitness)
-            if not fitness_is_progressing(fitness_scores):
-                break
-            if keyboard.is_pressed('q'):  # if key 'q' is pressed
-                print('You Pressed A Key!')
-                break  # finishing the loop
-        except KeyboardInterrupt:
-            pass
-        except KeyError:
-            pass
-        except ImportError:
-            pass
+
+        population.run_normally()
+        # population.run_async(4)
+        population.validate()
+        population.select()
+        fitness_scores.append(population.bestInGen.fitness)
+        if not fitness_is_progressing(fitness_scores):
+            break
+        # if keyboard.is_pressed('q'):  # if key 'q' is pressed
+        #     print('You Pressed A Key!')
+        #     break  # finishing the loop
+
     # SCORE OF EVOLVED MODELS ------------------------------------------
     # create final list of models
     final_models = []
