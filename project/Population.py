@@ -49,8 +49,6 @@ class Population(object):
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
         cut_point1 = random.randint(1, self.genLength - 3)
         cut_point2 = random.randint(cut_point1 + 1, self.genLength - 2)
-        while cut_point1 == cut_point2:
-            cut_point2 = random.randint(cut_point1, self.genLength - 2)
         genes1 = []
         genes2 = []
         genes1[0:cut_point1] = parent_first.genes[0:cut_point1].copy()
@@ -81,9 +79,12 @@ class Population(object):
     # Remove value from list of True values and add it to the list of False values
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
-    # TODO nowy cross (inne zakresy cutpointsów), nowy mutate (inne robienie), nowy fitness (gausowskie kary)
+    # TODO
+    #  [*] nowy cross (inne zakresy cutpointsów),
+    #  [*] nowy mutate (inne robienie),
+    #  [*] nowy fitness (gausowskie kary)
     def mutate(self, phenotype):
-        mutate_ratio = (self.genLength ** 3 - self.genLength) / \
+        mutate_ratio = (self.genLength ** 2 - self.genLength) / \
                        (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
         # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
         # phenotype.committee))

@@ -11,6 +11,7 @@ class Phenotype(object):
         # phenotype attributes
         self.__id = phenotype_id
         self.__committee = committee
+        self.__initialCommittee = committee
         self.__genLength = gen_length
         self.__fitness = 0.0
         self.__normalizedFitness = 0.0
@@ -94,11 +95,12 @@ class Phenotype(object):
     # Take results, vote for answer and calc score, then penalize bigger committees
     def calc_fitness(self):
         def punish_length(x):
-            sd10 = 2
-            sd20 = 5
-            y = math.exp(-(x - 8) ** 2 / (2 * sd10 ^ 2)) / (math.sqrt(2 * math.pi) * sd10) * \
-                math.exp(-(x - 18) ** 2 / (2 * sd20 ^ 2)) / (math.sqrt(2 * math.pi) * sd20)
-            return y * 1000
+            dist = x - self.__initialCommittee
+            y = -(dist / (self.__initialCommittee / 2)) ** 4 + 0.5
+            if y < 0:
+                y = 0
+            return y
+
         committee_answers = []
         for i in range(len(self.__predictions[0])):
             tmp = {}

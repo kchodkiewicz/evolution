@@ -1,9 +1,9 @@
 # Main
 import sys
 import time
-from random import shuffle, random
+from random import shuffle, random, randint, uniform
 from re import search
-
+import matplotlib.pyplot as plt
 import keyboard
 import pandas as pd
 from pandas import errors
@@ -11,7 +11,8 @@ from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
 from models.instances import Instances
-from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_outs
+from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_outs, \
+    create_dir
 from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
     plot_avg_max_distance_progress
 import numpy as np
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     # par1 = test_pop.phenotypes[0]
     # par2 = test_pop.phenotypes[1]
     # par1.genes = [True for i in range(len(par1.genes))]
-    # par2.genes = [False for i in range(len(par2.genes))]
+    #
     # i = 0
     # print(par1.genes, par2.genes)
     # ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
@@ -89,8 +90,41 @@ if __name__ == '__main__':
     # print(ch1.genes)
     # test_pop.mutate(ch1)
     # print(ch1.genes)
-
-    #  sys.exit(1)
+    # # par2.genes = [False for i in range(len(par2.genes))]
+    #
+    # initialCommittee = 10
+    # xp = [(uniform(0, 1), 10) for _ in range(1000)]
+    # xp = [(0.85, i) for i in range(84)]
+    # xp.sort()
+    #
+    # def punish_length(xd):
+    #     dist = xd - initialCommittee
+    #     yd = -(dist / (initialCommittee / 2)) ** 4 + 0.5
+    #     if yd < 0:
+    #         yd = 0
+    #     return yd
+    # fitnesses = []
+    # for i in xp:
+    #     fit = 0.8 * pow(i[0] + 1, 2) + 0.2 * punish_length(i[1])
+    #     fitnesses.append(fit)
+    #
+    # fig, ax = plt.subplots()
+    # x = np.array([xp[i][1] for i in range(len(fitnesses))])
+    # y = np.array(fitnesses)
+    # ax.plot(x, y, label="fitness scores")
+    # ax.set_xlabel('Liczebność komitetu')
+    # ax.set_ylabel('Współczynnik przystosowania')
+    # ax.set_title('Zależność współczynnika przystosowania od liczebności komitetu klasyfikatorów')
+    #
+    # try:
+    #     plt.savefig(f"output_files/test.png", dpi=800)
+    # except FileNotFoundError as e:
+    #     print('\033[93m' + str(e) + '\033[0m')
+    #     sys.exit(2)
+    # except ValueError as e:
+    #     print('\033[93m' + str(e) + '\033[0m')
+    #     sys.exit(2)
+    # sys.exit(1)
 
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
@@ -214,7 +248,6 @@ if __name__ == '__main__':
         theoretical_models.append(inst.trained_classifiers[i])
     theoretical_score = vote(theoretical_models, model.X_validate)
 
-
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
         p = []
@@ -229,7 +262,8 @@ if __name__ == '__main__':
     print("Separate scores:", separated_scores[:5])
     print(separated_scores[5:])
     write_to_json("classifiers_scores", population.genFitness)
-    print("Theoretical (assume: first 10 are best):", theoretical_score)
+    if Model.TEST:
+        print("Theoretical (assume: first 10 are best):", theoretical_score)
 
     plot_scores_progress()
     plot_genes_in_last_gen()
