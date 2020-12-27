@@ -81,12 +81,20 @@ class Population(object):
     # Remove value from list of True values and add it to the list of False values
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
+    # TODO nowy cross (inne zakresy cutpointsów), nowy mutate (inne robienie), nowy fitness (gausowskie kary)
     def mutate(self, phenotype):
-        mutate_ratio = random.uniform(0, self.mutation_ratio)
-        #  print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio * phenotype.committee))
-        for _ in range(math.ceil(self.mutation_ratio * phenotype.committee)):
-            index = random.randint(0, len(phenotype.genes) - 1)
-            phenotype.genes[index] = not phenotype.genes[index]
+        mutate_ratio = (self.genLength ** 3 - self.genLength) / \
+                       (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
+        # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
+        # phenotype.committee))
+        for _ in range(math.ceil(mutate_ratio)):
+            index1 = random.randint(0, len(phenotype.genes) - 1)
+            index2 = random.randint(0, len(phenotype.genes) - 1)
+            while index1 == index2:
+                index2 = random.randint(0, len(phenotype.genes) - 1)
+            tmp = phenotype.genes[index2]
+            phenotype.genes[index2] = phenotype.genes[index1]
+            phenotype.genes[index1] = tmp
         it = 0
         for i in phenotype.genes:
             if i:
