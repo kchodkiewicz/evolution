@@ -23,73 +23,74 @@ if __name__ == '__main__':
     # test_inst = Instances()
     # test_inst.trainClassifiers(model.X_train, model.y_train)
     # test_inst.predictClassifiers(model.X_test)
-    tab_start = """
-    \\begin{table}[h!] \\label{tab:select:test}
-    \\begin{center}
-    \\begin{tabular}{l l l l l}
-    \\textbf{nr osobnika} & \\textbf{$w$} & \\textbf{$P(w)$} & \\textbf{$P_{n,i}$}\\\\
-    \\hline
-        """
-    tab_end = """
-    \\end{tabular}
-    \\caption{Wynik testu sprawdzającego poprawność funkcji losującej osobniki do krzyżowania.}
-    \\end{center}
-    \\end{table}
-        """
-    test_pop = Population(10000, 10, 100)
-    arr = []
-    for i, phenotype in enumerate(test_pop.phenotypes):
-        phenotype.fitness = random()
-    sum_p = 0
-    for i in test_pop.phenotypes:
-        sum_p += i.fitness
-    for phenotype in test_pop.phenotypes:
-        phenotype.normalizedFitness = phenotype.fitness / sum_p
-        # print(phenotype.normalizedFitness)
-    np.random.shuffle(test_pop.phenotypes)
-    test_count = 10000
-    for i in range(test_count):
-        arr.append(test_pop.tournament_selection())
 
-    # print(tab_start)
-    arr.sort(key=lambda p: p.phenotype_id)
-    arr = list(dict.fromkeys(arr))
-    verifarr = []
-
-    for elem in arr:
-        j = 0
-        cc = elem.normalizedFitness
-        while cc < 1:
-            cc = cc * 10
-            j += 1
-
-        verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10 ** (-j) * 10)
-        print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10 ** (-j) * 2)
+    # tab_start = """
+    # \\begin{table}[h!] \\label{tab:select:test}
+    # \\begin{center}
+    # \\begin{tabular}{l l l l l}
+    # \\textbf{nr osobnika} & \\textbf{$w$} & \\textbf{$P(w)$} & \\textbf{$P_{n,i}$}\\\\
+    # \\hline
+    #     """
+    # tab_end = """
+    # \\end{tabular}
+    # \\caption{Wynik testu sprawdzającego poprawność funkcji losującej osobniki do krzyżowania.}
+    # \\end{center}
+    # \\end{table}
+    #     """
+    # test_pop = Population(10000, 10, 100)
+    # arr = []
+    # for i, phenotype in enumerate(test_pop.phenotypes):
+    #     phenotype.fitness = random()
+    # sum_p = 0
+    # for i in test_pop.phenotypes:
+    #     sum_p += i.fitness
+    # for phenotype in test_pop.phenotypes:
+    #     phenotype.normalizedFitness = phenotype.fitness / sum_p
+    #     # print(phenotype.normalizedFitness)
+    # np.random.shuffle(test_pop.phenotypes)
+    # test_count = 10000
+    # for i in range(test_count):
+    #     arr.append(test_pop.tournament_selection())
+    #
+    # # print(tab_start)
+    # arr.sort(key=lambda p: p.phenotype_id)
+    # arr = list(dict.fromkeys(arr))
+    # verifarr = []
+    #
     # for elem in arr:
-    #     print(str(elem.phenotype_id) + ' & ' + str(elem.counter) + ' & ' + str(elem.counter / test_count) + ' & ' +
-    #           '{:04f}'.format(elem.normalizedFitness) + ' \\\\')
-    i = 0
-    for elem in verifarr:
-        if elem:
-            i += 1
-    print(i)
-    # print(tab_end)
-    par1 = test_pop.phenotypes[0]
-    par2 = test_pop.phenotypes[1]
-    par1.genes = [True for i in range(len(par1.genes))]
-    par2.genes = [False for i in range(len(par2.genes))]
-    i = 0
-    print(par1.genes, par2.genes)
-    ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
-    print(cut1, cut2)
-    print(ch1.genes, ch2.genes)
+    #     j = 0
+    #     cc = elem.normalizedFitness
+    #     while cc < 1:
+    #         cc = cc * 10
+    #         j += 1
+    #
+    #     verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10 ** (-j) * 10)
+    #     print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10 ** (-j) * 2)
+    # # for elem in arr:
+    # #     print(str(elem.phenotype_id) + ' & ' + str(elem.counter) + ' & ' + str(elem.counter / test_count) + ' & ' +
+    # #           '{:04f}'.format(elem.normalizedFitness) + ' \\\\')
+    # i = 0
+    # for elem in verifarr:
+    #     if elem:
+    #         i += 1
+    # print(i)
+    # # print(tab_end)
+    # par1 = test_pop.phenotypes[0]
+    # par2 = test_pop.phenotypes[1]
+    # par1.genes = [True for i in range(len(par1.genes))]
+    # par2.genes = [False for i in range(len(par2.genes))]
+    # i = 0
+    # print(par1.genes, par2.genes)
+    # ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
+    # print(cut1, cut2)
+    # print(ch1.genes, ch2.genes)
+    #
+    # print('\nMutate')
+    # print(ch1.genes)
+    # test_pop.mutate(ch1)
+    # print(ch1.genes)
 
-    print('\nMutate')
-    print(ch1.genes)
-    test_pop.mutate(ch1)
-    print(ch1.genes)
-
-    sys.exit(1)
+    #  sys.exit(1)
 
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 

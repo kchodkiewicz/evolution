@@ -1,4 +1,5 @@
 # Phenotype genes and methods for classification etc.
+import math
 import random
 from models.Model import Model
 from models.instances import Instances
@@ -92,6 +93,12 @@ class Phenotype(object):
 
     # Take results, vote for answer and calc score, then penalize bigger committees
     def calc_fitness(self):
+        def punish_length(x):
+            sd10 = 2
+            sd20 = 5
+            y = math.exp(-(x - 8) ** 2 / (2 * sd10 ^ 2)) / (math.sqrt(2 * math.pi) * sd10) * \
+                math.exp(-(x - 18) ** 2 / (2 * sd20 ^ 2)) / (math.sqrt(2 * math.pi) * sd20)
+            return y * 1000
         committee_answers = []
         for i in range(len(self.__predictions[0])):
             tmp = {}
@@ -104,7 +111,7 @@ class Phenotype(object):
             val = max(inverse)[1]
             committee_answers.append(val)
         self.__fitness = 0.8 * pow(self.__model.calcScore(predictions=committee_answers, verify=False) + 1, 2) + \
-                         0.2 * 0.05 * (self.gen_length / self.__committee)
+                         0.2 * punish_length(self.committee)
         return self.__fitness
 
     # choose classifiers from list

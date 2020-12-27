@@ -1,6 +1,7 @@
 # Phenotypes list and methods for evolution
 import copy
 import json
+import math
 import random
 import time
 from Phenotype import Phenotype
@@ -46,8 +47,8 @@ class Population(object):
     def cross(self, cross_id, parent_first, parent_second):
         child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
-        cut_point1 = random.randint(1, self.genLength - 2)
-        cut_point2 = random.randint(cut_point1, self.genLength - 2)
+        cut_point1 = random.randint(1, self.genLength - 3)
+        cut_point2 = random.randint(cut_point1 + 1, self.genLength - 2)
         while cut_point1 == cut_point2:
             cut_point2 = random.randint(cut_point1, self.genLength - 2)
         genes1 = []
@@ -82,8 +83,8 @@ class Population(object):
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
         mutate_ratio = random.uniform(0, self.mutation_ratio)
-        print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', int(mutate_ratio * phenotype.committee))
-        for _ in range(int(mutate_ratio * phenotype.committee)):
+        #  print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio * phenotype.committee))
+        for _ in range(math.ceil(self.mutation_ratio * phenotype.committee)):
             index = random.randint(0, len(phenotype.genes) - 1)
             phenotype.genes[index] = not phenotype.genes[index]
         it = 0
