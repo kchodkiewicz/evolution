@@ -1,6 +1,8 @@
 # Main
+import statistics
 import sys
 import time
+from operator import xor
 from random import shuffle, random, randint, uniform
 from re import search
 import matplotlib.pyplot as plt
@@ -25,20 +27,20 @@ if __name__ == '__main__':
     # test_inst.trainClassifiers(model.X_train, model.y_train)
     # test_inst.predictClassifiers(model.X_test)
 
-    # tab_start = """
-    # \\begin{table}[h!] \\label{tab:select:test}
-    # \\begin{center}
-    # \\begin{tabular}{l l l l l}
-    # \\textbf{nr osobnika} & \\textbf{$w$} & \\textbf{$P(w)$} & \\textbf{$P_{n,i}$}\\\\
-    # \\hline
-    #     """
-    # tab_end = """
-    # \\end{tabular}
-    # \\caption{Wynik testu sprawdzającego poprawność funkcji losującej osobniki do krzyżowania.}
-    # \\end{center}
-    # \\end{table}
-    #     """
-    # test_pop = Population(10000, 10, 100)
+    tab_start = """
+    \\begin{table}[h!] \\label{tab:mut:test}
+    \\begin{center}
+    \\begin{tabular}{l l l l l}
+    \\textbf{średnia arytmetyczna} & \\textbf{mediana} & \\textbf{dominanta}\\\\
+    \\hline
+        """
+    tab_end = """
+    \\end{tabular}
+    \\caption{Wynik testu sprawdzającego poprawność funkcji mutującej.}
+    \\end{center}
+    \\end{table}
+        """
+    test_pop = Population(10000, 10, 40)
     # arr = []
     # for i, phenotype in enumerate(test_pop.phenotypes):
     #     phenotype.fitness = random()
@@ -85,16 +87,42 @@ if __name__ == '__main__':
     # ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
     # print(cut1, cut2)
     # print(ch1.genes, ch2.genes)
-    #
-    # print('\nMutate')
-    # print(ch1.genes)
-    # test_pop.mutate(ch1)
-    # print(ch1.genes)
-    # # par2.genes = [False for i in range(len(par2.genes))]
-    #
+
+    print('\nMutate')
+    print(tab_start)
+    for _ in range(10):
+        prev = []
+        new = []
+        for i in test_pop.phenotypes:
+            prev.append(i.genes.copy())
+            test_pop.mutate(i)
+            new.append(i.genes.copy())
+        tabs = []
+        for i in range(len(prev)):
+            itt = 0
+            for j in range(len(prev[i])):
+                if xor(prev[i][j], new[i][j]):
+                    itt += 1
+            tabs.append(itt)
+
+        avg = sum(tabs) / len(tabs)
+        median = statistics.median(tabs)
+        mode = statistics.mode(tabs)
+        print(avg, '&', median, '&', mode, '\\\\')
+    print(tab_end)
+    # par2.genes = [False for i in range(len(par2.genes))]
+
     # initialCommittee = 10
     # xp = [(uniform(0, 1), 10) for _ in range(1000)]
-    # xp = [(0.85, i) for i in range(84)]
+    # # xp = [(0.85, i) for i in range(84)]
+    # # xp = []
+    # # for i in range(1000):
+    # #     for j in range(84):
+    # #         if i % 100 == 0:
+    # #             t = j
+    # #         else:
+    # #             t = 0
+    # #         xp.append((i / 1000, t))
     # xp.sort()
     #
     # def punish_length(xd):
@@ -109,12 +137,13 @@ if __name__ == '__main__':
     #     fitnesses.append(fit)
     #
     # fig, ax = plt.subplots()
-    # x = np.array([xp[i][1] for i in range(len(fitnesses))])
+    # x = np.array([xp[i][0] for i in range(len(fitnesses))])
     # y = np.array(fitnesses)
     # ax.plot(x, y, label="fitness scores")
-    # ax.set_xlabel('Liczebność komitetu')
+    # ax.grid()
+    # ax.set_xlabel('Skuteczność klasyfikacji')
     # ax.set_ylabel('Współczynnik przystosowania')
-    # ax.set_title('Zależność współczynnika przystosowania od liczebności komitetu klasyfikatorów')
+    # #  ax.set_title('Zależność współczynnika przystosowania od liczebności komitetu klasyfikatorów')
     #
     # try:
     #     plt.savefig(f"output_files/test.png", dpi=800)
@@ -124,7 +153,7 @@ if __name__ == '__main__':
     # except ValueError as e:
     #     print('\033[93m' + str(e) + '\033[0m')
     #     sys.exit(2)
-    # sys.exit(1)
+    sys.exit(1)
 
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
@@ -247,6 +276,7 @@ if __name__ == '__main__':
     for i in range(10):
         theoretical_models.append(inst.trained_classifiers[i])
     theoretical_score = vote(theoretical_models, model.X_validate)
+
 
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
