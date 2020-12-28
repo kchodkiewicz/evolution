@@ -88,28 +88,28 @@ if __name__ == '__main__':
     # print(cut1, cut2)
     # print(ch1.genes, ch2.genes)
 
-    print('\nMutate')
-    print(tab_start)
-    for _ in range(10):
-        prev = []
-        new = []
-        for i in test_pop.phenotypes:
-            prev.append(i.genes.copy())
-            test_pop.mutate(i)
-            new.append(i.genes.copy())
-        tabs = []
-        for i in range(len(prev)):
-            itt = 0
-            for j in range(len(prev[i])):
-                if xor(prev[i][j], new[i][j]):
-                    itt += 1
-            tabs.append(itt)
-
-        avg = sum(tabs) / len(tabs)
-        median = statistics.median(tabs)
-        mode = statistics.mode(tabs)
-        print(avg, '&', median, '&', mode, '\\\\')
-    print(tab_end)
+    # print('\nMutate')
+    # print(tab_start)
+    # for _ in range(10):
+    #     prev = []
+    #     new = []
+    #     for i in test_pop.phenotypes:
+    #         prev.append(i.genes.copy())
+    #         test_pop.mutate(i)
+    #         new.append(i.genes.copy())
+    #     tabs = []
+    #     for i in range(len(prev)):
+    #         itt = 0
+    #         for j in range(len(prev[i])):
+    #             if xor(prev[i][j], new[i][j]):
+    #                 itt += 1
+    #         tabs.append(itt)
+    #
+    #     avg = sum(tabs) / len(tabs)
+    #     median = statistics.median(tabs)
+    #     mode = statistics.mode(tabs)
+    #     print(avg, '&', median, '&', mode, '\\\\')
+    # print(tab_end)
     # par2.genes = [False for i in range(len(par2.genes))]
 
     # initialCommittee = 10
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     # except ValueError as e:
     #     print('\033[93m' + str(e) + '\033[0m')
     #     sys.exit(2)
-    sys.exit(1)
+    # sys.exit(1)
 
     # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
