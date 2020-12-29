@@ -6,7 +6,6 @@ from operator import xor
 from random import shuffle, random, randint, uniform
 from re import search
 import matplotlib.pyplot as plt
-import keyboard
 import pandas as pd
 from pandas import errors
 from sklearn.model_selection import train_test_split
@@ -273,9 +272,14 @@ if __name__ == '__main__':
     # SCORE OF FIRST 10 MODELS -----------------------------------------
     # create theoretical list of models
     theoretical_models = []
-    for i in range(10):
-        theoretical_models.append(inst.trained_classifiers[i])
-    theoretical_score = vote(theoretical_models, model.X_validate)
+    if Model.TEST:
+        for i in range(10):
+            theoretical_models.append(inst.trained_classifiers[i])
+        theoretical_score = vote(theoretical_models, model.X_validate)
+    else:
+        for i in range(10):
+            theoretical_models.append(inst.trained_classifiers[randint(0, len(inst.trained_classifiers) - 1)])
+        theoretical_score = vote(theoretical_models, model.X_validate)
 
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
@@ -292,6 +296,8 @@ if __name__ == '__main__':
     write_to_json("classifiers_scores", population.genFitness)
     if Model.TEST:
         print("Theoretical (assume: first 10 are best):", theoretical_score)
+    else:
+        print("Random committee (for comparison):", theoretical_score)
 
     plot_scores_progress()
     plot_genes_in_last_gen()
