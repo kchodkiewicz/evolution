@@ -284,7 +284,6 @@ if __name__ == '__main__':
             p.append(inst.trained_classifiers[it].__class__.__name__)
         return p
 
-
     print("Classifiers:", conv_genes(population.bestInGen.genes))
     print(human_readable_genes(conv_genes(population.bestInGen.genes)))
     print("Score:", score, "in", population.genNo, "iterations")
