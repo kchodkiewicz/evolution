@@ -4,8 +4,7 @@
 # Methods for training and testing classifiers
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.linear_model import SGDClassifier, LogisticRegression, RidgeClassifier, PassiveAggressiveClassifier, \
-    LassoLars
+from sklearn.linear_model import SGDClassifier, LogisticRegression, PassiveAggressiveClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -314,6 +313,8 @@ class Instances(object):
                 print_progress(i + 1, len(inst), "Training")
                 trained_model = instance.fit(X, y)
             except exceptions.FitFailedWarning as e:
+                print("An error occurred while training classifier. Omitting.", e)
+            except ValueError as e:
                 print("An error occurred while training classifier. Omitting.", e)
             else:
                 self.__trained_classifiers.append(trained_model)

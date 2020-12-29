@@ -277,7 +277,6 @@ if __name__ == '__main__':
         theoretical_models.append(inst.trained_classifiers[i])
     theoretical_score = vote(theoretical_models, model.X_validate)
 
-
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
         p = []

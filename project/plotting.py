@@ -22,7 +22,7 @@ def draw(name):
         print('\033[93m' + str(e) + '\033[0m')
         sys.exit(2)
     print('Drawing ' + name)
-    plt.show()
+    # plt.show()
 
 
 def find_file(name):
