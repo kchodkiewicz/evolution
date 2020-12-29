@@ -27,20 +27,20 @@ if __name__ == '__main__':
     # test_inst.trainClassifiers(model.X_train, model.y_train)
     # test_inst.predictClassifiers(model.X_test)
 
-    tab_start = """
-    \\begin{table}[h!] \\label{tab:mut:test}
-    \\begin{center}
-    \\begin{tabular}{l l l l l}
-    \\textbf{średnia arytmetyczna} & \\textbf{mediana} & \\textbf{dominanta}\\\\
-    \\hline
-        """
-    tab_end = """
-    \\end{tabular}
-    \\caption{Wynik testu sprawdzającego poprawność funkcji mutującej.}
-    \\end{center}
-    \\end{table}
-        """
-    test_pop = Population(10000, 10, 40)
+    # tab_start = """
+    # \\begin{table}[h!] \\label{tab:mut:test}
+    # \\begin{center}
+    # \\begin{tabular}{l l l l l}
+    # \\textbf{średnia arytmetyczna} & \\textbf{mediana} & \\textbf{dominanta}\\\\
+    # \\hline
+    #     """
+    # tab_end = """
+    # \\end{tabular}
+    # \\caption{Wynik testu sprawdzającego poprawność funkcji mutującej.}
+    # \\end{center}
+    # \\end{table}
+    #     """
+    # test_pop = Population(10000, 10, 40)
     # arr = []
     # for i, phenotype in enumerate(test_pop.phenotypes):
     #     phenotype.fitness = random()
@@ -277,7 +277,6 @@ if __name__ == '__main__':
         theoretical_models.append(inst.trained_classifiers[i])
     theoretical_score = vote(theoretical_models, model.X_validate)
 
-
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
         p = []
@@ -285,12 +284,11 @@ if __name__ == '__main__':
             p.append(inst.trained_classifiers[it].__class__.__name__)
         return p
 
-
     print("Classifiers:", conv_genes(population.bestInGen.genes))
     print(human_readable_genes(conv_genes(population.bestInGen.genes)))
     print("Score:", score, "in", population.genNo, "iterations")
     print("Separate scores:", separated_scores[:5])
-    print(separated_scores[5:])
+    print("                ", separated_scores[5:])
     write_to_json("classifiers_scores", population.genFitness)
     if Model.TEST:
         print("Theoretical (assume: first 10 are best):", theoretical_score)
@@ -299,5 +297,12 @@ if __name__ == '__main__':
     plot_genes_in_last_gen()
     plot_avg_max_distance_progress()
     plot_best_phenotype_genes_progress()
+
+    out_file_name = f'{dataset[9:]}-{col}-{metrics}-{pop}-{comm}-{Model.RUN_ID}'
+    out_content = f'{human_readable_genes(conv_genes(population.bestInGen.genes))}\nScore: {score} in ' \
+                  f'{population.genNo} iterations\nSeparate scores: {separated_scores}'
+    with open(f'output_files/plots/{Model.RUN_ID}/{out_file_name}.txt', 'w') as f:
+        f.write(out_content)
+
     print('\033[94m' + f'All processes finished. Results may be found in output_files/plots/' + '\033[0m' +
           '\033[1m' + f'{Model.RUN_ID}' + '\033[0m')

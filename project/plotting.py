@@ -22,7 +22,7 @@ def draw(name):
         print('\033[93m' + str(e) + '\033[0m')
         sys.exit(2)
     print('Drawing ' + name)
-    plt.show()
+    # plt.show()
 
 
 def find_file(name):
@@ -48,7 +48,7 @@ def plot_scores_progress():
     ax.plot(x, y, label="fitness scores")
     ax.set_xlabel('Numer osobnika')
     ax.set_ylabel('Współczynnik przystosowania')
-    #ax.set_title('Wyniki poszczególnych osobników')
+    # ax.set_title('Wyniki poszczególnych osobników')
     draw(name)
 
 
@@ -68,7 +68,7 @@ def plot_best_phenotype_genes_progress():
             pass
     ax.set_xlabel('Numer populacji')
     ax.set_ylabel('Numer klasyfikatora')
-    #ax.set_title('Rozkład genów najlepszych osobników w populacjach')
+    # ax.set_title('Rozkład genów najlepszych osobników w populacjach')
     draw(name)
 
 
@@ -96,7 +96,7 @@ def plot_genes_in_last_gen():
     ax.bar(x + width / 2, false_l, label='False ')
     ax.set_ylabel('Liczba genów pozytywnych (' + str(sum(true_l) / len(true_l)) + ') i negatywnych (' +
                   str(sum(false_l) / len(false_l)) + ')')
-    #ax.set_title('Rozkład genów w osobnikach poszczególnych populacji')
+    # ax.set_title('Rozkład genów w osobnikach poszczególnych populacji')
 
     fig.tight_layout()
     draw(name)
@@ -121,6 +121,6 @@ def plot_avg_max_distance_progress():
     ax.plot(keys, values_avg, label='średni wynik', marker='^')
     ax.set_xlabel('Numer generacji')
     ax.set_ylabel('Dystans max - avg')
-    #ax.set_title('Wykres zbiegania się wyników osobników na przestrzeni populacji')
+    # ax.set_title('Wykres zbiegania się wyników osobników na przestrzeni populacji')
     ax.legend()
     draw(name)

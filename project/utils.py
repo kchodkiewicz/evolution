@@ -108,9 +108,12 @@ def parse_args(argv):
 
 # Remove columns with same data (low variance)
 def variance_threshold_selector(data, threshold=0.9):
-    selector = VarianceThreshold(threshold)
-    selector.fit(data)
-    return data[data.columns[selector.get_support(indices=True)]]
+    try:
+        selector = VarianceThreshold(threshold)
+        selector.fit(data)
+        return data[data.columns[selector.get_support(indices=True)]]
+    except ValueError:
+        return data
 
 
 def clear_outs():
