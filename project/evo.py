@@ -8,6 +8,7 @@ from re import search
 import matplotlib.pyplot as plt
 import pandas as pd
 from pandas import errors
+from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
@@ -234,10 +235,8 @@ if __name__ == '__main__':
             sys.exit(2)
 
     # EVOLUTION --------------------------------------------------------
-    # TODO add tournament to dev branch
     fitness_scores = []
     while True:
-
         population.run_normally()
         # population.run_async(4)
         population.validate()
@@ -255,7 +254,7 @@ if __name__ == '__main__':
     for i, gen in enumerate(population.bestInGen.genes):
         if gen:
             final_models.append(inst.trained_classifiers[i])
-    score = vote(final_models, model.X_validate)
+    score, report = vote(final_models, model.X_validate)
 
     # SEPARATE SCORES OF EVOLVED MODELS --------------------------------
     # create list of models used in final list
@@ -275,11 +274,11 @@ if __name__ == '__main__':
     if Model.TEST:
         for i in range(10):
             theoretical_models.append(inst.trained_classifiers[i])
-        theoretical_score = vote(theoretical_models, model.X_validate)
+        theoretical_score, theoretical_report = vote(theoretical_models, model.X_validate)
     else:
         for i in range(10):
             theoretical_models.append(inst.trained_classifiers[randint(0, len(inst.trained_classifiers) - 1)])
-        theoretical_score = vote(theoretical_models, model.X_validate)
+        theoretical_score, theoretical_report = vote(theoretical_models, model.X_validate)
 
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
@@ -291,6 +290,7 @@ if __name__ == '__main__':
     print("Classifiers:", conv_genes(population.bestInGen.genes))
     print(human_readable_genes(conv_genes(population.bestInGen.genes)))
     print("Score:", score, "in", population.genNo, "iterations")
+    print(report)
     print("Separate scores:", separated_scores[:5])
     print("                ", separated_scores[5:])
     write_to_json("classifiers_scores", population.genFitness)
@@ -298,6 +298,7 @@ if __name__ == '__main__':
         print("Theoretical (assume: first 10 are best):", theoretical_score)
     else:
         print("Random committee (for comparison):", theoretical_score)
+    print(theoretical_report)
 
     plot_scores_progress()
     plot_genes_in_last_gen()

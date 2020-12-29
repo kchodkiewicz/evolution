@@ -5,6 +5,8 @@ import os
 import sys
 import time
 from sklearn.feature_selection import VarianceThreshold
+from sklearn.metrics import classification_report
+
 from models.Model import Model
 
 
@@ -233,5 +235,6 @@ def vote(models_arr, X):
         val = max(inverse)[1]
         committee_answers.append(val)
     model = Model()
+    report = classification_report(model.y_validate, committee_answers)
     # calculate score of committee
-    return model.calcScore(predictions=committee_answers, verify=True)
+    return model.calcScore(predictions=committee_answers, verify=True), report
