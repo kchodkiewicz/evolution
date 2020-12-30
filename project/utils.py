@@ -5,6 +5,8 @@ import os
 import sys
 import time
 from sklearn.feature_selection import VarianceThreshold
+from sklearn.metrics import classification_report
+
 from models.Model import Model
 
 
@@ -61,8 +63,9 @@ def parse_args(argv):
             if arg == "accuracy_score" or arg == "f1_score":
                 metrics_method = arg
             else:
-                print('\033[93m' + 'Incorrect metrics method: ' + str(arg) + '\033[0m')
-                sys.exit(2)
+                if metrics_method != 'accuracy_score':
+                    print('\033[93m' + 'Incorrect metrics method: ' + str(arg) + '\033[0m')
+                    sys.exit(2)
         elif opt in ("-p", "--pop_size"):
             if not arg.isnumeric():
                 print('\033[93m' + "Incorrect population size: " + str(arg) + '\033[0m')
@@ -108,9 +111,12 @@ def parse_args(argv):
 
 # Remove columns with same data (low variance)
 def variance_threshold_selector(data, threshold=0.9):
-    selector = VarianceThreshold(threshold)
-    selector.fit(data)
-    return data[data.columns[selector.get_support(indices=True)]]
+    try:
+        selector = VarianceThreshold(threshold)
+        selector.fit(data)
+        return data[data.columns[selector.get_support(indices=True)]]
+    except ValueError:
+        return data
 
 
 def clear_outs():
@@ -230,5 +236,6 @@ def vote(models_arr, X):
         val = max(inverse)[1]
         committee_answers.append(val)
     model = Model()
+    report = classification_report(model.y_validate, committee_answers)
     # calculate score of committee
-    return model.calcScore(predictions=committee_answers, verify=True)
+    return model.calcScore(predictions=committee_answers, verify=True), report
