@@ -306,8 +306,13 @@ if __name__ == '__main__':
     plot_best_phenotype_genes_progress()
 
     out_file_name = f'{dataset[9:]}-{col}-{metrics}-{pop}-{comm}-{Model.RUN_ID}'
-    out_content = f'{human_readable_genes(conv_genes(population.bestInGen.genes))}\nScore: {score} in ' \
-                  f'{population.genNo} iterations\nSeparate scores: {separated_scores}'
+    out_content = f'{conv_genes(population.bestInGen.genes)}\n' \
+                  f'{human_readable_genes(conv_genes(population.bestInGen.genes))}\n' \
+                  f'Score: {score} in {population.genNo} iterations\n' \
+                  f'{report}\n' \
+                  f'Separate scores: {separated_scores}\n' \
+                  f'Random committee (for comparison): {theoretical_score}' \
+                  f'\n{theoretical_report}'
     with open(f'output_files/plots/{Model.RUN_ID}/{out_file_name}.txt', 'w') as f:
         f.write(out_content)
 

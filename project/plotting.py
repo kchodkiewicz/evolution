@@ -46,6 +46,7 @@ def plot_scores_progress():
     x = np.array([i for i in range(len(scores))])
     y = np.array(scores)
     ax.plot(x, y, label="fitness scores")
+    ax.grid()
     ax.set_xlabel('Numer osobnika')
     ax.set_ylabel('Współczynnik przystosowania')
     # ax.set_title('Wyniki poszczególnych osobników')
@@ -66,6 +67,7 @@ def plot_best_phenotype_genes_progress():
             ax.scatter([keys[i] for _ in range(len(values[i]))], values[i], label='populacja ' + str(i), marker='x')
         except IndexError:
             pass
+    ax.grid()
     ax.set_xlabel('Numer populacji')
     ax.set_ylabel('Numer klasyfikatora')
     # ax.set_title('Rozkład genów najlepszych osobników w populacjach')
@@ -87,13 +89,15 @@ def plot_genes_in_last_gen():
                 trues += 1
             else:
                 falses += 1
-        false_l.append(trues)
-        true_l.append(falses)
+        false_l.append(falses)
+        true_l.append(trues)
     x = np.arange(len(labels))
     width = 0.35
     fig, ax = plt.subplots()
+
     ax.bar(x - width / 2, true_l, label='True ')
     ax.bar(x + width / 2, false_l, label='False ')
+    ax.grid()
     ax.set_ylabel('Liczba genów pozytywnych (' + str(sum(true_l) / len(true_l)) + ') i negatywnych (' +
                   str(sum(false_l) / len(false_l)) + ')')
     # ax.set_title('Rozkład genów w osobnikach poszczególnych populacji')
@@ -119,6 +123,7 @@ def plot_avg_max_distance_progress():
     ax.plot(keys, dist, label='dystans', marker='o')
     ax.plot(keys, values_max, label='maksymalny wynik', marker='x')
     ax.plot(keys, values_avg, label='średni wynik', marker='^')
+    ax.grid()
     ax.set_xlabel('Numer generacji')
     ax.set_ylabel('Dystans max - avg')
     # ax.set_title('Wykres zbiegania się wyników osobników na przestrzeni populacji')

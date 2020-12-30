@@ -63,8 +63,9 @@ def parse_args(argv):
             if arg == "accuracy_score" or arg == "f1_score":
                 metrics_method = arg
             else:
-                print('\033[93m' + 'Incorrect metrics method: ' + str(arg) + '\033[0m')
-                sys.exit(2)
+                if metrics_method != 'accuracy_score':
+                    print('\033[93m' + 'Incorrect metrics method: ' + str(arg) + '\033[0m')
+                    sys.exit(2)
         elif opt in ("-p", "--pop_size"):
             if not arg.isnumeric():
                 print('\033[93m' + "Incorrect population size: " + str(arg) + '\033[0m')
