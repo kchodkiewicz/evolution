@@ -5,6 +5,7 @@ import math
 import random
 import time
 from Phenotype import Phenotype
+from models.instances import Instances
 from utils import print_progress, conv_genes, write_to_json
 from models.Model import Model
 
@@ -18,13 +19,14 @@ class Population(object):
         self.genNo = 0
         if gen_length < committee:
             raise ValueError
-        self.mutation_ratio = 1/gen_length  # max amount of changed genes in phenotype
+        self.mutation_ratio = 1  # amount of swapped genes in phenotype
         self.phenotypes = [Phenotype(i, self.classifierCommittee, self.genLength) for i in range(self.size)]
         self.bestInGen = None
         self.__genFitness = []
         self.output = {}
         self.start_time = time.localtime()
         self.__validation_res = {}
+        self.inst = Instances()
 
     def load_population(self, filename):
         try:
@@ -71,7 +73,7 @@ class Population(object):
                 jt += 1
         child2nd.committee = jt
         return child1st, child2nd, cut_point1, cut_point2
-        #return child1st, child2nd
+        # return child1st, child2nd
 
     # Create lists of True and False values in genes
     # Get random amount of mutations (between 0 and 3)
@@ -79,12 +81,8 @@ class Population(object):
     # Remove value from list of True values and add it to the list of False values
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
-    # TODO
-    #  [*] nowy cross (inne zakresy cutpointsów),
-    #  [*] nowy mutate (inne robienie),
-    #  [*] nowy fitness (gausowskie kary)
     def mutate(self, phenotype):
-        mutate_ratio = (self.genLength ** 2 - self.genLength) / \
+        mutate_ratio = self.mutation_ratio * (self.genLength ** 2 - self.genLength) / \
                        (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
         # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
         # phenotype.committee))
@@ -175,7 +173,7 @@ class Population(object):
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
-            specimen = {}
+            specimen = {'used_models': self.inst.get_models_index_arr()}  # TODO new thingy not tested
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
             write_to_json("population_dump", specimen)
@@ -194,12 +192,13 @@ class Population(object):
         self.__validation_res[self.genNo]["max"] = self.bestInGen.fitness
         write_to_json("validation_res", self.__validation_res)
         if (self.bestInGen.fitness * 0.9) < avg_fitness:
-            self.mutation_ratio = 10/self.genLength
+            self.mutation_ratio = 3
         else:
-            self.mutation_ratio = 1/self.genLength
+            self.mutation_ratio = 1
 
     def run_normally(self):
-        print("Gen No", self.genNo, end=' ', flush=True)
+        if Model.verbose:
+            print("Gen No", self.genNo, end=' ', flush=True)
         for phenotype in self.phenotypes:
             fit = phenotype.run()
             self.__genFitness.append(fit)

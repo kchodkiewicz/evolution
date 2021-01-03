@@ -14,6 +14,7 @@ class Model(object):
     verbose = False
     RUN_ID = None
     TEST = False
+    PRE_TRAIN = False
 
     def calcScore(self, predictions, **kwargs):
         def calc(y, predicts):
