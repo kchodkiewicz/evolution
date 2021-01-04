@@ -1,2 +1,4 @@
 output_files/**/*.json
 output_files/**/*.png
+models/trained_classifiers/*.pkl
+models/vanilla_classifiers/*.pkl
