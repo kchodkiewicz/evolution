@@ -1,5 +1,4 @@
 # Phenotype genes and methods for classification etc.
-import math
 import random
 from models.Model import Model
 from models.instances import Instances

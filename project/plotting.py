@@ -12,9 +12,10 @@ from utils import create_dir
 
 
 def draw(name):
+    plt.rcParams['agg.path.chunksize'] = 10000
     path_name = create_dir('plots', Model.RUN_ID)
     try:
-        plt.savefig(f"{path_name}/{Model.RUN_ID}-{name}", dpi=800)
+        plt.savefig(f"{path_name}/{name}", dpi=800)
     except FileNotFoundError as e:
         print('\033[93m' + str(e) + '\033[0m')
         sys.exit(2)

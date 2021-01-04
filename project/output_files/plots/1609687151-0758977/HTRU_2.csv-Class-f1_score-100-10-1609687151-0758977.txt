@@ -1,0 +1,37 @@
+[8, 10, 21, 24, 33, 60, 63, 69, 71, 76]
+Score: 0.9776536312849162 in 30 iterations
+              precision    recall  f1-score   support
+
+           nie pulsar   &    0.98   &   0.99   &   0.99   &   0.98   &   1.00   &   0.99 \\
+           pulsar   &    0.93   &   0.81   &   0.87   &   0.97   &   0.79   &   0.87 \\
+
+    accuracy                           0.98      1611
+   macro avg       0.95      0.90      0.93      1611
+weighted avg       0.98      0.98      0.98      1611
+
+Separate scores: [0.978895096213532, 0.973308504034761, 0.9658597144630664, 0.9708255741775295, 0.973308504034761, 0.973308504034761, 0.9671011793916822, 0.973308504034761, 0.9708255741775295, 0.9646182495344506]
+Random committee (for comparison): 0.9795158286778398
+              precision    recall  f1-score   support
+
+   0.98   &   1.00   &   0.99 \\
+   0.97   &   0.79   &   0.87 \\
+
+    accuracy                           0.98      1611
+   macro avg       0.98      0.89      0.93      1611
+weighted avg       0.98      0.98      0.98      1611
+
+
+ ------------------------------------------ 
+DecisionTreeClassifier & \texttt{(criterion='entropy', max\_features='sqrt')} \\
+GaussianNB & \texttt{()} \\
+SGDClassifier & \texttt{()} \\
+SGDClassifier & \texttt{(penalty='elasticnet')} \\
+KNeighborsClassifier & \texttt{(algorithm='ball\_tree')} \\
+PassiveAggressiveClassifier & \texttt{(C=10, early\_stopping=True)} \\
+PassiveAggressiveClassifier & \texttt{(n\_iter\_no\_change=1)} \\
+LinearDiscriminantAnalysis & \texttt{(store\_covariance=True)} \\
+LinearDiscriminantAnalysis & \texttt{(solver='lsqr')} \\
+LinearDiscriminantAnalysis & \texttt{(solver='eigen', shrinkage=1.0)} \\
+
+
+
