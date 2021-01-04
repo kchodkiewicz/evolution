@@ -1,4 +1,4 @@
-# Drawing utilities
+# Drawing utilities -- its me and its good
 import glob
 import json
 import os
@@ -22,8 +22,7 @@ def draw(name):
     except ValueError as e:
         print('\033[93m' + str(e) + '\033[0m')
         sys.exit(2)
-    print('Drawing ' + name)
-    # plt.show()
+    print('[DONE]')
 
 
 def find_file(name):
@@ -42,6 +41,7 @@ def find_file(name):
 
 def plot_scores_progress():
     name = 'classifiers_scores'
+    print('Drawing ' + name)
     scores = find_file(name)
     fig, ax = plt.subplots()
     x = np.array([i for i in range(len(scores))])
@@ -50,12 +50,12 @@ def plot_scores_progress():
     ax.grid()
     ax.set_xlabel('Numer osobnika')
     ax.set_ylabel('Współczynnik przystosowania')
-    # ax.set_title('Wyniki poszczególnych osobników')
     draw(name)
 
 
 def plot_best_phenotype_genes_progress():
     name = 'gen_stats'
+    print('Drawing ' + name)
     scores = find_file(name)
     fig, ax = plt.subplots()
     keys = []
@@ -71,12 +71,12 @@ def plot_best_phenotype_genes_progress():
     ax.grid()
     ax.set_xlabel('Numer populacji')
     ax.set_ylabel('Numer klasyfikatora')
-    # ax.set_title('Rozkład genów najlepszych osobników w populacjach')
     draw(name)
 
 
 def plot_genes_in_last_gen():
     name = 'population_dump'
+    print('Drawing ' + name)
     scores = find_file(name)
     labels = []
     false_l = []
@@ -101,14 +101,13 @@ def plot_genes_in_last_gen():
     ax.grid()
     ax.set_ylabel('Liczba genów pozytywnych (' + str(sum(true_l) / len(true_l)) + ') i negatywnych (' +
                   str(sum(false_l) / len(false_l)) + ')')
-    # ax.set_title('Rozkład genów w osobnikach poszczególnych populacji')
-
     fig.tight_layout()
     draw(name)
 
 
 def plot_avg_max_distance_progress():
     name = 'validation_res'
+    print('Drawing ' + name)
     fig, ax = plt.subplots()
     keys = []
     values_max = []
@@ -127,6 +126,5 @@ def plot_avg_max_distance_progress():
     ax.grid()
     ax.set_xlabel('Numer generacji')
     ax.set_ylabel('Dystans max - avg')
-    # ax.set_title('Wykres zbiegania się wyników osobników na przestrzeni populacji')
     ax.legend()
     draw(name)
