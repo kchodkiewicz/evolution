@@ -166,6 +166,14 @@ def clear_cache():
         os.mkdir('output_files/validation_res', 0o777)
     except FileExistsError:
         pass
+    try:
+        os.mkdir('models/vanilla_classifiers', 0o777)
+    except FileExistsError:
+        pass
+    try:
+        os.mkdir('models/trained_classifiers', 0o777)
+    except FileExistsError:
+        pass
 
 
 def create_dir(path, run_id):
