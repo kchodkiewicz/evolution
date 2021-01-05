@@ -1,0 +1,35 @@
+[11, 17, 36, 40, 48, 58, 70, 71, 80, 83]
+Score: 0.8571428571428571 in 53 iterations
+              precision    recall  f1-score   support
+
+           0       0.82      0.93      0.87        15
+           1       0.91      0.77      0.83        13
+
+    accuracy                           0.86        28
+   macro avg       0.87      0.85      0.85        28
+weighted avg       0.86      0.86      0.86        28
+
+Separate scores: [0.7857142857142857, 0.8214285714285714, 0.8214285714285714, 0.8571428571428571, 0.8571428571428571, 0.7142857142857143, 0.8571428571428571, 0.8571428571428571, 0.8214285714285714, 0.8571428571428571]
+Random committee (for comparison): 0.75
+              precision    recall  f1-score   support
+
+           0       0.70      0.93      0.80        15
+           1       0.88      0.54      0.67        13
+
+    accuracy                           0.75        28
+   macro avg       0.79      0.74      0.73        28
+weighted avg       0.78      0.75      0.74        28
+
+
+ ------------------------------------------ 
+Chosen classifiers:
+GaussianNB(var_smoothing=1)
+SVC(C=1e2)
+KNeighborsClassifier(n_neighbors=10)
+KNeighborsClassifier(algorithm='brute')
+GaussianProcessClassifier(max_iter_predict=10)
+LogisticRegression(solver='saga', penalty='l1')
+PassiveAggressiveClassifier(n_iter_no_change=1)
+QuadraticDiscriminantAnalysis()
+LinearDiscriminantAnalysis(solver='lsqr', shrinkage=1.0)
+LinearDiscriminantAnalysis(solver='eigen', shrinkage=1.0)

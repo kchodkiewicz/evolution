@@ -1,6 +1,6 @@
 # Phenotype genes and methods for classification etc. -- its me and its good
 import random
-from models.Model import Model
+from models.Model import Model, calcScore
 from models.instances import Instances
 
 
@@ -17,8 +17,8 @@ class Phenotype(object):
         self.__genes = [False for _ in range(self.gen_length)]
         # classifier attribute
         self.__predictions = []
-        self.__model = Model()
-        self.__inst = Instances()
+        # self.__model = Model()
+        # self.__inst = Instances()
         self.create_random_genes()
         # testing
         self.__counter = 0
@@ -111,7 +111,7 @@ class Phenotype(object):
             inverse = [(value, key) for key, value in tmp.items()]
             val = max(inverse)[1]
             committee_answers.append(val)
-        self.__fitness = 0.8 * pow(self.__model.calcScore(predictions=committee_answers, verify=False) + 1, 2) + \
+        self.__fitness = 0.8 * pow(calcScore(predictions=committee_answers, verify=False) + 1, 2) + \
                          0.2 * punish_length(self.committee)
         return self.__fitness
 

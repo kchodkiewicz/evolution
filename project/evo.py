@@ -10,7 +10,7 @@ import numpy as np
 from pandas import errors
 from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
-from models.Model import Model
+from models.Model import Model, calcScore
 from models.instances import Instances, trainClassifiers, predictClassifiers
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_cache, \
     print_progress
@@ -20,14 +20,14 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
 if __name__ == '__main__':
     dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = parse_args(sys.argv[1:])
 
-    inst = Instances()
-    model = Model()
+    # inst = Instances()
+    # model = Model()
 
     # Add id for run
     timestamp = time.time()
     Model.RUN_ID = str(timestamp).replace('.', '-')
     print('Run identifier:', Model.RUN_ID)
-    Model.verbose = verbose
+    Model.VERBOSE = verbose
     Model.TEST = testing
     Model.PRE_TRAIN = pre_trained
     Model.METRICS_METHOD = metrics
@@ -40,10 +40,10 @@ if __name__ == '__main__':
         sys.exit(2)
 
     # remove features with low variance (same value in 90% of samples)
-    variance_threshold_selector(model.dataset, 0.9)
+    variance_threshold_selector(Model.dataset, 0.9)
     # split for X, y and remove id column
     try:
-        X = model.dataset.drop(columns=col)
+        X = Model.dataset.drop(columns=col)
     except AttributeError:
         print('\033[93m' + "Column with name: " + str(col) + " not found in provided dataset" + '\033[0m')
         sys.exit(2)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     X = X.drop(columns="ID", errors='ignore')
     X = X.drop(columns="Identification", errors='ignore')
     X = X.drop(columns="identification", errors='ignore')
-    y = model.dataset[col]
+    y = Model.dataset[col]
 
     Model.X_train, X_in, Model.y_train, y_in = train_test_split(X, y, test_size=0.3)
     Model.X_test, Model.X_validate, Model.y_test, Model.y_validate = train_test_split(X_in, y_in, test_size=0.3)
@@ -66,8 +66,8 @@ if __name__ == '__main__':
 
     if load_file is None:
         # if running normal mode
-        trainClassifiers(model.X_train, model.y_train)
-        predictClassifiers(model.X_test)
+        trainClassifiers(Model.X_train, Model.y_train)
+        predictClassifiers(Model.X_test)
     else:
         # if continuing previous evolution use models_list and predictions from .json file
         try:
@@ -111,13 +111,14 @@ if __name__ == '__main__':
         fitness_scores.append(population.bestInGen.fitness)
         if not fitness_is_progressing(fitness_scores):
             break
-    print('\033[94m' + 'Evolution finished' + '\033[0m')
+    print('\033[94m' + '------------------------------------------\nEvolution '
+                       'finished\n------------------------------------------' + '\033[0m')
 
     # CALCULATE METRICS, MAKE REPORTS ----------------------------------
     # Get specified untrained classifier from file
     def load_vanilla_classifier(it):
         try:
-            with open(os.path.join('models/vanilla_classifiers', f'v-{inst.models_index[it]}.pkl'), 'rb') as fid:
+            with open(os.path.join('models/vanilla_classifiers', f'v-{Instances.models_index[it]}.pkl'), 'rb') as fid:
                 instance = pickle.load(fid)
         except FileNotFoundError as ex:
             print('\033[93m' + str(ex) + '\033[0m')
@@ -130,44 +131,44 @@ if __name__ == '__main__':
     # create final list of models
     final_models = []
     for i, gen in enumerate(population.bestInGen.genes):
+        print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
         if gen:
-            print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
-            fitted = load_vanilla_classifier(i).fit(model.X_train, model.y_train)
+            fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
             final_models.append(fitted)
     print('')
-    score, report = vote(final_models, model.X_validate)
+    score, report = vote(final_models, Model.X_validate)
 
     # SEPARATE SCORES OF EVOLVED MODELS --------------------------------
     # create list of models used in final list
     separated_models = []
     for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
         print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
-        fitted = load_vanilla_classifier(i).fit(model.X_train, model.y_train)
+        fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
         separated_models.append(fitted)
     print('')
     # make predictions for every model
-    separated_predicts = predictSelected(separated_models, model.X_validate)
+    separated_predicts = predictSelected(separated_models, Model.X_validate)
     # calculate separate score for every model
     separated_scores = []
     for mod in separated_predicts:
-        separated_scores.append(model.calcScore(mod, verify=True))
+        separated_scores.append(calcScore(mod, verify=True))
 
     # SCORE OF FIRST 10 / RANDOM MODELS --------------------------------
     # create theoretical list of models
     theoretical_models = []
     if Model.TEST:
-        for i in range(comm):
-            print_progress(i + 1, comm, 'Calculating theoretical score: ')
-            fitted = load_vanilla_classifier(i).fit(model.X_train, model.y_train)
+        for i, sc in enumerate(separated_scores):
+            print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+            fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
             theoretical_models.append(fitted)
-        theoretical_score, theoretical_report = vote(theoretical_models, model.X_validate)
+        theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
     else:
-        for i in range(comm):
-            print_progress(i, comm, 'Calculating theoretical score: ')
-            fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(model.X_train,
-                                                                                                 model.y_train)
+        for i, sc in enumerate(separated_scores):
+            print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+            fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(Model.X_train,
+                                                                                                 Model.y_train)
             theoretical_models.append(fitted)
-        theoretical_score, theoretical_report = vote(theoretical_models, model.X_validate)
+        theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
     print('')
 
     # OUTPUT -----------------------------------------------------------
@@ -182,7 +183,7 @@ if __name__ == '__main__':
             p = genes_index
         else:
             for it in genes_index:
-                p.append(pp[str(inst.models_index[it])])
+                p.append(pp[str(Instances.models_index[it])])
         return p
     genes_list = 'Chosen classifiers:\n'
     for i in human_readable_genes(conv_genes(population.bestInGen.genes)):
@@ -212,8 +213,8 @@ if __name__ == '__main__':
                   f'{report}\n' \
                   f'Separate scores: {separated_scores}\n' \
                   f'Random committee (for comparison): {theoretical_score}' \
-                  f'\n{theoretical_report}\n\n ------------------------------------------ \n' \
-                    f'{genes_list}'
+                  f'\n{theoretical_report}\n\n------------------------------------------\n' \
+                  f'{genes_list}'
 
     with open(f'output_files/plots/{Model.RUN_ID}/{out_file_name}.txt', 'w') as f:
         f.write(out_content)

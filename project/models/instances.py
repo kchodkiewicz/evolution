@@ -14,7 +14,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from models.Model import Model
+from models.Model import Model, calcScore
 from sklearn import exceptions
 
 from utils import print_progress
@@ -51,6 +51,8 @@ def trainClassifiers(X, y):
             trained_model = instance.fit(X, y)
         except exceptions.FitFailedWarning as e:
             print("An error occurred while training classifier. Omitting.", e)
+        except exceptions.ConvergenceWarning as e:
+            print("An error occurred while training classifier. Omitting.", e)
         except ValueError as e:
             print("An error occurred while training classifier. Omitting.", e)
         except AttributeError:
@@ -65,7 +67,6 @@ def trainClassifiers(X, y):
 
 
 def predictClassifiers(X):
-    model = Model()
     i = 0
     for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
         for name in files:
@@ -82,7 +83,7 @@ def predictClassifiers(X):
                 sys.exit(2)
             else:
                 try:
-                    Instances.scores.append(model.calcScore(predictions, verify=False))
+                    Instances.scores.append(calcScore(predictions, verify=False))
                 except ValueError as e:
                     print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
                 else:

@@ -26,7 +26,7 @@ class Population(object):
         self.output = {}
         self.start_time = time.localtime()
         self.__validation_res = {}
-        self.inst = Instances()
+        # self.inst = Instances()
 
     def load_population(self, filename):
         try:
@@ -168,13 +168,13 @@ class Population(object):
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
-        if Model.verbose:
+        if Model.VERBOSE:
             print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
-            specimen = {'used_models': self.inst.models_index,
-                        'predictions': self.inst.predictions_arr}
+            specimen = {'used_models': Instances.models_index,
+                        'predictions': Instances.predictions_arr}
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
             write_to_json("population_dump", specimen)
@@ -192,13 +192,14 @@ class Population(object):
         self.__validation_res[self.genNo]["avg"] = avg_fitness
         self.__validation_res[self.genNo]["max"] = self.bestInGen.fitness
         write_to_json("validation_res", self.__validation_res)
-        if (self.bestInGen.fitness * 0.9) < avg_fitness:
-            self.mutation_ratio = 3
-        else:
-            self.mutation_ratio = 1
+        if self.genNo < 15:
+            if (self.bestInGen.fitness * 0.999) < avg_fitness:
+                self.mutation_ratio = 1.5
+            else:
+                self.mutation_ratio = 1
 
     def run_normally(self):
-        if Model.verbose:
+        if Model.VERBOSE:
             print("Gen No", self.genNo, end=' ', flush=True)
         for phenotype in self.phenotypes:
             fit = phenotype.run()

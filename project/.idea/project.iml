@@ -7,6 +7,8 @@
       <excludeFolder url="file://$MODULE_DIR$/output_files/gen_stats" />
       <excludeFolder url="file://$MODULE_DIR$/output_files/population_dump" />
       <excludeFolder url="file://$MODULE_DIR$/output_files/validation_res" />
+      <excludeFolder url="file://$MODULE_DIR$/models/trained_classifiers" />
+      <excludeFolder url="file://$MODULE_DIR$/models/vanilla_classifiers" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.8 (MLEnv)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

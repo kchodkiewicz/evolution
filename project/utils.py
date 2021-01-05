@@ -10,7 +10,7 @@ import numpy
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.metrics import classification_report
 
-from models.Model import Model
+from models.Model import Model, calcScore
 
 
 # Validate if fitness of last 20 classifiers is getting better
@@ -233,7 +233,7 @@ def predictSelected(classifiers_arr, X):
 
 # Print progress bar
 def print_progress(i, end, msg):
-    if Model.verbose:
+    if Model.VERBOSE:
         bar_len = 10
         block = int(round((i / end) * bar_len))
         if i != end:
@@ -245,7 +245,7 @@ def print_progress(i, end, msg):
             print('{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
                   dots, end='',
                   flush=True)
-        print("\r", '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
+        print('\r' + '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
               dots, end='',
               flush=True)
 
@@ -265,7 +265,6 @@ def vote(models_arr, X):
         inverse = [(value, key) for key, value in tmp.items()]
         val = max(inverse)[1]
         committee_answers.append(val)
-    model = Model()
-    report = classification_report(model.y_validate, committee_answers)
+    report = classification_report(Model.y_validate, committee_answers)
     # calculate score of committee
-    return model.calcScore(predictions=committee_answers, verify=True), report
+    return calcScore(committee_answers, verify=True), report

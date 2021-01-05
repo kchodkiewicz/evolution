@@ -1,0 +1,32 @@
+[5, 15, 19, 39, 55, 65, 66]
+Score: 0.8571428571428571 in 35 iterations
+              precision    recall  f1-score   support
+
+           0       0.92      0.79      0.85        14
+           1       0.81      0.93      0.87        14
+
+    accuracy                           0.86        28
+   macro avg       0.86      0.86      0.86        28
+weighted avg       0.86      0.86      0.86        28
+
+Separate scores: [0.75, 0.75, 0.9285714285714286, 0.8571428571428571, 0.8214285714285714, 0.8571428571428571, 0.75]
+Random committee (for comparison): 0.7857142857142857
+              precision    recall  f1-score   support
+
+           0       1.00      0.57      0.73        14
+           1       0.70      1.00      0.82        14
+
+    accuracy                           0.79        28
+   macro avg       0.85      0.79      0.78        28
+weighted avg       0.85      0.79      0.78        28
+
+
+------------------------------------------
+Chosen classifiers:
+DecisionTreeClassifier(max_features='log2')
+SVC(gamma='auto')
+SVC(kernel='poly', gamma='auto')
+KNeighborsClassifier(algorithm='kd_tree')
+LogisticRegression(penalty='none')
+PassiveAggressiveClassifier(loss='squared_hinge')
+PassiveAggressiveClassifier(early_stopping=True)
