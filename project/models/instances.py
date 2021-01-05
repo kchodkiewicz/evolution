@@ -1,24 +1,94 @@
 # Instances of all supported classifiers
 # If desired classifier is not listed add by creating instance
 # with unique name and append it to __instances list
-# Methods for training and testing classifiers
+# Methods for training and testing classifiers -- its me and its good
 import os
 import pickle
 import sys
 
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
 from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.linear_model import SGDClassifier, LogisticRegression, PassiveAggressiveClassifier, LassoLars
+from sklearn.linear_model import SGDClassifier, LogisticRegression, PassiveAggressiveClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-
 from models.Model import Model
 from sklearn import exceptions
 
 from utils import print_progress
+
+
+def set_pred_arr(value):
+    Instances.predictions_arr = value
+
+
+def set_models_index_arr(value):
+    Instances.models_index = value
+
+
+def get_models_index_arr():
+    return Instances.models_index
+
+
+def get_models_index(i):
+    return Instances.models_index[i]
+
+
+def trainClassifiers(X, y):
+    if Model.TEST:
+        inst = Instances.instances_test
+        Instances.instances = []
+    else:
+        inst = Instances.instances
+        Instances.instances_test = []
+    for i, instance in enumerate(inst):
+        with open(f'models/vanilla_classifiers/v-{i}.pkl', 'wb') as fid:
+            pickle.dump(instance, fid)
+        try:
+            print_progress(i + 1, len(inst), "Training")
+            trained_model = instance.fit(X, y)
+        except exceptions.FitFailedWarning as e:
+            print("An error occurred while training classifier. Omitting.", e)
+        except ValueError as e:
+            print("An error occurred while training classifier. Omitting.", e)
+        except AttributeError:
+            pass
+        else:
+            with open(f'models/trained_classifiers/t-{i}.pkl', 'wb') as fid:
+                pickle.dump(trained_model, fid)
+            del instance
+            del trained_model
+            Instances.models_index.append(i)
+    print('')
+
+
+def predictClassifiers(X):
+    model = Model()
+    i = 0
+    for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
+        for name in files:
+            try:
+                print_progress(i + 1, len(files), "Predicting")
+                with open(os.path.join(root, name), 'rb') as fid:
+                    instance = pickle.load(fid)
+                predictions = instance.predict(X)
+            except exceptions.NotFittedError as e:
+                print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+                      + str(e) + '\033[0m')
+            except FileNotFoundError as e:
+                print('\033[93m' + str(e) + '\033[0m')
+                sys.exit(2)
+            else:
+                try:
+                    Instances.scores.append(model.calcScore(predictions, verify=False))
+                except ValueError as e:
+                    print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
+                else:
+                    Instances.predictions_arr.append(predictions)
+            i += 1
+        print('')
 
 
 class Instances(object):
@@ -134,292 +204,184 @@ class Instances(object):
     # lasso9 = LassoLars(copy_X=True, fit_intercept=False, positive=True)
     # lasso10 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False, positive=True)
 
-    __instances_test = [gaussianProcess8,
-                        svm8,
-                        svm9,
-                        stochasticGradient0,
-                        stochasticGradient1,
-                        stochasticGradient6,
-                        stochasticGradient7,
-                        gaussianProcess4,
-                        kNeighbors1,
-                        kNeighbors2,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        decisionTree0,
-                        ]
+    instances_test = [gaussianProcess8,
+                      svm8,
+                      svm9,
+                      stochasticGradient0,
+                      stochasticGradient1,
+                      stochasticGradient6,
+                      stochasticGradient7,
+                      gaussianProcess4,
+                      kNeighbors1,
+                      kNeighbors2,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      decisionTree0,
+                      ]
 
-    __instances = [decisionTree0,
-                   decisionTree1,
-                   decisionTree2,
-                   decisionTree3,
-                   decisionTree4,
-                   decisionTree5,
-                   decisionTree6,
-                   decisionTree7,
-                   decisionTree8,
-                   decisionTree9,
-                   naiveBayes0,
-                   naiveBayes1,
-                   naiveBayes2,
-                   naiveBayes3,
-                   svm0,
-                   svm1,
-                   svm2,
-                   svm3,
-                   svm4,
-                   svm5,
-                   svm6,
-                   svm7,
-                   svm8,
-                   svm9,
-                   stochasticGradient0,
-                   stochasticGradient1,
-                   stochasticGradient2,
-                   stochasticGradient3,
-                   stochasticGradient4,
-                   stochasticGradient5,
-                   stochasticGradient6,
-                   stochasticGradient7,
-                   stochasticGradient8,
-                   stochasticGradient9,
-                   kNeighbors0,
-                   kNeighbors1,
-                   kNeighbors2,
-                   kNeighbors3,
-                   kNeighbors4,
-                   kNeighbors5,
-                   kNeighbors6,
-                   kNeighbors7,
-                   kNeighbors8,
-                   kNeighbors9,
-                   gaussianProcess0,
-                   gaussianProcess1,
-                   gaussianProcess2,
-                   gaussianProcess3,
-                   gaussianProcess4,
-                   gaussianProcess5,
-                   gaussianProcess6,
-                   gaussianProcess7,
-                   gaussianProcess8,
-                   gaussianProcess9,
-                   logisticRegression0,
-                   logisticRegression1,
-                   logisticRegression2,
-                   logisticRegression3,
-                   logisticRegression4,
-                   logisticRegression5,
-                   logisticRegression6,
-                   logisticRegression7,
-                   passiveAggressive0,
-                   passiveAggressive1,
-                   passiveAggressive2,
-                   passiveAggressive3,
-                   passiveAggressive4,
-                   passiveAggressive5,
-                   passiveAggressive6,
-                   passiveAggressive7,
-                   passiveAggressive8,
-                   quadraticDiscriminantAnalysis0,
-                   quadraticDiscriminantAnalysis1,
-                   quadraticDiscriminantAnalysis2,
-                   quadraticDiscriminantAnalysis3,
-                   linearDiscriminantAnalysis0,
-                   linearDiscriminantAnalysis1,
-                   linearDiscriminantAnalysis2,
-                   linearDiscriminantAnalysis3,
-                   linearDiscriminantAnalysis4,
-                   linearDiscriminantAnalysis5,
-                   linearDiscriminantAnalysis6,
-                   linearDiscriminantAnalysis7,
-                   linearDiscriminantAnalysis8
-                   ]
+    instances = [decisionTree0,
+                 decisionTree1,
+                 decisionTree2,
+                 decisionTree3,
+                 decisionTree4,
+                 decisionTree5,
+                 decisionTree6,
+                 decisionTree7,
+                 decisionTree8,
+                 decisionTree9,
+                 naiveBayes0,
+                 naiveBayes1,
+                 naiveBayes2,
+                 naiveBayes3,
+                 svm0,
+                 svm1,
+                 svm2,
+                 svm3,
+                 svm4,
+                 svm5,
+                 svm6,
+                 svm7,
+                 svm8,
+                 svm9,
+                 stochasticGradient0,
+                 stochasticGradient1,
+                 stochasticGradient2,
+                 stochasticGradient3,
+                 stochasticGradient4,
+                 stochasticGradient5,
+                 stochasticGradient6,
+                 stochasticGradient7,
+                 stochasticGradient8,
+                 stochasticGradient9,
+                 kNeighbors0,
+                 kNeighbors1,
+                 kNeighbors2,
+                 kNeighbors3,
+                 kNeighbors4,
+                 kNeighbors5,
+                 kNeighbors6,
+                 kNeighbors7,
+                 kNeighbors8,
+                 kNeighbors9,
+                 gaussianProcess0,
+                 gaussianProcess1,
+                 gaussianProcess2,
+                 gaussianProcess3,
+                 gaussianProcess4,
+                 gaussianProcess5,
+                 gaussianProcess6,
+                 gaussianProcess7,
+                 gaussianProcess8,
+                 gaussianProcess9,
+                 logisticRegression0,
+                 logisticRegression1,
+                 logisticRegression2,
+                 logisticRegression3,
+                 logisticRegression4,
+                 logisticRegression5,
+                 logisticRegression6,
+                 logisticRegression7,
+                 passiveAggressive0,
+                 passiveAggressive1,
+                 passiveAggressive2,
+                 passiveAggressive3,
+                 passiveAggressive4,
+                 passiveAggressive5,
+                 passiveAggressive6,
+                 passiveAggressive7,
+                 passiveAggressive8,
+                 quadraticDiscriminantAnalysis0,
+                 quadraticDiscriminantAnalysis1,
+                 quadraticDiscriminantAnalysis2,
+                 quadraticDiscriminantAnalysis3,
+                 linearDiscriminantAnalysis0,
+                 linearDiscriminantAnalysis1,
+                 linearDiscriminantAnalysis2,
+                 linearDiscriminantAnalysis3,
+                 linearDiscriminantAnalysis4,
+                 linearDiscriminantAnalysis5,
+                 linearDiscriminantAnalysis6,
+                 linearDiscriminantAnalysis7,
+                 linearDiscriminantAnalysis8
+                 ]
 
     # array of trained classifiers [DEPRECATED]
-    __trained_classifiers = []
+    trained_classifiers = []
     # array of results from predicting
-    __predictions_classifiers = []
+    predictions_arr = []
     # array of accuracy / f1 scores of classifiers
-    __scores = []
+    scores = []
     # array of indexes of trained classifiers (used for getting names from models_list.json)
     # necessary if some classifiers didn't complete fit() and are not used
-    __models_index = []
-
-    def get_models_index(self, i):
-        return self.__models_index[i]
-
-    def get_models_index_arr(self):
-        return self.__models_index
-
-    def set_models_index_arr(self, value):
-        self.__models_index = value
-
-    @property
-    def trained_classifiers(self):
-        return self.__trained_classifiers
-
-    @property
-    def predictions_arr(self):
-        return self.__predictions_classifiers
-
-    def set_pred_arr(self, value):
-        self.__predictions_classifiers = value
-
-    @property
-    def instances(self):
-        if Model.TEST:
-            return self.__instances_test
-        else:
-            return self.__instances
-
-    @property
-    def scores(self):
-        return self.__scores
-
-    def trainClassifiers(self, X, y):
-        if Model.TEST:
-            inst = self.__instances_test
-            self.__instances = []
-        else:
-            inst = self.__instances
-            self.__instances_test = []
-        for i, instance in enumerate(inst):
-            tmp = [it for it in range(18 + 1)]
-            for it in range(22, 25 + 1):
-                tmp.append(it)
-            for it in range(28, 51 + 1):
-                tmp.append(it)
-            for it in range(54, 83 + 1):
-                tmp.append(it)
-            self.set_models_index_arr(tmp)
-            # with open(f'models/vanilla_classifiers/v-{i}.pkl', 'wb') as fid:
-            #     pickle.dump(instance, fid)
-            # try:
-            #     print_progress(i + 1, len(inst), "Training")
-            #     trained_model = instance.fit(X, y)
-            # except exceptions.FitFailedWarning as e:
-            #     print("An error occurred while training classifier. Omitting.", e)
-            # except ValueError as e:
-            #     print("An error occurred while training classifier. Omitting.", e)
-            # except AttributeError:
-            #     pass
-            # else:
-            #     with open(f'models/trained_classifiers/t-{i}.pkl', 'wb') as fid:
-            #         pickle.dump(trained_model, fid)
-            #     del instance
-            #     del trained_model
-            #     self.__models_index.append(i)
-        print('')
-
-    def predictClassifiers(self, X):
-        model = Model()
-        i = 0
-        for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
-            for name in files:
-                try:
-                    print_progress(i + 1, len(files), "Predicting")
-                    with open(os.path.join(root, name), 'rb') as fid:
-                        instance = pickle.load(fid)
-                    predictions = instance.predict(X)
-                except exceptions.NotFittedError as e:
-                    print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
-                          + str(e) + '\033[0m')
-                except FileNotFoundError as e:
-                    print('\033[93m' + str(e) + '\033[0m')
-                    sys.exit(2)
-                else:
-                    try:
-                        self.__scores.append(model.calcScore(predictions, verify=False))
-                    except ValueError as e:
-                        print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
-                    else:
-                        self.__predictions_classifiers.append(predictions)
-                i += 1
-            print('')
-
-        # for i, instance in enumerate(self.__trained_classifiers):
-        #     try:
-        #         print_progress(i + 1, len(self.__trained_classifiers), "Predicting")
-        #
-        #         predictions = instance.predict(X)
-        #     except exceptions.NotFittedError as e:
-        #         print("An error occurred while estimating classes. Omitting.", e)
-        #     else:
-        #         try:
-        #             self.__scores.append(model.calcScore(predictions, verify=False))
-        #         except ValueError as e:
-        #             print(" Couldn't calculate score. Omitting.", e)
-        #         else:
-        #             self.__predictions_classifiers.append(predictions)
-        # print('')
+    models_index = []

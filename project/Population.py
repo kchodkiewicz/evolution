@@ -1,4 +1,4 @@
-# Phenotypes list and methods for evolution
+# Phenotypes list and methods for evolution -- its me and its good
 import copy
 import json
 import math
@@ -173,7 +173,8 @@ class Population(object):
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
-            specimen = {'used_models': self.inst.get_models_index_arr()}  # TODO new thingy not tested
+            specimen = {'used_models': self.inst.models_index,
+                        'predictions': self.inst.predictions_arr}
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
             write_to_json("population_dump", specimen)

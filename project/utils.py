@@ -1,9 +1,12 @@
-# Tools
+# Tools -- its me and its good
 import getopt
 import json
 import os
 import sys
 import time
+from json import JSONEncoder
+
+import numpy
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.metrics import classification_report
 
@@ -131,7 +134,7 @@ def variance_threshold_selector(data, threshold=0.9):
 
 def clear_cache():
     paths = ['output_files/classifiers_scores/', 'output_files/gen_stats/', 'output_files/validation_res/']
-             # 'models/trained_classifiers/', 'models/vanilla_classifiers/']
+    # 'models/trained_classifiers/', 'models/vanilla_classifiers/']
     for path in paths:
         try:
             for root, dirs, files in os.walk(path, topdown=False):
@@ -175,6 +178,13 @@ def create_dir(path, run_id):
         return dir_path
 
 
+class NumpyArrayEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return JSONEncoder.default(self, obj)
+
+
 # Write to specified .json file
 def write_to_json(path, content):
     if Model.RUN_ID is None:
@@ -190,7 +200,7 @@ def write_to_json(path, content):
             with open(f'{dir_path}/{time.localtime()[0]}-{time.localtime()[1]}-'
                       f'{time.localtime()[2]}_'
                       f'{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json', 'w') as filename:
-                json.dump(content, filename, indent=4)
+                json.dump(content, filename, indent=4, cls=NumpyArrayEncoder)
         except Exception as e:
             print('\033[93m' + str(e) + '\033[0m')
 

@@ -1,4 +1,4 @@
-# Phenotype genes and methods for classification etc.
+# Phenotype genes and methods for classification etc. -- its me and its good
 import random
 from models.Model import Model
 from models.instances import Instances
@@ -121,5 +121,5 @@ class Phenotype(object):
         self.__predictions.clear()
         for i, gen in enumerate(self.genes):
             if gen:
-                self.__predictions.append(self.__inst.predictions_arr[i])
+                self.__predictions.append(Instances.predictions_arr[i])
         return self.calc_fitness()

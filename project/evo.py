@@ -1,4 +1,4 @@
-# Main
+# Main -- its me and its good
 import json
 import os
 import pickle
@@ -6,11 +6,12 @@ import sys
 import time
 from random import randint
 import pandas as pd
+import numpy as np
 from pandas import errors
 from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model
-from models.instances import Instances
+from models.instances import Instances, trainClassifiers, predictClassifiers
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_cache, \
     print_progress
 from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
@@ -18,141 +19,6 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
 
 if __name__ == '__main__':
     dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = parse_args(sys.argv[1:])
-
-    # TESTING GROUND ---------------------------------------------------------------------------------------------------
-    # test_inst = Instances()
-    # test_inst.trainClassifiers(model.X_train, model.y_train)
-    # test_inst.predictClassifiers(model.X_test)
-
-    # tab_start = """
-    # \\begin{table}[h!] \\label{tab:mut:test}
-    # \\begin{center}
-    # \\begin{tabular}{l l l l l}
-    # \\textbf{średnia arytmetyczna} & \\textbf{mediana} & \\textbf{dominanta}\\\\
-    # \\hline
-    #     """
-    # tab_end = """
-    # \\end{tabular}
-    # \\caption{Wynik testu sprawdzającego poprawność funkcji mutującej.}
-    # \\end{center}
-    # \\end{table}
-    #     """
-    # test_pop = Population(10000, 10, 40)
-    # arr = []
-    # for i, phenotype in enumerate(test_pop.phenotypes):
-    #     phenotype.fitness = random()
-    # sum_p = 0
-    # for i in test_pop.phenotypes:
-    #     sum_p += i.fitness
-    # for phenotype in test_pop.phenotypes:
-    #     phenotype.normalizedFitness = phenotype.fitness / sum_p
-    #     # print(phenotype.normalizedFitness)
-    # np.random.shuffle(test_pop.phenotypes)
-    # test_count = 10000
-    # for i in range(test_count):
-    #     arr.append(test_pop.tournament_selection())
-    #
-    # # print(tab_start)
-    # arr.sort(key=lambda p: p.phenotype_id)
-    # arr = list(dict.fromkeys(arr))
-    # verifarr = []
-    #
-    # for elem in arr:
-    #     j = 0
-    #     cc = elem.normalizedFitness
-    #     while cc < 1:
-    #         cc = cc * 10
-    #         j += 1
-    #
-    #     verifarr.append(abs(elem.normalizedFitness - elem.counter / test_count) > 10 ** (-j) * 10)
-    #     print(abs(elem.normalizedFitness - elem.counter / test_count), elem.normalizedFitness, 10 ** (-j) * 2)
-    # # for elem in arr:
-    # #     print(str(elem.phenotype_id) + ' & ' + str(elem.counter) + ' & ' + str(elem.counter / test_count) + ' & ' +
-    # #           '{:04f}'.format(elem.normalizedFitness) + ' \\\\')
-    # i = 0
-    # for elem in verifarr:
-    #     if elem:
-    #         i += 1
-    # print(i)
-    # # print(tab_end)
-    # par1 = test_pop.phenotypes[0]
-    # par2 = test_pop.phenotypes[1]
-    # par1.genes = [True for i in range(len(par1.genes))]
-    #
-    # i = 0
-    # print(par1.genes, par2.genes)
-    # ch1, ch2, cut1, cut2 = test_pop.cross(i, par1, par2)
-    # print(cut1, cut2)
-    # print(ch1.genes, ch2.genes)
-
-    # print('\nMutate')
-    # print(tab_start)
-    # for _ in range(10):
-    #     prev = []
-    #     new = []
-    #     for i in test_pop.phenotypes:
-    #         prev.append(i.genes.copy())
-    #         test_pop.mutate(i)
-    #         new.append(i.genes.copy())
-    #     tabs = []
-    #     for i in range(len(prev)):
-    #         itt = 0
-    #         for j in range(len(prev[i])):
-    #             if xor(prev[i][j], new[i][j]):
-    #                 itt += 1
-    #         tabs.append(itt)
-    #
-    #     avg = sum(tabs) / len(tabs)
-    #     median = statistics.median(tabs)
-    #     mode = statistics.mode(tabs)
-    #     print(avg, '&', median, '&', mode, '\\\\')
-    # print(tab_end)
-    # par2.genes = [False for i in range(len(par2.genes))]
-
-    # initialCommittee = 10
-    # xp = [(uniform(0, 1), 10) for _ in range(1000)]
-    # # xp = [(0.85, i) for i in range(84)]
-    # # xp = []
-    # # for i in range(1000):
-    # #     for j in range(84):
-    # #         if i % 100 == 0:
-    # #             t = j
-    # #         else:
-    # #             t = 0
-    # #         xp.append((i / 1000, t))
-    # xp.sort()
-    #
-    # def punish_length(xd):
-    #     dist = xd - initialCommittee
-    #     yd = -(dist / (initialCommittee / 2)) ** 4 + 0.5
-    #     if yd < 0:
-    #         yd = 0
-    #     return yd
-    # fitnesses = []
-    # for i in xp:
-    #     fit = 0.8 * pow(i[0] + 1, 2) + 0.2 * punish_length(i[1])
-    #     fitnesses.append(fit)
-    #
-    # fig, ax = plt.subplots()
-    # x = np.array([xp[i][0] for i in range(len(fitnesses))])
-    # y = np.array(fitnesses)
-    # ax.plot(x, y, label="fitness scores")
-    # ax.grid()
-    # ax.set_xlabel('Skuteczność klasyfikacji')
-    # ax.set_ylabel('Współczynnik przystosowania')
-    # #  ax.set_title('Zależność współczynnika przystosowania od liczebności komitetu klasyfikatorów')
-    #
-    # try:
-    #     plt.savefig(f"output_files/test.png", dpi=800)
-    # except FileNotFoundError as e:
-    #     print('\033[93m' + str(e) + '\033[0m')
-    #     sys.exit(2)
-    # except ValueError as e:
-    #     print('\033[93m' + str(e) + '\033[0m')
-    #     sys.exit(2)
-    # sys.exit(1)
-
-    # END TESTING GROUND -----------------------------------------------------------------------------------------------
 
     inst = Instances()
     model = Model()
@@ -198,29 +64,32 @@ if __name__ == '__main__':
     print("Running for configuration:", "\n* dataset:", dataset, "\n* column:", col, "\n* metrics method:", metrics,
           "\n* population size:", pop, "\n* committee size:", comm, "\n* load_genes:", load_file)
 
-    if load_file is None:  # TODO new thingy not tested
-        inst.trainClassifiers(model.X_train, model.y_train)
-        inst.predictClassifiers(model.X_test)
-    else:  # TODO new thingy not tested
-        # TODO temporary bcos i fucked up
-        # TODO save predictions_arr and load it
-        tmp = [i for i in range(18 + 1)]
-        for i in range(22, 25 + 1):
-            tmp.append(i)
-        for i in range(28, 51 + 1):
-            tmp.append(i)
-        for i in range(54, 83 + 1):
-            tmp.append(i)
-        inst.set_models_index_arr(tmp)
-        inst.set_pred_arr([i for i in range(len(tmp))])
-
+    if load_file is None:
+        # if running normal mode
+        trainClassifiers(model.X_train, model.y_train)
+        predictClassifiers(model.X_test)
+    else:
+        # if continuing previous evolution use models_list and predictions from .json file
+        try:
+            with open(load_file) as f:
+                file_genes = json.load(f)
+        except FileNotFoundError as e:
+            print('\033[93m' + "Couldn't open genes file. Running default mode. Error: " + str(e) + '\033[0m')
+        except ValueError as e:
+            print('\033[93m' + "Couldn't open genes file. Running default mode. Error: " + str(e) + '\033[0m')
+        except KeyError as e:
+            print('\033[93m' + "Couldn't open genes file. Running default mode. Error: " + str(e) + '\033[0m')
+        else:
+            Instances.models_index = file_genes['used_models']
+            ndarray_compatible = np.asarray(file_genes['predictions'])
+            Instances.predictions_arr = ndarray_compatible
     try:
-        if comm > len(inst.predictions_arr):
+        if comm > len(Instances.predictions_arr):
             raise ValueError
-        population = Population(size=pop, committee=comm, gen_length=len(inst.predictions_arr))
+        population = Population(size=pop, committee=comm, gen_length=len(Instances.predictions_arr))
     except ValueError:
         print('\033[93m' + "Committee size cannot be greater than the amount of different classifiers (" +
-              str(len(inst.predictions_arr)) + ")" + '\033[0m')
+              str(len(Instances.predictions_arr)) + ")" + '\033[0m')
         sys.exit(2)
 
     if load_file is not None:
@@ -228,13 +97,10 @@ if __name__ == '__main__':
             population.load_population(load_file)
         except FileNotFoundError as e:
             print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
-            sys.exit(2)
         except ValueError as e:
             print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
-            sys.exit(2)
         except KeyError as e:
             print('\033[93m' + "Couldn't open genes file. Running default mode." + '\033[0m')
-            sys.exit(2)
 
     # EVOLUTION --------------------------------------------------------
     fitness_scores = []
@@ -251,7 +117,7 @@ if __name__ == '__main__':
     # Get specified untrained classifier from file
     def load_vanilla_classifier(it):
         try:
-            with open(os.path.join('models/vanilla_classifiers', f'v-{inst.get_models_index(it)}.pkl'), 'rb') as fid:
+            with open(os.path.join('models/vanilla_classifiers', f'v-{inst.models_index[it]}.pkl'), 'rb') as fid:
                 instance = pickle.load(fid)
         except FileNotFoundError as ex:
             print('\033[93m' + str(ex) + '\033[0m')
@@ -298,8 +164,8 @@ if __name__ == '__main__':
     else:
         for i in range(comm):
             print_progress(i, comm, 'Calculating theoretical score: ')
-            fitted = load_vanilla_classifier(randint(0, len(inst.predictions_arr) - 1)).fit(model.X_train,
-                                                                                            model.y_train)
+            fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(model.X_train,
+                                                                                                 model.y_train)
             theoretical_models.append(fitted)
         theoretical_score, theoretical_report = vote(theoretical_models, model.X_validate)
     print('')
@@ -316,12 +182,14 @@ if __name__ == '__main__':
             p = genes_index
         else:
             for it in genes_index:
-                p.append(pp[str(inst.get_models_index(it))])
+                p.append(pp[str(inst.models_index[it])])
         return p
+    genes_list = 'Chosen classifiers:\n'
+    for i in human_readable_genes(conv_genes(population.bestInGen.genes)):
+        genes_list += i + '\n'
 
-
-    print("Classifiers:", conv_genes(population.bestInGen.genes))
-    print(human_readable_genes(conv_genes(population.bestInGen.genes)))
+    print("Classifiers' indexes:", conv_genes(population.bestInGen.genes))
+    print(genes_list)
     print("Score:", score, "in", population.genNo, "iterations")
     print(report)
     print("Separate scores:", separated_scores[:5])
@@ -344,9 +212,9 @@ if __name__ == '__main__':
                   f'{report}\n' \
                   f'Separate scores: {separated_scores}\n' \
                   f'Random committee (for comparison): {theoretical_score}' \
-                  f'\n{theoretical_report}\n\n ------------------------------------------ \n'
-    for i in human_readable_genes(conv_genes(population.bestInGen.genes)):
-        out_content += i + '\n'
+                  f'\n{theoretical_report}\n\n ------------------------------------------ \n' \
+                    f'{genes_list}'
+
     with open(f'output_files/plots/{Model.RUN_ID}/{out_file_name}.txt', 'w') as f:
         f.write(out_content)
 
