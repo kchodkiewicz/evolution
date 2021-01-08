@@ -5,13 +5,14 @@ import pickle
 import sys
 import time
 from random import randint
+
 import pandas as pd
 import numpy as np
 from pandas import errors
 from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
 from models.Model import Model, calcScore
-from models.instances import Instances, trainClassifiers, predictClassifiers
+from models.instances import Instances, trainClassifiers, predictClassifiers, trainForLoadFile
 from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_cache, \
     print_progress
 from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
@@ -20,9 +21,6 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
 if __name__ == '__main__':
     clear_cache()
     dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = parse_args(sys.argv[1:])
-
-    # inst = Instances()
-    # model = Model()
 
     # Add id for run
     timestamp = time.time()
@@ -69,6 +67,7 @@ if __name__ == '__main__':
         trainClassifiers(Model.X_train, Model.y_train)
         predictClassifiers(Model.X_test)
     else:
+        trainForLoadFile()
         # if continuing previous evolution use models_list and predictions from .json file
         try:
             with open(load_file) as f:
@@ -116,12 +115,21 @@ if __name__ == '__main__':
 
     # CALCULATE METRICS, MAKE REPORTS ----------------------------------
     # Get specified untrained classifier from file
-    def load_vanilla_classifier(it):
+    def load_trained_classifier(it):
         try:
             with open(os.path.join('models/trained_classifiers', f't-{Instances.models_index[it]}.pkl'), 'rb') as fid:
                 instance = pickle.load(fid)
         except FileNotFoundError as ex:
-            print('\033[93m' + f"Cannot include model at index {it} in final score. Error: "  + str(ex) + '\033[0m')
+            print('\033[93m' + f"Cannot include model at index {it} in final score. Error: " + str(ex) + '\033[0m')
+        else:
+            return instance
+
+    def load_vanilla_classifier(it):
+        try:
+            with open(os.path.join('models/vanilla_classifiers', f'v-{Instances.models_index[it]}.pkl'), 'rb') as fid:
+                instance = pickle.load(fid)
+        except FileNotFoundError as ex:
+            print('\033[93m' + f"Cannot include model at index {it} in final score. Error: " + str(ex) + '\033[0m')
         else:
             return instance
 
@@ -129,46 +137,83 @@ if __name__ == '__main__':
     # SCORE OF EVOLVED MODELS ------------------------------------------
     # create final list of models
     final_models = []
-    for i, gen in enumerate(population.bestInGen.genes):
-        print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
-        if gen:
-            fitted = load_vanilla_classifier(i)  # .fit(Model.X_train, Model.y_train)
-            final_models.append(fitted)
-    print('')
-    score, report = vote(final_models, Model.X_validate)
+    if load_file is None:
+        for i, gen in enumerate(population.bestInGen.genes):
+            print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
+            if gen:
+                fitted = load_trained_classifier(i)  # .fit(Model.X_train, Model.y_train)
+                final_models.append(fitted)
+        print('')
+        score, report = vote(final_models, Model.X_validate)
+    else:
+        for i, gen in enumerate(population.bestInGen.genes):
+            print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
+            if gen:
+                fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
+                final_models.append(fitted)
+        print('')
+        score, report = vote(final_models, Model.X_validate)
 
     # SEPARATE SCORES OF EVOLVED MODELS --------------------------------
     # create list of models used in final list
     separated_models = []
-    for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
-        print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
-        fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
-        separated_models.append(fitted)
-    print('')
-    # make predictions for every model
-    separated_predicts = predictSelected(separated_models, Model.X_validate)
-    # calculate separate score for every model
-    separated_scores = []
-    for mod in separated_predicts:
-        separated_scores.append(calcScore(mod, verify=True))
+    if load_file is None:
+        for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
+            print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
+            fitted = load_trained_classifier(i)
+            separated_models.append(fitted)
+        print('')
+        # make predictions for every model
+        separated_predicts = predictSelected(separated_models, Model.X_validate)
+        # calculate separate score for every model
+        separated_scores = []
+        for mod in separated_predicts:
+            separated_scores.append(calcScore(mod, verify=True))
+    else:
+        for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
+            print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
+            fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
+            separated_models.append(fitted)
+        print('')
+        # make predictions for every model
+        separated_predicts = predictSelected(separated_models, Model.X_validate)
+        # calculate separate score for every model
+        separated_scores = []
+        for mod in separated_predicts:
+            separated_scores.append(calcScore(mod, verify=True))
 
     # SCORE OF FIRST 10 / RANDOM MODELS --------------------------------
     # create theoretical list of models
     theoretical_models = []
-    if Model.TEST:
-        for i, sc in enumerate(separated_scores):
-            print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
-            fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
-            theoretical_models.append(fitted)
-        theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+    if load_file is None:
+        if Model.TEST:
+            for i, sc in enumerate(separated_scores):
+                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                fitted = load_trained_classifier(i)
+                theoretical_models.append(fitted)
+            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+        else:
+            for i, sc in enumerate(separated_scores):
+                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                fitted = load_trained_classifier(randint(0, len(Instances.predictions_arr) - 1))
+                theoretical_models.append(fitted)
+            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+        print('')
     else:
-        for i, sc in enumerate(separated_scores):
-            print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
-            fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(Model.X_train,
-                                                                                                 Model.y_train)
-            theoretical_models.append(fitted)
-        theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
-    print('')
+        if Model.TEST:
+            for i, sc in enumerate(separated_scores):
+                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
+                theoretical_models.append(fitted)
+            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+        else:
+            for i, sc in enumerate(separated_scores):
+                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(Model.X_train,
+                                                                                                     Model.y_train)
+                theoretical_models.append(fitted)
+            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+        print('')
 
     # OUTPUT -----------------------------------------------------------
     def human_readable_genes(genes_index):
@@ -189,17 +234,18 @@ if __name__ == '__main__':
         genes_list += i + '\n'
 
     print("Classifiers' indexes:", conv_genes(population.bestInGen.genes))
-    print(genes_list)
+    if not Model.TEST:
+        print(genes_list)
     print("Score:", score, "in", population.genNo, "iterations")
     print(report)
     print("Separate scores:", separated_scores[:5])
     print("                ", separated_scores[5:])
-    write_to_json("classifiers_scores", population.genFitness)
     if Model.TEST:
         print("Theoretical (assume: first 10 are best):", theoretical_score)
     else:
         print("Random committee (for comparison):", theoretical_score)
     print(theoretical_report)
+    write_to_json("classifiers_scores", population.genFitness)
 
     plot_scores_progress()
     plot_genes_in_last_gen()
@@ -211,8 +257,8 @@ if __name__ == '__main__':
                   f'Score: {score} in {population.genNo} iterations\n' \
                   f'{report}\n' \
                   f'Separate scores: {separated_scores}\n' \
-                  f'Random committee (for comparison): {theoretical_score}' \
-                  f'\n{theoretical_report}\n\n------------------------------------------\n' \
+                  f'Theoretical score: {theoretical_score}\n' \
+                  f'{theoretical_report}\n' \
                   f'{genes_list}'
 
     with open(f'output_files/plots/{Model.RUN_ID}/{out_file_name}.txt', 'w') as f:

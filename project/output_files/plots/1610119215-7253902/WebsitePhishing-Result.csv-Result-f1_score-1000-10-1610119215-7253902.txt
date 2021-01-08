@@ -1,0 +1,35 @@
+[7, 8, 16, 17, 24, 26, 34, 37, 52, 58]
+Score: 0.860655737704918 in 42 iterations
+              precision    recall  f1-score   support
+
+          -1       0.86      0.96      0.91        56
+           0       1.00      0.46      0.63        13
+           1       0.85      0.85      0.85        53
+
+    accuracy                           0.86       122
+   macro avg       0.90      0.76      0.80       122
+weighted avg       0.87      0.86      0.85       122
+
+Separate scores: [0.7540983606557377, 0.8360655737704918, 0.8770491803278688, 0.860655737704918, 0.8360655737704918, 0.8360655737704918, 0.8278688524590164, 0.8442622950819673, 0.8360655737704918, 0.8360655737704918]
+Theoretical score: 0.8524590163934426
+              precision    recall  f1-score   support
+
+          -1       0.84      0.95      0.89        56
+           0       0.82      0.69      0.75        13
+           1       0.88      0.79      0.83        53
+
+    accuracy                           0.85       122
+   macro avg       0.84      0.81      0.82       122
+weighted avg       0.85      0.85      0.85       122
+
+[94mChosen classifiers:[0m
+DecisionTreeClassifier(splitter='random', max_features='log2', )
+DecisionTreeClassifier(criterion='entropy', max_features='sqrt')
+SVC(C=1e-2)
+SVC(C=1e2)
+SGDClassifier()
+SGDClassifier(loss='modified_huber')
+KNeighborsClassifier()
+KNeighborsClassifier(weights='distance')
+GaussianProcessClassifier(max_iter_predict=10)
+LogisticRegression(solver='saga', penalty='l1')
