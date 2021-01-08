@@ -133,8 +133,8 @@ def variance_threshold_selector(data, threshold=0.9):
 
 
 def clear_cache():
-    paths = ['output_files/classifiers_scores/', 'output_files/gen_stats/', 'output_files/validation_res/']
-    # 'models/trained_classifiers/', 'models/vanilla_classifiers/']
+    paths = ['output_files/classifiers_scores/', 'output_files/gen_stats/', 'output_files/validation_res/',
+             'models/trained_classifiers/', 'models/vanilla_classifiers/']
     for path in paths:
         try:
             for root, dirs, files in os.walk(path, topdown=False):
@@ -146,6 +146,8 @@ def clear_cache():
         except OSError as e:
             print('\033[93m' + str(e) + '\033[0m')
         print('Deleting directories at ' + str(path))
+    os.rmdir(os.path.join('models', 'trained_classifiers'))
+    os.rmdir(os.path.join('models', 'vanilla_classifiers'))
     try:
         os.mkdir('output_files/gen_stats', 0o777)
     except FileExistsError:

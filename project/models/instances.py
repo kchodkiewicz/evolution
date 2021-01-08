@@ -78,6 +78,9 @@ def predictClassifiers(X):
             except exceptions.NotFittedError as e:
                 print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
                       + str(e) + '\033[0m')
+            except exceptions.ConvergenceWarning as e:
+                print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+                      + str(e) + '\033[0m')
             except FileNotFoundError as e:
                 print('\033[93m' + str(e) + '\033[0m')
                 sys.exit(2)

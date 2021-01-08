@@ -18,6 +18,7 @@ from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, p
     plot_avg_max_distance_progress
 
 if __name__ == '__main__':
+    clear_cache()
     dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = parse_args(sys.argv[1:])
 
     # inst = Instances()
@@ -31,7 +32,6 @@ if __name__ == '__main__':
     Model.TEST = testing
     Model.PRE_TRAIN = pre_trained
     Model.METRICS_METHOD = metrics
-    clear_cache()
 
     try:
         Model.dataset = pd.read_csv(dataset)
@@ -118,11 +118,10 @@ if __name__ == '__main__':
     # Get specified untrained classifier from file
     def load_vanilla_classifier(it):
         try:
-            with open(os.path.join('models/vanilla_classifiers', f'v-{Instances.models_index[it]}.pkl'), 'rb') as fid:
+            with open(os.path.join('models/trained_classifiers', f't-{it}.pkl'), 'rb') as fid:
                 instance = pickle.load(fid)
         except FileNotFoundError as ex:
-            print('\033[93m' + str(ex) + '\033[0m')
-            print('\033[93m' + f"Cannot include model at index {it} in final score" + '\033[0m')
+            print('\033[93m' + f"Cannot include model at index {it} in final score. Error: "  + str(ex) + '\033[0m')
         else:
             return instance
 
@@ -133,7 +132,7 @@ if __name__ == '__main__':
     for i, gen in enumerate(population.bestInGen.genes):
         print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
         if gen:
-            fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
+            fitted = load_vanilla_classifier(i)  # .fit(Model.X_train, Model.y_train)
             final_models.append(fitted)
     print('')
     score, report = vote(final_models, Model.X_validate)
@@ -185,7 +184,7 @@ if __name__ == '__main__':
             for it in genes_index:
                 p.append(pp[str(Instances.models_index[it])])
         return p
-    genes_list = 'Chosen classifiers:\n'
+    genes_list = '\033[94mChosen classifiers:\033[0m\n'
     for i in human_readable_genes(conv_genes(population.bestInGen.genes)):
         genes_list += i + '\n'
 

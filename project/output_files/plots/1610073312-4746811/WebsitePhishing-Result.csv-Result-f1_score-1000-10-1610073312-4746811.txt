@@ -1,0 +1,37 @@
+[6, 16, 25, 36, 40, 42, 47, 56, 57, 71]
+Score: 0.8524590163934426 in 44 iterations
+              precision    recall  f1-score   support
+
+          -1       0.85      0.95      0.90        59
+           0       1.00      0.08      0.15        12
+           1       0.85      0.92      0.89        51
+
+    accuracy                           0.85       122
+   macro avg       0.90      0.65      0.65       122
+weighted avg       0.87      0.85      0.82       122
+
+Separate scores: [0.8278688524590164, 0.8688524590163934, 0.8688524590163934, 0.8524590163934426, 0.8360655737704918, 0.8360655737704918, 0.8524590163934426, 0.8688524590163934, 0.8278688524590164, 0.8114754098360656]
+Random committee (for comparison): 0.860655737704918
+              precision    recall  f1-score   support
+
+          -1       0.86      0.93      0.89        59
+           0       1.00      0.25      0.40        12
+           1       0.85      0.92      0.89        51
+
+    accuracy                           0.86       122
+   macro avg       0.90      0.70      0.73       122
+weighted avg       0.87      0.86      0.84       122
+
+
+------------------------------------------
+[94mChosen classifiers:[0m
+DecisionTreeClassifier(criterion='entropy', max_features='log2')
+SVC(C=1e-2)
+SGDClassifier(loss='log')
+KNeighborsClassifier(n_neighbors=10)
+KNeighborsClassifier(algorithm='brute')
+KNeighborsClassifier(algorithm='kd_tree', weights='distance')
+GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True)
+LogisticRegression(solver='liblinear', penalty='l1')
+LogisticRegression(solver='newton-cg')
+QuadraticDiscriminantAnalysis()

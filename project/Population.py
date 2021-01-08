@@ -82,7 +82,7 @@ class Population(object):
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
-        mutate_ratio = self.mutation_ratio * (self.genLength ** 2 - self.genLength) / \
+        mutate_ratio = (self.genLength ** 2 - self.genLength) / \
                        (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
         # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
         # phenotype.committee))
@@ -160,16 +160,18 @@ class Population(object):
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
             i += 2
-        print('')
+        if Model.VERBOSE:
+            print('')
         for j, phenotype in enumerate(self.phenotypes):
             print_progress(j + 1, len(self.phenotypes), "Mutating")
             self.mutate(phenotype)
-        print('')
+        if Model.VERBOSE:
+            print('')
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
         if Model.VERBOSE:
-            print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
+            print(f"Best in gen {self.genNo}: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
@@ -200,8 +202,11 @@ class Population(object):
 
     def run_normally(self):
         if Model.VERBOSE:
-            print("Gen No", self.genNo, end=' ', flush=True)
-        for phenotype in self.phenotypes:
+            print("", end=' ', flush=True)
+        for i, phenotype in enumerate(self.phenotypes):
+            print_progress(i + 1, len(self.phenotypes), "Selecting")
             fit = phenotype.run()
             self.__genFitness.append(fit)
+        if Model.VERBOSE:
+            print('')
         self.genNo += 1

@@ -1,0 +1,35 @@
+[20, 34, 41, 42, 44, 47, 48, 50, 59, 70]
+Score: 0.7857142857142857 in 36 iterations
+              precision    recall  f1-score   support
+
+           0       0.70      0.70      0.70        10
+           1       0.83      0.83      0.83        18
+
+    accuracy                           0.79        28
+   macro avg       0.77      0.77      0.77        28
+weighted avg       0.79      0.79      0.79        28
+
+Separate scores: [0.6785714285714286, 0.9642857142857143, 0.9642857142857143, 0.39285714285714285, 0.6785714285714286, 0.8214285714285714, 0.75, 0.6785714285714286, 0.6785714285714286, 0.75]
+Random committee (for comparison): 0.8571428571428571
+              precision    recall  f1-score   support
+
+           0       0.88      0.70      0.78        10
+           1       0.85      0.94      0.89        18
+
+    accuracy                           0.86        28
+   macro avg       0.86      0.82      0.84        28
+weighted avg       0.86      0.86      0.85        28
+
+
+------------------------------------------
+[94m Chosen classifiers:[0m
+SVC(kernel='sigmoid')
+KNeighborsClassifier()
+KNeighborsClassifier(algorithm='ball_tree', weights='distance')
+KNeighborsClassifier(algorithm='kd_tree', weights='distance')
+GaussianProcessClassifier()
+GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True)
+GaussianProcessClassifier(max_iter_predict=10)
+GaussianProcessClassifier(n_restarts_optimizer=1, max_iter_predict=10)
+LogisticRegression(solver='saga', penalty='none')
+PassiveAggressiveClassifier(n_iter_no_change=1)
