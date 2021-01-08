@@ -68,6 +68,10 @@ def trainClassifiers(X, y):
 
 def predictClassifiers(X):
     i = 0
+    for j, m in enumerate(Instances.models_index):
+        with open(os.path.join('models/trained_classifiers', f't-{j}.pkl'), 'rb') as fid:
+            instance = pickle.load(fid)
+        predictions = instance.predict(X) # TODO check this out
     for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
         for name in files:
             try:

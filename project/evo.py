@@ -118,7 +118,7 @@ if __name__ == '__main__':
     # Get specified untrained classifier from file
     def load_vanilla_classifier(it):
         try:
-            with open(os.path.join('models/trained_classifiers', f't-{it}.pkl'), 'rb') as fid:
+            with open(os.path.join('models/trained_classifiers', f't-{Instances.models_index[it]}.pkl'), 'rb') as fid:
                 instance = pickle.load(fid)
         except FileNotFoundError as ex:
             print('\033[93m' + f"Cannot include model at index {it} in final score. Error: "  + str(ex) + '\033[0m')
