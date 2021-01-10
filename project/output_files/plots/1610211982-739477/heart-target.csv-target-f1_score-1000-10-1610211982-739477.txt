@@ -1,0 +1,33 @@
+[11, 17, 21, 26, 50, 57, 65, 68, 69, 71]
+Score: 0.8214285714285714 in 20 iterations
+              precision    recall  f1-score   support
+
+           0       0.92      0.73      0.81        15
+           1       0.75      0.92      0.83        13
+
+    accuracy                           0.82        28
+   macro avg       0.83      0.83      0.82        28
+weighted avg       0.84      0.82      0.82        28
+
+Separate scores: [0.6785714285714286, 0.7857142857142857, 0.7857142857142857, 0.7142857142857143, 0.8928571428571429, 0.6785714285714286, 0.8571428571428571, 0.6785714285714286, 0.8214285714285714, 0.8214285714285714]
+Theoretical score: 0.7857142857142857
+              precision    recall  f1-score   support
+
+           0       0.85      0.73      0.79        15
+           1       0.73      0.85      0.79        13
+
+    accuracy                           0.79        28
+   macro avg       0.79      0.79      0.79        28
+weighted avg       0.79      0.79      0.79        28
+
+[94mChosen classifiers:[0m
+GaussianNB(var_smoothing=1)
+SVC(C=1e2)
+SVC(kernel='sigmoid', gamma='auto')
+SGDClassifier(loss='modified_huber')
+GaussianProcessClassifier(n_restarts_optimizer=1, max_iter_predict=10)
+LogisticRegression(solver='newton-cg')
+PassiveAggressiveClassifier(loss='squared_hinge')
+PassiveAggressiveClassifier(C=10, loss='hinge', early_stopping=True)
+PassiveAggressiveClassifier(loss='squared_hinge', early_stopping=True)
+QuadraticDiscriminantAnalysis()

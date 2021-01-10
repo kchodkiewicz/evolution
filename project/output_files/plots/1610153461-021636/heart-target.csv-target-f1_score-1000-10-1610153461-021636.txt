@@ -1,0 +1,33 @@
+[5, 9, 17, 21, 35, 39, 45, 46, 57, 67]
+Score: 0.7857142857142857 in 23 iterations
+              precision    recall  f1-score   support
+
+           0       0.90      0.64      0.75        14
+           1       0.72      0.93      0.81        14
+
+    accuracy                           0.79        28
+   macro avg       0.81      0.79      0.78        28
+weighted avg       0.81      0.79      0.78        28
+
+Separate scores: [0.8571428571428571, 0.8571428571428571, 0.8214285714285714, 0.8214285714285714, 0.7142857142857143, 0.75, 0.8214285714285714, 0.8571428571428571, 0.6785714285714286, 0.8928571428571429]
+Theoretical score: 0.7142857142857143
+              precision    recall  f1-score   support
+
+           0       0.88      0.50      0.64        14
+           1       0.65      0.93      0.76        14
+
+    accuracy                           0.71        28
+   macro avg       0.76      0.71      0.70        28
+weighted avg       0.76      0.71      0.70        28
+
+[94mChosen classifiers:[0m
+DecisionTreeClassifier(max_features='log2')
+DecisionTreeClassifier(splitter='random', max_features='sqrt')
+SVC(C=1e2)
+SVC(kernel='sigmoid', gamma='auto')
+KNeighborsClassifier(n_neighbors=2)
+KNeighborsClassifier(algorithm='kd_tree')
+GaussianProcessClassifier(warm_start=True)
+GaussianProcessClassifier(n_restarts_optimizer=1)
+LogisticRegression(solver='newton-cg')
+PassiveAggressiveClassifier(C=10, early_stopping=True)

@@ -7,7 +7,6 @@ import pickle
 import sys
 
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
-from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import SGDClassifier, LogisticRegression, PassiveAggressiveClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -72,8 +71,8 @@ def trainClassifiers(X, y):
         else:
             with open(f'models/trained_classifiers/t-{i}.pkl', 'wb') as fid:
                 pickle.dump(trained_model, fid)
-            del instance
-            del trained_model
+            instance = None
+            trained_model = None
             Instances.models_index.append(i)
     print('')
 
