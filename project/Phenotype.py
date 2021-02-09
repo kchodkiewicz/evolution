@@ -1,7 +1,7 @@
 # Phenotype genes and methods for classification etc. -- its me and its good
 import random
-from models.Model import Model, calcScore
 from models.instances import Instances
+from utils import calcScore
 
 
 class Phenotype(object):
@@ -17,8 +17,6 @@ class Phenotype(object):
         self.__genes = [False for _ in range(self.gen_length)]
         # classifier attribute
         self.__predictions = []
-        # self.__model = Model()
-        # self.__inst = Instances()
         self.create_random_genes()
         # testing
         self.__counter = 0

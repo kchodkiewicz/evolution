@@ -3,3 +3,4 @@ output_files/**/*.png
 models/trained_classifiers/*.pkl
 models/vanilla_classifiers/*.pkl
 ../**/.DS_Store
+**/__pycache__

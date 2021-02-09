@@ -1,0 +1,39 @@
+[8, 10, 21, 24, 33, 60, 63, 69, 71, 76]
+Score: 0.9776536312849162 in 30 iterations
+              precision    recall  f1-score   support
+
+       nie pulsar   &    0.98   &   0.99   &   0.99   &   0.98   &   1.00   &   0.99 \\
+           pulsar   &    0.93   &   0.81   &   0.87   &   0.97   &   0.79   &   0.87 \\
+
+		   &  &  & 0.98&  &  & 0.98\\
+
+    accuracy                           0.98      1611
+   macro avg       0.95      0.90      0.93      1611
+weighted avg       0.98      0.98      0.98      1611
+
+Separate scores: [0.978895096213532, 0.973308504034761, 0.9658597144630664, 0.9708255741775295, 0.973308504034761, 0.973308504034761, 0.9671011793916822, 0.973308504034761, 0.9708255741775295, 0.9646182495344506]
+Random committee (for comparison): 0.9795158286778398
+              precision    recall  f1-score   support
+
+   0.98   &   1.00   &   0.99 \\
+   0.97   &   0.79   &   0.87 \\
+
+    accuracy                           0.98      1611
+   macro avg       0.98      0.89      0.93      1611
+weighted avg       0.98      0.98      0.98      1611
+
+
+ ------------------------------------------ 
+1 & DecisionTreeClassifier & \multicolumn{1}{p{8cm}}{\texttt{(criterion='entropy', max\_features='sqrt')} \\
+2 & GaussianNB & \multicolumn{1}{p{8cm}}{\texttt{()} }\\
+3 & SGDClassifier & \multicolumn{1}{p{8cm}}{\texttt{()} }\\
+4 & SGDClassifier & \multicolumn{1}{p{8cm}}{\texttt{(penalty='elasticnet')} }\\
+5 & KNeighborsClassifier & \multicolumn{1}{p{8cm}}{\texttt{(algorithm='ball\_tree')} }\\
+6 & PassiveAggressiveClassifier & \multicolumn{1}{p{8cm}}{\texttt{(C=10, early\_stopping=True)} }\\
+7 & PassiveAggressiveClassifier & \multicolumn{1}{p{8cm}}{\texttt{(n\_iter\_no\_change=1)} }\\
+8 & LinearDiscriminantAnalysis & \multicolumn{1}{p{8cm}}{\texttt{(store\_covariance=True)} }\\
+9 & LinearDiscriminantAnalysis & \multicolumn{1}{p{8cm}}{\texttt{(solver='lsqr')} }\\
+10 & LinearDiscriminantAnalysis & \multicolumn{1}{p{8cm}}{\texttt{(solver='eigen', shrinkage=1.0)} }\\
+
+
+
