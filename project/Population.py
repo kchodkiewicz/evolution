@@ -3,6 +3,7 @@ import copy
 import json
 import math
 import random
+import numpy as np
 import time
 from Phenotype import Phenotype
 from models.instances import Instances
@@ -82,14 +83,29 @@ class Population(object):
     # Then repeat for list of False values
     # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
-        mutate_ratio = self.mutation_ratio * (self.genLength ** 2 - self.genLength) / \
-                       (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
-        # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
-        # phenotype.committee))
-        for _ in range(math.ceil(mutate_ratio)):
+        # mutate_ratio = (self.genLength ** 2 - self.genLength) / \
+        #                (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
+        # # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
+        # # phenotype.committee))
+        # for _ in range(math.ceil(mutate_ratio)):
+        #     index1 = random.randint(0, len(phenotype.genes) - 1)
+        #     index2 = random.randint(0, len(phenotype.genes) - 1)
+        #     while index1 == index2:
+        #         index2 = random.randint(0, len(phenotype.genes) - 1)
+        #     tmp = phenotype.genes[index2]
+        #     phenotype.genes[index2] = phenotype.genes[index1]
+        #     phenotype.genes[index1] = tmp
+        # it = 0
+        # for i in phenotype.genes:
+        #     if i:
+        #         it += 1
+        # phenotype.committee = it
+        for i in range(self.mutation_ratio):
             index1 = random.randint(0, len(phenotype.genes) - 1)
             index2 = random.randint(0, len(phenotype.genes) - 1)
             while index1 == index2:
+                index2 = random.randint(0, len(phenotype.genes) - 1)
+            while phenotype.genes[index1] == phenotype.genes[index2]:
                 index2 = random.randint(0, len(phenotype.genes) - 1)
             tmp = phenotype.genes[index2]
             phenotype.genes[index2] = phenotype.genes[index1]
@@ -160,21 +176,29 @@ class Population(object):
             new_generation.append(copy.deepcopy(child1st))
             new_generation.append(copy.deepcopy(child2nd))
             i += 2
-        print('')
+        if Model.VERBOSE:
+            print('')
         for j, phenotype in enumerate(self.phenotypes):
             print_progress(j + 1, len(self.phenotypes), "Mutating")
             self.mutate(phenotype)
-        print('')
+        if Model.VERBOSE:
+            print('')
         new_generation.pop(0)
         new_generation.append(copy.deepcopy(self.bestInGen))
         self.phenotypes = copy.deepcopy(new_generation)
         if Model.VERBOSE:
-            print("Best in gen: fitness =", self.bestInGen.fitness, "genes =", conv_genes(self.bestInGen.genes))
+            print(f"Best in gen {self.genNo}: fitness =", self.bestInGen.fitness, "genes =",
+                  conv_genes(self.bestInGen.genes))
         self.output[self.genNo] = conv_genes(self.bestInGen.genes)
         write_to_json("gen_stats", self.output)
         if self.genNo % 5 == 0:
+            pred_copy = Instances.predictions_arr.copy()
             specimen = {'used_models': Instances.models_index,
-                        'predictions': Instances.predictions_arr}
+                        'predictions': [0 for i in range(len(pred_copy))]}
+            # specimen = {}
+            for tt, dim1 in enumerate(pred_copy):
+                specimen['predictions'][tt] = dim1.tolist()
+
             for i, phenotype in enumerate(self.phenotypes):
                 specimen[i] = phenotype.genes
             write_to_json("population_dump", specimen)
@@ -194,14 +218,17 @@ class Population(object):
         write_to_json("validation_res", self.__validation_res)
         if self.genNo < 15:
             if (self.bestInGen.fitness * 0.999) < avg_fitness:
-                self.mutation_ratio = 1.5
+                self.mutation_ratio = 2
             else:
                 self.mutation_ratio = 1
 
     def run_normally(self):
         if Model.VERBOSE:
-            print("Gen No", self.genNo, end=' ', flush=True)
-        for phenotype in self.phenotypes:
+            print("", end=' ', flush=True)
+        for i, phenotype in enumerate(self.phenotypes):
+            print_progress(i + 1, len(self.phenotypes), "Selecting")
             fit = phenotype.run()
             self.__genFitness.append(fit)
+        if Model.VERBOSE:
+            print('')
         self.genNo += 1

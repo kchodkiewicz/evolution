@@ -133,8 +133,8 @@ def variance_threshold_selector(data, threshold=0.9):
 
 
 def clear_cache():
-    paths = ['output_files/classifiers_scores/', 'output_files/gen_stats/', 'output_files/validation_res/']
-    # 'models/trained_classifiers/', 'models/vanilla_classifiers/']
+    paths = ['output_files/classifiers_scores/', 'output_files/gen_stats/', 'output_files/validation_res/',
+             'models/trained_classifiers/', 'models/vanilla_classifiers/']
     for path in paths:
         try:
             for root, dirs, files in os.walk(path, topdown=False):
@@ -146,6 +146,14 @@ def clear_cache():
         except OSError as e:
             print('\033[93m' + str(e) + '\033[0m')
         print('Deleting directories at ' + str(path))
+    try:
+        os.rmdir(os.path.join('models', 'trained_classifiers'))
+    except FileNotFoundError:
+        pass
+    try:
+        os.rmdir(os.path.join('models', 'vanilla_classifiers'))
+    except FileNotFoundError:
+        pass
     try:
         os.mkdir('output_files/gen_stats', 0o777)
     except FileExistsError:
@@ -186,11 +194,11 @@ def create_dir(path, run_id):
         return dir_path
 
 
-class NumpyArrayEncoder(JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, numpy.ndarray):
-            return obj.tolist()
-        return JSONEncoder.default(self, obj)
+# class NumpyArrayEncoder(JSONEncoder):
+#     def default(self, obj):
+#         if isinstance(obj, numpy.ndarray):
+#             return obj.tolist()
+#         return JSONEncoder.default(self, obj)
 
 
 # Write to specified .json file
@@ -208,7 +216,7 @@ def write_to_json(path, content):
             with open(f'{dir_path}/{time.localtime()[0]}-{time.localtime()[1]}-'
                       f'{time.localtime()[2]}_'
                       f'{time.localtime()[3]}:{time.localtime()[4]}:{time.localtime()[5]}.json', 'w') as filename:
-                json.dump(content, filename, indent=4, cls=NumpyArrayEncoder)
+                json.dump(content, filename, indent=4)  # , cls=NumpyArrayEncoder
         except Exception as e:
             print('\033[93m' + str(e) + '\033[0m')
 

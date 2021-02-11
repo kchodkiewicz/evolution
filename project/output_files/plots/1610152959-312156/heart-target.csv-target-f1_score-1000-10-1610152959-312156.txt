@@ -1,0 +1,33 @@
+[3, 4, 8, 9, 15, 23, 26, 60, 62, 63]
+Score: 0.8928571428571429 in 30 iterations
+              precision    recall  f1-score   support
+
+           0       1.00      0.77      0.87        13
+           1       0.83      1.00      0.91        15
+
+    accuracy                           0.89        28
+   macro avg       0.92      0.88      0.89        28
+weighted avg       0.91      0.89      0.89        28
+
+Separate scores: [0.6785714285714286, 0.7857142857142857, 0.7857142857142857, 0.8571428571428571, 0.75, 0.7857142857142857, 0.7857142857142857, 0.8214285714285714, 0.8214285714285714, 0.8571428571428571]
+Theoretical score: 0.75
+              precision    recall  f1-score   support
+
+           0       0.71      0.77      0.74        13
+           1       0.79      0.73      0.76        15
+
+    accuracy                           0.75        28
+   macro avg       0.75      0.75      0.75        28
+weighted avg       0.75      0.75      0.75        28
+
+[94mChosen classifiers:[0m
+DecisionTreeClassifier(splitter='random', criterion='entropy')
+DecisionTreeClassifier(max_features='sqrt')
+DecisionTreeClassifier(criterion='entropy', max_features='sqrt')
+DecisionTreeClassifier(splitter='random', max_features='sqrt')
+SVC(gamma='auto')
+SVC(kernel='linear')
+SGDClassifier(loss='modified_huber')
+LogisticRegression(solver='saga')
+PassiveAggressiveClassifier()
+PassiveAggressiveClassifier(C=10)

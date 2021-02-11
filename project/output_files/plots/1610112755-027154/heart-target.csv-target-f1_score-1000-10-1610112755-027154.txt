@@ -1,0 +1,33 @@
+[0, 3, 4, 5, 25, 34, 45, 46, 51, 72]
+Score: 0.75 in 38 iterations
+              precision    recall  f1-score   support
+
+           0       0.75      0.69      0.72        13
+           1       0.75      0.80      0.77        15
+
+    accuracy                           0.75        28
+   macro avg       0.75      0.75      0.75        28
+weighted avg       0.75      0.75      0.75        28
+
+Separate scores: [0.75, 0.8928571428571429, 0.8571428571428571, 0.75, 0.8571428571428571, 0.6428571428571429, 0.75, 0.75, 0.6785714285714286, 0.7857142857142857]
+Theoretical score: 0.6428571428571429
+              precision    recall  f1-score   support
+
+           0       0.80      0.31      0.44        13
+           1       0.61      0.93      0.74        15
+
+    accuracy                           0.64        28
+   macro avg       0.70      0.62      0.59        28
+weighted avg       0.70      0.64      0.60        28
+
+[94mChosen classifiers:[0m
+DecisionTreeClassifier(max_depth=1)
+DecisionTreeClassifier(splitter='random', criterion='entropy')
+DecisionTreeClassifier(max_features='sqrt')
+DecisionTreeClassifier(max_features='log2')
+SGDClassifier(loss='log')
+KNeighborsClassifier()
+GaussianProcessClassifier(warm_start=True)
+GaussianProcessClassifier(n_restarts_optimizer=1)
+GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True, max_iter_predict=10)
+QuadraticDiscriminantAnalysis(store_covariance=True)

@@ -7,7 +7,6 @@ import pickle
 import sys
 
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis, LinearDiscriminantAnalysis
-from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import SGDClassifier, LogisticRegression, PassiveAggressiveClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -36,6 +35,18 @@ def get_models_index(i):
     return Instances.models_index[i]
 
 
+def trainForLoadFile():
+    if Model.TEST:
+        inst = Instances.instances_test
+        Instances.instances = []
+    else:
+        inst = Instances.instances
+        Instances.instances_test = []
+    for i, instance in enumerate(inst):
+        with open(f'models/vanilla_classifiers/v-{i}.pkl', 'wb') as fid:
+            pickle.dump(instance, fid)
+
+
 def trainClassifiers(X, y):
     if Model.TEST:
         inst = Instances.instances_test
@@ -60,36 +71,62 @@ def trainClassifiers(X, y):
         else:
             with open(f'models/trained_classifiers/t-{i}.pkl', 'wb') as fid:
                 pickle.dump(trained_model, fid)
-            del instance
-            del trained_model
+            instance = None
+            trained_model = None
             Instances.models_index.append(i)
     print('')
 
 
 def predictClassifiers(X):
     i = 0
-    for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
-        for name in files:
+    for j, index in enumerate(Instances.models_index):
+        try:
+            print_progress(j + 1, len(Instances.models_index), "Predicting")
+            with open(os.path.join('models/trained_classifiers/', f't-{index}.pkl'), 'rb') as fid:
+                instance = pickle.load(fid)
+            predictions = instance.predict(X)
+        except exceptions.NotFittedError as e:
+            print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+                  + str(e) + '\033[0m')
+        except exceptions.ConvergenceWarning as e:
+            print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+                  + str(e) + '\033[0m')
+        except FileNotFoundError as e:
+            print('\033[93m' + str(e) + '\033[0m')
+            sys.exit(2)
+        else:
             try:
-                print_progress(i + 1, len(files), "Predicting")
-                with open(os.path.join(root, name), 'rb') as fid:
-                    instance = pickle.load(fid)
-                predictions = instance.predict(X)
-            except exceptions.NotFittedError as e:
-                print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
-                      + str(e) + '\033[0m')
-            except FileNotFoundError as e:
-                print('\033[93m' + str(e) + '\033[0m')
-                sys.exit(2)
+                Instances.scores.append(calcScore(predictions, verify=False))
+            except ValueError as e:
+                print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
             else:
-                try:
-                    Instances.scores.append(calcScore(predictions, verify=False))
-                except ValueError as e:
-                    print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
-                else:
-                    Instances.predictions_arr.append(predictions)
-            i += 1
-        print('')
+                Instances.predictions_arr.append(predictions)
+    print('')
+    # for root, dirs, files in os.walk('models/trained_classifiers/', topdown=False):
+    #     for name in files:
+    #         try:
+    #             print_progress(i + 1, len(files), "Predicting")
+    #             with open(os.path.join(root, name), 'rb') as fid:
+    #                 instance = pickle.load(fid)
+    #             predictions = instance.predict(X)
+    #         except exceptions.NotFittedError as e:
+    #             print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+    #                   + str(e) + '\033[0m')
+    #         except exceptions.ConvergenceWarning as e:
+    #             print('\033[93m' + "An error occurred while estimating classes. Omitting. Error: "
+    #                   + str(e) + '\033[0m')
+    #         except FileNotFoundError as e:
+    #             print('\033[93m' + str(e) + '\033[0m')
+    #             sys.exit(2)
+    #         else:
+    #             try:
+    #                 Instances.scores.append(calcScore(predictions, verify=False))
+    #             except ValueError as e:
+    #                 print('\033[93m' + " Couldn't calculate score. Omitting. Error: " + str(e) + '\033[0m')
+    #             else:
+    #                 Instances.predictions_arr.append(predictions)
+    #         i += 1
+    #     print('')
 
 
 class Instances(object):
@@ -142,17 +179,6 @@ class Instances(object):
     kNeighbors8 = KNeighborsClassifier(algorithm='kd_tree', weights='distance')
     kNeighbors9 = KNeighborsClassifier(algorithm='brute', weights='distance')
 
-    gaussianProcess0 = GaussianProcessClassifier()
-    gaussianProcess1 = GaussianProcessClassifier(warm_start=True)
-    gaussianProcess2 = GaussianProcessClassifier(n_restarts_optimizer=1)
-    gaussianProcess3 = GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True)
-    gaussianProcess4 = GaussianProcessClassifier(max_iter_predict=10)
-    gaussianProcess5 = GaussianProcessClassifier(warm_start=True, max_iter_predict=10)
-    gaussianProcess6 = GaussianProcessClassifier(n_restarts_optimizer=1, max_iter_predict=10)
-    gaussianProcess7 = GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True, max_iter_predict=10)
-    gaussianProcess8 = GaussianProcessClassifier(max_iter_predict=10, warm_start=True)
-    gaussianProcess9 = GaussianProcessClassifier(n_restarts_optimizer=2)
-
     logisticRegression0 = LogisticRegression()
     logisticRegression3 = LogisticRegression(penalty='none')
     logisticRegression2 = LogisticRegression(solver='liblinear', penalty='l1')
@@ -161,12 +187,6 @@ class Instances(object):
     logisticRegression5 = LogisticRegression(solver='saga', penalty='none')
     logisticRegression6 = LogisticRegression(solver='saga')
     logisticRegression7 = LogisticRegression(solver='liblinear', penalty='l2')
-
-    # ridgeClassification0 = RidgeClassifier(copy_X=True)
-    # ridgeClassification3 = RidgeClassifier(copy_X=True, tol=1, solver='sparse_cg')
-    # ridgeClassification4 = RidgeClassifier(copy_X=True, tol=1e-1, solver='sparse_cg')
-    # ridgeClassification7 = RidgeClassifier(copy_X=True, solver='saga')
-    # ridgeClassification9 = RidgeClassifier(copy_X=True, solver='saga', random_state=42)
 
     passiveAggressive0 = PassiveAggressiveClassifier()
     passiveAggressive1 = PassiveAggressiveClassifier(C=10)
@@ -193,26 +213,13 @@ class Instances(object):
     linearDiscriminantAnalysis7 = LinearDiscriminantAnalysis(solver='eigen', shrinkage='auto')
     linearDiscriminantAnalysis8 = LinearDiscriminantAnalysis(solver='eigen', shrinkage=1.0)
 
-    # lasso0 = LassoLars(copy_X=True)
-    # lasso1 = LassoLars(copy_X=True, alpha=0.5)
-    # lasso2 = LassoLars(copy_X=True, fit_intercept=False)
-    # lasso3 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False)
-    # lasso4 = LassoLars(copy_X=True, fit_path=False)
-    # lasso5 = LassoLars(copy_X=True, alpha=0.5, fit_path=False)
-    # lasso6 = LassoLars(copy_X=True, fit_intercept=False, fit_path=False)
-    # lasso7 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False, fit_path=False)
-    # lasso8 = LassoLars(copy_X=True, jitter=1)
-    # lasso9 = LassoLars(copy_X=True, fit_intercept=False, positive=True)
-    # lasso10 = LassoLars(copy_X=True, alpha=0.5, fit_intercept=False, positive=True)
-
-    instances_test = [gaussianProcess8,
+    instances_test = [
                       svm8,
                       svm9,
                       stochasticGradient0,
                       stochasticGradient1,
                       stochasticGradient6,
                       stochasticGradient7,
-                      gaussianProcess4,
                       kNeighbors1,
                       kNeighbors2,
                       decisionTree0,
@@ -310,7 +317,7 @@ class Instances(object):
                  svm2,
                  svm3,
                  svm4,
-                 svm5,
+                 # svm5,
                  svm6,
                  svm7,
                  svm8,
@@ -335,16 +342,6 @@ class Instances(object):
                  kNeighbors7,
                  kNeighbors8,
                  kNeighbors9,
-                 gaussianProcess0,
-                 gaussianProcess1,
-                 gaussianProcess2,
-                 gaussianProcess3,
-                 gaussianProcess4,
-                 gaussianProcess5,
-                 gaussianProcess6,
-                 gaussianProcess7,
-                 gaussianProcess8,
-                 gaussianProcess9,
                  logisticRegression0,
                  logisticRegression1,
                  logisticRegression2,
