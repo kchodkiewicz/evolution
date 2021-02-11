@@ -4,13 +4,9 @@ import json
 import os
 import sys
 import time
-from json import JSONEncoder
-
-import numpy
 from sklearn.feature_selection import VarianceThreshold
-from sklearn.metrics import classification_report
-
-from models.Model import Model, calcScore
+from sklearn.metrics import classification_report, accuracy_score, f1_score
+from models.Model import Model
 
 
 # Validate if fitness of last 20 classifiers is getting better
@@ -256,6 +252,20 @@ def print_progress(i, end, msg):
         print('\r' + '{:<15}'.format(msg), '[ ', '#' * block, ' ' * int(bar_len - block), ']', i, '/', str(end) + ' ' +
               dots, end='',
               flush=True)
+
+
+def calcScore(predictions, **kwargs):
+    def calc(y, predicts):
+        if Model.METRICS_METHOD == "accuracy_score":
+            score = accuracy_score(y, predicts)
+        else:
+            score = f1_score(y, predicts, average='micro')
+        return score
+
+    if kwargs['verify']:
+        return calc(Model.y_validate, predictions)
+    else:
+        return calc(Model.y_test, predictions)
 
 
 def vote(models_arr, X):

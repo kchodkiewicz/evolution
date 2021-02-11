@@ -1,4 +1,4 @@
-# Main -- its me and its good
+# Main
 import json
 import os
 import pickle
@@ -11,16 +11,14 @@ import numpy as np
 from pandas import errors
 from sklearn.model_selection import train_test_split
 from Population import Population, conv_genes, write_to_json
-from models.Model import Model, calcScore
+from models.Model import Model
 from models.instances import Instances, trainClassifiers, predictClassifiers, trainForLoadFile
-from utils import parse_args, variance_threshold_selector, fitness_is_progressing, predictSelected, vote, clear_cache, \
-    print_progress
-from plotting import plot_scores_progress, plot_best_phenotype_genes_progress, plot_genes_in_last_gen, \
-    plot_avg_max_distance_progress
+import utils as ut
+import plotting as pt
 
 if __name__ == '__main__':
-    clear_cache()
-    dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = parse_args(sys.argv[1:])
+    ut.clear_cache()
+    dataset, col, metrics, pop, comm, load_file, verbose, testing, pre_trained = ut.parse_args(sys.argv[1:])
 
     # Add id for run
     timestamp = time.time()
@@ -38,7 +36,7 @@ if __name__ == '__main__':
         sys.exit(2)
 
     # remove features with low variance (same value in 90% of samples)
-    variance_threshold_selector(Model.dataset, 0.9)
+    ut.variance_threshold_selector(Model.dataset, 0.9)
     # split for X, y and remove id column
     try:
         X = Model.dataset.drop(columns=col)
@@ -108,7 +106,7 @@ if __name__ == '__main__':
         population.validate()
         population.select()
         fitness_scores.append(population.bestInGen.fitness)
-        if not fitness_is_progressing(fitness_scores):
+        if not ut.fitness_is_progressing(fitness_scores):
             break
     print('\033[94m' + '------------------------------------------\nEvolution '
                        'finished\n------------------------------------------' + '\033[0m')
@@ -139,48 +137,48 @@ if __name__ == '__main__':
     final_models = []
     if load_file is None:
         for i, gen in enumerate(population.bestInGen.genes):
-            print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
+            ut.print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
             if gen:
-                fitted = load_trained_classifier(i)  # .fit(Model.X_train, Model.y_train)
+                fitted = load_trained_classifier(i)
                 final_models.append(fitted)
         print('')
-        score, report = vote(final_models, Model.X_validate)
+        score, report = ut.vote(final_models, Model.X_validate)
     else:
         for i, gen in enumerate(population.bestInGen.genes):
-            print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
+            ut.print_progress(i + 1, len(population.bestInGen.genes), 'Calculating final score: ')
             if gen:
                 fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
                 final_models.append(fitted)
         print('')
-        score, report = vote(final_models, Model.X_validate)
+        score, report = ut.vote(final_models, Model.X_validate)
 
     # SEPARATE SCORES OF EVOLVED MODELS --------------------------------
     # create list of models used in final list
     separated_models = []
     if load_file is None:
         for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
-            print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
+            ut.print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
             fitted = load_trained_classifier(i)
             separated_models.append(fitted)
         print('')
         # make predictions for every model
-        separated_predicts = predictSelected(separated_models, Model.X_validate)
+        separated_predicts = ut.predictSelected(separated_models, Model.X_validate)
         # calculate separate score for every model
         separated_scores = []
         for mod in separated_predicts:
-            separated_scores.append(calcScore(mod, verify=True))
+            separated_scores.append(ut.calcScore(mod, verify=True))
     else:
         for i, mod in enumerate(conv_genes(population.bestInGen.genes)):
-            print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
+            ut.print_progress(i + 1, len(conv_genes(population.bestInGen.genes)), 'Calculating separate scores: ')
             fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
             separated_models.append(fitted)
         print('')
         # make predictions for every model
-        separated_predicts = predictSelected(separated_models, Model.X_validate)
+        separated_predicts = ut.predictSelected(separated_models, Model.X_validate)
         # calculate separate score for every model
         separated_scores = []
         for mod in separated_predicts:
-            separated_scores.append(calcScore(mod, verify=True))
+            separated_scores.append(ut.calcScore(mod, verify=True))
 
     # SCORE OF FIRST 10 / RANDOM MODELS --------------------------------
     # create theoretical list of models
@@ -188,31 +186,31 @@ if __name__ == '__main__':
     if load_file is None:
         if Model.TEST:
             for i, sc in enumerate(separated_scores):
-                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                ut.print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
                 fitted = load_trained_classifier(i)
                 theoretical_models.append(fitted)
-            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+            theoretical_score, theoretical_report = ut.vote(theoretical_models, Model.X_validate)
         else:
             for i, sc in enumerate(separated_scores):
-                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                ut.print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
                 fitted = load_trained_classifier(randint(0, len(Instances.predictions_arr) - 1))
                 theoretical_models.append(fitted)
-            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+            theoretical_score, theoretical_report = ut.vote(theoretical_models, Model.X_validate)
         print('')
     else:
         if Model.TEST:
             for i, sc in enumerate(separated_scores):
-                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                ut.print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
                 fitted = load_vanilla_classifier(i).fit(Model.X_train, Model.y_train)
                 theoretical_models.append(fitted)
-            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+            theoretical_score, theoretical_report = ut.vote(theoretical_models, Model.X_validate)
         else:
             for i, sc in enumerate(separated_scores):
-                print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
+                ut.print_progress(i + 1, len(separated_scores), 'Calculating theoretical score: ')
                 fitted = load_vanilla_classifier(randint(0, len(Instances.predictions_arr) - 1)).fit(Model.X_train,
                                                                                                      Model.y_train)
                 theoretical_models.append(fitted)
-            theoretical_score, theoretical_report = vote(theoretical_models, Model.X_validate)
+            theoretical_score, theoretical_report = ut.vote(theoretical_models, Model.X_validate)
         print('')
 
     # OUTPUT -----------------------------------------------------------
@@ -247,10 +245,10 @@ if __name__ == '__main__':
     print(theoretical_report)
     write_to_json("classifiers_scores", population.genFitness)
 
-    plot_scores_progress()
-    plot_genes_in_last_gen()
-    plot_avg_max_distance_progress()
-    plot_best_phenotype_genes_progress()
+    pt.plot_scores_progress()
+    pt.plot_genes_in_last_gen()
+    pt.plot_avg_max_distance_progress()
+    pt.plot_best_phenotype_genes_progress()
 
     out_file_name = f'{dataset[9:]}-{col}-{metrics}-{pop}-{comm}-{Model.RUN_ID}'
     out_content = f'{conv_genes(population.bestInGen.genes)}\n' \

@@ -1,9 +1,7 @@
 # Phenotypes list and methods for evolution -- its me and its good
 import copy
 import json
-import math
 import random
-import numpy as np
 import time
 from Phenotype import Phenotype
 from models.instances import Instances
@@ -14,6 +12,13 @@ from models.Model import Model
 class Population(object):
 
     def __init__(self, size, committee, gen_length):
+        """
+        Create population of phenotypes for genetic evolution
+
+        :param size: number of phenotypes in population
+        :param committee: amount of classifiers in committee
+        :param gen_length: length of genotype
+        """
         self.size = size
         self.classifierCommittee = committee
         self.genLength = gen_length
@@ -27,7 +32,6 @@ class Population(object):
         self.output = {}
         self.start_time = time.localtime()
         self.__validation_res = {}
-        # self.inst = Instances()
 
     def load_population(self, filename):
         try:
@@ -43,11 +47,17 @@ class Population(object):
     def genFitness(self):
         return self.__genFitness
 
-    # Create list of indexes of true values in both parents
-    # choose genes for child1 and remove them from true_genes
-    # get list of genes that duplicate in both parents (AND)
-    # add to child2 all duplicated genes and remaining genes from true_genes
     def cross(self, cross_id, parent_first, parent_second):
+        """
+        Cross two phenotypes and create two new phenotypes
+
+        Return two new phenotypes with mixed parents' genes
+        :param cross_id: identification number of crossing
+        :param parent_first: 1st parent phenotype
+        :param parent_second: 2nd parent phenotype
+        :rtype: (Phenotype, Phenotype, int, int)
+        :return: (1st offspring, 2nd offspring, 1st cut point, 2nd cut point)
+        """
         child1st = Phenotype(cross_id, self.classifierCommittee, self.genLength)
         child2nd = Phenotype(cross_id + 1, self.classifierCommittee, self.genLength)
         cut_point1 = random.randint(1, self.genLength - 3)
@@ -74,32 +84,16 @@ class Population(object):
                 jt += 1
         child2nd.committee = jt
         return child1st, child2nd, cut_point1, cut_point2
-        # return child1st, child2nd
 
-    # Create lists of True and False values in genes
-    # Get random amount of mutations (between 0 and 3)
-    # Get random indexes of values in lists of True and False values
-    # Remove value from list of True values and add it to the list of False values
-    # Then repeat for list of False values
-    # Create list of genes according to the modified positive_values and negative_values
     def mutate(self, phenotype):
-        # mutate_ratio = (self.genLength ** 2 - self.genLength) / \
-        #                (2 * self.classifierCommittee * (self.genLength - self.classifierCommittee))
-        # # print('def', self.mutation_ratio, 'rand', mutate_ratio, 'range', math.ceil(mutate_ratio *
-        # # phenotype.committee))
-        # for _ in range(math.ceil(mutate_ratio)):
-        #     index1 = random.randint(0, len(phenotype.genes) - 1)
-        #     index2 = random.randint(0, len(phenotype.genes) - 1)
-        #     while index1 == index2:
-        #         index2 = random.randint(0, len(phenotype.genes) - 1)
-        #     tmp = phenotype.genes[index2]
-        #     phenotype.genes[index2] = phenotype.genes[index1]
-        #     phenotype.genes[index1] = tmp
-        # it = 0
-        # for i in phenotype.genes:
-        #     if i:
-        #         it += 1
-        # phenotype.committee = it
+        """
+        Mutate genotype of provided phenotype
+
+        Invert one True and one False gene
+        i.e. change one classifier in committee
+        :param phenotype: currently mutating phenotype
+        :return: None
+        """
         for i in range(self.mutation_ratio):
             index1 = random.randint(0, len(phenotype.genes) - 1)
             index2 = random.randint(0, len(phenotype.genes) - 1)
@@ -124,12 +118,16 @@ class Population(object):
         self.bestInGen = best
         return best
 
-    # Pick random phenotype from a weighted list of phenotypes
-    # Get random number between 0 and 1
-    # Check if phenotype's normalized fitness is greater than random number
-    # If it is then return this phenotype
-    # If not then try for another phenotype (keep the same random number)
-    def find_parent(self):
+    def roulette_wheel_selection(self):
+        """
+        Roulette wheel selection
+
+        Select random number between [0, 1],
+        then return phenotype if its fitness is higher
+        or go to next phenotype
+        :rtype: Phenotype
+        :return: parent selected for crossing
+        """
         rand = random.uniform(0, 1)
         for phenotype in self.phenotypes:
             if phenotype.normalizedFitness > rand:
@@ -139,6 +137,14 @@ class Population(object):
         return self.phenotypes[0]
 
     def tournament_selection(self):
+        """
+        Tournament selection
+
+        Randomly select two phenotypes,
+        then return one with higher fitness
+        :rtype: Phenotype
+        :return: parent selected for crossing
+        """
         candidate1 = self.phenotypes[random.randint(0, len(self.phenotypes) - 1)]
         candidate2 = self.phenotypes[random.randint(0, len(self.phenotypes) - 1)]
 
@@ -152,11 +158,14 @@ class Population(object):
             candidate2.counter = candidate2.counter + 1
             return candidate2
 
-    # Create sorted (based on fitness) list of all phenotypes
-    # Generate weighted list with best phenotypes having most slots
-    # Cross with randomly chosen parents from weighted list
-    # Mutate phenotypes
     def select(self):
+        """
+        Create sorted (based on fitness) list of all phenotypes
+        Generate weighted list with best phenotypes having most slots
+        Cross with randomly chosen parents from weighted list
+        Mutate phenotypes
+        :return: None
+        """
         total_fitness = 0.0
         for phenotype in self.phenotypes:
             total_fitness += phenotype.fitness
@@ -194,8 +203,7 @@ class Population(object):
         if self.genNo % 5 == 0:
             pred_copy = Instances.predictions_arr.copy()
             specimen = {'used_models': Instances.models_index,
-                        'predictions': [0 for i in range(len(pred_copy))]}
-            # specimen = {}
+                        'predictions': [0 for _ in range(len(pred_copy))]}
             for tt, dim1 in enumerate(pred_copy):
                 specimen['predictions'][tt] = dim1.tolist()
 
@@ -203,10 +211,13 @@ class Population(object):
                 specimen[i] = phenotype.genes
             write_to_json("population_dump", specimen)
 
-    # Check whether all phenotypes are getting similar fitness
-    # i.e. max fitness is close to avg fitness
-    # If so then increase mutation ratio to eliminate similarity
     def validate(self):
+        """
+        Check whether all phenotypes are getting similar fitness
+        i.e. max fitness is close to avg fitness
+        If so then increase mutation ratio to eliminate similarity
+        :return: None
+        """
         sum_fitness = 0
         self.find_best_in_gen()
         for phenotype in self.phenotypes:

@@ -13,10 +13,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from models.Model import Model, calcScore
+from models.Model import Model
 from sklearn import exceptions
 
-from utils import print_progress
+from utils import print_progress, calcScore
 
 
 def set_pred_arr(value):
@@ -78,7 +78,6 @@ def trainClassifiers(X, y):
 
 
 def predictClassifiers(X):
-    i = 0
     for j, index in enumerate(Instances.models_index):
         try:
             print_progress(j + 1, len(Instances.models_index), "Predicting")

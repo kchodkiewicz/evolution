@@ -2,5 +2,6 @@ output_files/**/*.json
 output_files/**/*.png
 models/trained_classifiers/*.pkl
 models/vanilla_classifiers/*.pkl
-__pycache__/*
-models/__pycache__/*
+../**/.DS_Store
+**/__pycache__
+

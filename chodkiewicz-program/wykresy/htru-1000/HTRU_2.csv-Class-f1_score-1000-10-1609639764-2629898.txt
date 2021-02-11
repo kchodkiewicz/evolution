@@ -1,0 +1,48 @@
+[14, 21, 24, 34, 44, 46, 56, 57, 64, 71]
+Score: 0.973308504034761 in 39 iterations
+              precision    recall  f1-score   support
+
+       nie pulsar   &    0.98   &   0.99   &   0.99   &  0.98   &   0.99   &   0.98  \\
+           pulsar   &    0.93   &   0.77   &   0.84   &  0.90   &   0.79   &   0.84  \\
+
+		   &  &  & 0.97&  &  & 0.97\\
+
+    accuracy                           0.97      1611
+   macro avg       0.95      0.88      0.92      1611
+weighted avg       0.97      0.97      0.97      1611
+
+Separate scores: [
+K & 0.9776 & 0.9733 \\
+1 & 0.9788 & 0.9726 \\
+2 & 0.9733 & 0.9689 \\
+3 & 0.9658 & 0.9608 \\
+4 & 0.9708 & 0.9664 \\
+5 & 0.9733 & 0.9671 \\
+6 & 0.9733 & 0.9695 \\
+7 & 0.9671 & 0.9708 \\
+8 & 0.9733 & 0.9639 \\
+9 & 0.9708 & 0.9689 \\
+10 & 0.9646 & 0.9627 \\
+
+Random committee (for comparison): 0.9720670391061452
+              precision    recall  f1-score   support
+
+  0.98   &   0.99   &   0.98  \\
+  0.90   &   0.79   &   0.84  \\
+
+    accuracy                           0.97      1611
+   macro avg       0.94      0.89      0.91      1611
+weighted avg       0.97      0.97      0.97      1611
+
+
+ ------------------------------------------ 
+1 & SVC & \multicolumn{1}{p{8cm}}{\texttt{()} }\\
+2 & SGDClassifier & \multicolumn{1}{p{8cm}}{\texttt{()} }\\
+3 & SGDClassifier & \multicolumn{1}{p{8cm}}{\texttt{(penalty='elasticnet')} }\\
+4 & KNeighborsClassifier & \multicolumn{1}{p{8cm}}{\texttt{(algorithm='kd_tree')} }\\
+5 & GaussianProcessClassifier & \multicolumn{1}{p{8cm}}{\texttt{(warm_start=True, max_iter_predict=10)} }\\
+6 & GaussianProcessClassifier & \multicolumn{1}{p{8cm}}{\texttt{(n_restarts_optimizer=1, warm_start=True, max_iter_predict=10)} }\\
+7 & PassiveAggressiveClassifier & \multicolumn{1}{p{8cm}}{\texttt{(C=10)} }\\
+8 & PassiveAggressiveClassifier & \multicolumn{1}{p{8cm}}{\texttt{(C=10, loss='hinge')} }\\
+9 & QuadraticDiscriminantAnalysis & \multicolumn{1}{p{8cm}}{\texttt{()} }\\
+10 & LinearDiscriminantAnalysis & \multicolumn{1}{p{8cm}}{\texttt{(solver='lsqr')} }\\

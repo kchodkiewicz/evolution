@@ -1,0 +1,35 @@
+[1, 9, 15, 17, 26, 35, 36, 37, 42, 43, 62]
+['DecisionTreeClassifier', 'DecisionTreeClassifier', 'SVC', 'SVC', 'SGDClassifier', 'KNeighborsClassifier', 'KNeighborsClassifier', 'KNeighborsClassifier', 'KNeighborsClassifier', 'KNeighborsClassifier', 'PassiveAggressiveClassifier']
+Score: 0.8688524590163934 in 42 iterations
+
+ 
+
+              precision    recall  f1-score   support
+
+          -1       0.90      0.92      0.91        60
+           0       0.60      0.27      0.37        11
+           1       0.86      0.94      0.90        51
+
+    accuracy                           0.87       122
+   macro avg       0.79      0.71      0.73       122
+weighted avg       0.86      0.87      0.86       122
+
+Separate scores: [0.8688524590163934, 0.8688524590163934, 0.8770491803278688, 0.9098360655737705, 0.8032786885245902, 0.8278688524590164, 0.8770491803278688, 0.8524590163934426, 0.8524590163934426, 0.8688524590163934, 0.7295081967213115]
+0.8688524590163934
+              precision    recall  f1-score   support
+
+          -1       0.87      0.92      0.89        60
+           0       1.00      0.18      0.31        11
+           1       0.86      0.96      0.91        51
+
+    accuracy                           0.87       122
+   macro avg       0.91      0.69      0.70       122
+weighted avg       0.88      0.87      0.85       122
+
+
+
+
+
+
+
+
