@@ -14,9 +14,6 @@
 Committee consists of group of different classifiers. Classifiers have different accuracy in varied types of datasets, so choosing best is crucial for effective predictions. Committee in general increases accuracy compared to separate usage and decreases overfitting.
 Genetic algorithm is used for finding best committee of classifiers for specified dataset.
 
-## Screenshots
-![Example screenshot](./img/screenshot.png)
-
 ## Technologies
 * Python3
 * Scikit-learn
@@ -43,8 +40,7 @@ Genetic algorithm is used for finding best committee of classifiers for specifie
 * `-t, --test - use testing list of classifiers (assumption: first 10 are best)`
 
 ## Code Examples
-Show examples of usage:
-`put-your-code-here`
+`python3 evo.py -i dataset.csv -c Class -p 100 -s 10 -v`
 
 ## Features
 List of features ready:
@@ -56,13 +52,6 @@ List of features ready:
 
 To-do list:
 * Soft voting
-* In-app dataset editor
-
-## Status
-Project is: _in progress_
-
-## Inspiration
-Add here credits. Project inspired by..., based on...
 
 ## Contact
 Created by [kchod.98@gmail.com] - feel free to contact me!
