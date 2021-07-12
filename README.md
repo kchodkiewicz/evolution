@@ -7,6 +7,7 @@
 * [Usage](#usage)
 * [Code Examples](#code-examples)
 * [Features](#features)
+* [Code Structure](#code-structure)
 * [Contact](#contact)
 
 ## General info
@@ -20,11 +21,6 @@ Genetic algorithm is used for finding best committee of classifiers for specifie
 * Matplotlib
 * UCI Machine Learning Repository
 * Kaggle
-
-## Setup
-
-### Installation:
-
 
 ### Usage:
 
@@ -51,6 +47,15 @@ List of features ready:
 
 To-do list:
 * Soft voting
+
+## Code Structure
+
+`evo.py` -- main file
+`Phenotype.py` -- class representing specimen used in evolution
+`Population.py` -- class managing the process of evolution i.e. selection, crossing and mutation
+`plotting.py, utils.py` -- supporting functions
+`Models/Model.py` --  class providing general program configuration
+`Models/instances.py` --  list of classifiers used in the program and functions for fitting and predicting
 
 ## Contact
 Created by [kchod.98@gmail.com] - feel free to contact me!
