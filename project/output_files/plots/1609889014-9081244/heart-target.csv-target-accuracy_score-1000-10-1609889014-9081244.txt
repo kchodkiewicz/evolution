@@ -1,0 +1,35 @@
+[1, 4, 5, 7, 30, 36, 48, 51, 66, 74]
+Score: 0.8214285714285714 in 22 iterations
+              precision    recall  f1-score   support
+
+           0       0.89      0.84      0.86        19
+           1       0.70      0.78      0.74         9
+
+    accuracy                           0.82        28
+   macro avg       0.79      0.81      0.80        28
+weighted avg       0.83      0.82      0.82        28
+
+Separate scores: [0.6785714285714286, 0.6428571428571429, 0.6785714285714286, 0.7142857142857143, 0.7142857142857143, 0.7142857142857143, 0.7142857142857143, 0.6785714285714286, 0.7857142857142857, 0.75]
+Random committee (for comparison): 0.75
+              precision    recall  f1-score   support
+
+           0       0.88      0.74      0.80        19
+           1       0.58      0.78      0.67         9
+
+    accuracy                           0.75        28
+   macro avg       0.73      0.76      0.73        28
+weighted avg       0.78      0.75      0.76        28
+
+
+------------------------------------------
+Chosen classifiers:
+DecisionTreeClassifier(criterion='entropy')
+DecisionTreeClassifier(max_features='sqrt')
+DecisionTreeClassifier(max_features='log2')
+DecisionTreeClassifier(splitter='random', max_features='log2', )
+SGDClassifier(loss='log', penalty='elasticnet')
+KNeighborsClassifier(n_neighbors=10)
+GaussianProcessClassifier(max_iter_predict=10)
+GaussianProcessClassifier(n_restarts_optimizer=1, warm_start=True, max_iter_predict=10)
+PassiveAggressiveClassifier(early_stopping=True)
+QuadraticDiscriminantAnalysis(tol=1.0e-1, store_covariance=True)

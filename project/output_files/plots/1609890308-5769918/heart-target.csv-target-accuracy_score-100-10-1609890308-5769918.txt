@@ -1,0 +1,35 @@
+[6, 7, 9, 14, 15, 34, 38, 55, 63, 73]
+Score: 0.6785714285714286 in 28 iterations
+              precision    recall  f1-score   support
+
+           0       0.86      0.43      0.57        14
+           1       0.62      0.93      0.74        14
+
+    accuracy                           0.68        28
+   macro avg       0.74      0.68      0.66        28
+weighted avg       0.74      0.68      0.66        28
+
+Separate scores: [0.75, 0.6785714285714286, 0.7142857142857143, 0.8571428571428571, 0.75, 0.8571428571428571, 0.7142857142857143, 0.75, 0.7857142857142857, 0.7142857142857143]
+Random committee (for comparison): 0.7142857142857143
+              precision    recall  f1-score   support
+
+           0       0.69      0.79      0.73        14
+           1       0.75      0.64      0.69        14
+
+    accuracy                           0.71        28
+   macro avg       0.72      0.71      0.71        28
+weighted avg       0.72      0.71      0.71        28
+
+
+------------------------------------------
+Chosen classifiers:
+DecisionTreeClassifier(criterion='entropy', max_features='log2')
+DecisionTreeClassifier(splitter='random', max_features='log2', )
+DecisionTreeClassifier(splitter='random', max_features='sqrt')
+SVC()
+SVC(gamma='auto')
+KNeighborsClassifier()
+KNeighborsClassifier(algorithm='ball_tree')
+LogisticRegression(penalty='none')
+PassiveAggressiveClassifier(C=10)
+QuadraticDiscriminantAnalysis(tol=1.0e-1)
