@@ -50,12 +50,12 @@ To-do list:
 
 ## Code Structure
 
-`evo.py` -- main file
-`Phenotype.py` -- class representing specimen used in evolution
-`Population.py` -- class managing the process of evolution i.e. selection, crossing and mutation
-`plotting.py, utils.py` -- supporting functions
-`Models/Model.py` --  class providing general program configuration
-`Models/instances.py` --  list of classifiers used in the program and functions for fitting and predicting
+* `evo.py` -- main file
+* `Phenotype.py` -- class representing specimen used in evolution
+* `Population.py` -- class managing the process of evolution i.e. selection, crossing and mutation
+* `plotting.py, utils.py` -- supporting functions
+* `Models/Model.py` --  class providing general program configuration
+* `Models/instances.py` --  list of classifiers used in the program and functions for fitting and predicting
 
 ## Contact
 Created by [kchod.98@gmail.com] - feel free to contact me!
